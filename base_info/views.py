@@ -7,6 +7,7 @@ from rest_framework.decorators import api_view
 from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from big_house.models import Goods, Product, ProductDetails
+from big_house.serializers import GoodsSerializer, ProductDetailsSerializer, ProductSerializer
 from commons.exceptions import ValueIsNoneException
 
 LOG = logging.getLogger(__name__)
@@ -121,7 +122,8 @@ def query_goods(request, goods_code):
     try:
         goods = Goods.objects.get(goodsCode=code)
         LOG.debug('Query goods information is %s' % goods)
-        message = JSONRenderer().render(goods)
+        goodsSeria = GoodsSerializer(goods)
+        message = JSONRenderer().render(goodsSeria.data)
     except Exception as e:
         LOG.error('Query goods information error. [ERROR] %s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -137,14 +139,16 @@ def query_product(request, product_code):
     LOG.debug('Current received product_code is %s' % code)
 
     try:
-        product = Product.objects.get(product_code=code)
         details = ProductDetails.objects.filter(product_code=code)
 
         details_array = []
         renderer = JSONRenderer()
         for detail in details:
-            details_array.append(renderer.render(detail))
-        message = renderer.render(product)
+            detailSeria = ProductDetailsSerializer(detail)
+            details_array.append(renderer.render(detailSeria.data))
+        product = Product.objects.get(product_code=code)
+        productSeria = ProductSerializer(product)
+        message = renderer.render(productSeria.data)
         message['details'] = details_array
     except Exception as e:
         LOG.error('Query product information error. [ERROR] %s' % str(e))

@@ -1,4 +1,3 @@
-from time import timezone
 from django.db import models
 
 # Create your models here.
@@ -9,9 +8,9 @@ class Product(models.Model):
     product_code = models.CharField(db_column='PRODUCT_CODE', null=False, max_length=32, unique=True)
     product_name = models.CharField(db_column='PRODUCT_NAME', null=False, max_length=200)
     product_desc = models.CharField(db_column='PRODUCT_DESC', null=True, max_length=500)
-    create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True, default=timezone.now)
+    create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)
     creator = models.CharField(db_column='CREATOR', null=False, max_length=50)
-    update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True, default=timezone.now)
+    update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True)
     updater = models.CharField(db_column='UPDATER', null=False, max_length=50)
     yn = models.SmallIntegerField(db_column='YN', max_length=4, default=0)
 
@@ -32,13 +31,13 @@ class ProductDetails(models.Model):
 
 class Warehouse(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
-    code = models.CharField(db_column='CODE', null=False, max_length=99, unqiue=True)
-    name = models.CharField(db_column='NAME', null=False, max_length=255, unqiue=True)
+    code = models.CharField(db_column='CODE', null=False, max_length=99, unique=True)
+    name = models.CharField(db_column='NAME', null=False, max_length=255, unique=True)
     address = models.CharField(db_column='ADDRESS', null=False, max_length=255)
     type = models.SmallIntegerField(db_column='TYPE', null=False, default=1)
-    create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True, default=timezone.now)
+    create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)
     creator = models.CharField(db_column='CREATOR', null=False, max_length=50)
-    update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True, default=timezone.now)
+    update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True)
     updater = models.CharField(db_column='UPDATER', null=False, max_length=50)
     yn = models.SmallIntegerField(db_column='YN', max_length=4, default=0)
 
@@ -53,9 +52,9 @@ class StorageRecord(models.Model):
     code = models.CharField(db_column='CODE', null=False, max_length=50)
     warehouse = models.CharField(db_column='WAREHOUSE', null=False, max_length=99)
     type = models.SmallIntegerField(db_column='TYPE', null=False, default=1)
-    create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True, default=timezone.now)
+    create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)
     creator = models.CharField(db_column='CREATOR', null=False, max_length=50)
-    update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True, default=timezone.now)
+    update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True)
     updater = models.CharField(db_column='UPDATER', null=False, max_length=50)
     yn = models.SmallIntegerField(db_column='YN', max_length=4, default=0)
 
@@ -70,9 +69,9 @@ class Receipt(models.Model):
     receipt_desc = models.CharField(db_column='RECEIPT_DESC', null=True, max_length=255)
     receipt_stat = models.SmallIntegerField(db_column='RECEIPT_STAT', null=True, default=0)
     warehouse = models.CharField(db_column='WAREHOUSE', null=False, default=32)
-    create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True, default=timezone.now)
+    create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)
     creator = models.CharField(db_column='CREATOR', null=False, max_length=50)
-    update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True, default=timezone.now)
+    update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True)
     updater = models.CharField(db_column='UPDATER', null=False, max_length=50)
     yn = models.SmallIntegerField(db_column='YN', max_length=4, default=0)
 
@@ -86,9 +85,9 @@ class ReceiptDetails(models.Model):
     goods_qty = models.IntegerField(db_column='GOODS_QTY', null=False, default=1)
     code = models.CharField(db_column='CODE', null=False, max_length=50)
     status = models.SmallIntegerField(db_column='STATUS', null=False, default=0)
-    create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True, default=timezone.now)
+    create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)
     creator = models.CharField(db_column='CREATOR', null=False, max_length=50)
-    update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True, default=timezone.now)
+    update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True)
     updater = models.CharField(db_column='UPDATER', null=False, max_length=50)
 
     class Meta:
@@ -100,9 +99,9 @@ class WarehouseDetails(models.Model):
     warehouse_code = models.CharField(db_column='WAREHOUS_CODE', null=False, max_length=50)
     goods_code = models.CharField(db_column='QOODS_CODE', null=False, max_length=32)
     qty = models.IntegerField(db_column='QTY', null=False, default=0)
-    create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True, default=timezone.now)
+    create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)
     creator = models.CharField(db_column='CREATOR', null=False, max_length=50)
-    update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True, default=timezone.now)
+    update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True)
     updater = models.CharField(db_column='UPDATER', null=False, max_length=50)
 
     class Meta:
