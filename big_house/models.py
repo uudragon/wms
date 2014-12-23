@@ -19,7 +19,6 @@ class Product(models.Model):
 
 
 class ProductDetails(models.Model):
-    id = models.AutoField(db_column='ID', primary_key=True)
     product_code = models.CharField(db_column='PRODUCT_CODE', null=False, max_length=32)
     goods_code = models.CharField(db_column='GOODS_CODE', null=False, max_length=32)
     goods_qty = models.IntegerField(db_column='GOODS_QTY', null=False, default=1)
@@ -27,6 +26,7 @@ class ProductDetails(models.Model):
 
     class Meta:
         db_table = 'T_PRODUCT_DETAILS'
+        unique_together = ("product_code", "goods_code")
 
 
 class Warehouse(models.Model):
