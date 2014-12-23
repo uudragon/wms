@@ -21,9 +21,7 @@ isbn|String|N|ISBN
 barcode|String|N|条码
 product_date|datetime|Y	|生产日期
 createor|String|Y|创建人
-create_time|datetime|Y|创建时间
 updater|String|Y|修改人
-update_time|datetime|Y|修改时间，update时，永远显示当前时间
 yn|Int|Y|是否失效。默认0。0有效；1失效
 
 样例报文：
@@ -38,9 +36,7 @@ yn|Int|Y|是否失效。默认0。0有效；1失效
 	‘barcode’:’091-13131-2233141324’,
 	‘product_date’:’2014-12-22 10:00:00’,
 	‘creator’:’aa’,
-	‘create_time’:’ 2014-12-22 10:00:00’,
 	‘updater’:’aa’,
-	‘update_time’:’ 2014-12-22 10:00:00’,
 	‘yn’:1}
 ######1.4 响应报文
 成功响应：
@@ -79,9 +75,7 @@ product_name|String	|Y	|产品名称
 product_desc|String|N|产品描述
 details	|Array|	Y|产品明细，
 createor|String|Y|创建人
-create_time|datetime|Y|创建时间
 updater|String|Y|修改人
-update_time|datetime|Y|修改时间，update时，永远显示当前时间
 yn|Int|Y|是否失效。默认0。0有效；1失效
 
 
@@ -103,9 +97,7 @@ is_gift|Int|Y|是否赠品，1是；0不是。Default：0
 		‘is_gift’:0
 	}],
 	‘creator’:’aa’,
- 	‘create_time’:’ 2014-12-22 10:00:00’,
  	‘updater’:’aa’,
- 	‘update_time’:’ 2014-12-22 10:00:00’,
 	‘yn’:1}
 
 ######2.4 响应报文
