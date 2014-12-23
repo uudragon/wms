@@ -1,0 +1,5 @@
+#ignore all .pyc files
+*.pyc
+#ignore ide project files
+*.iml
+.idea/**/*
