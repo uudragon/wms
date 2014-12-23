@@ -1,5 +1,7 @@
 ####商品与产品定义接口说明
 #####1.	商品定义接口
+该结构可用于商品定义的创建与修改功能，当所传入的goods_code已经存在于数据库时，会按照传入的goods_code对已有数据进行更新；
+否则按新纪录插入到数据表中
 ######1.1 url
 	method: POST
 	wms/baseinfo/goods_define/
@@ -58,6 +60,9 @@ error| String  | 错误信息
 	{‘error’:’Attribute[‘goods_code’] can not be none.’}
 			
 #####2.	产品定义接口
+该接口用于产品定义的创建与更新。如果所传入的product_code已经在数据库中有对应记录，则按该product_code更新已有纪录；
+否则，按新纪录进行创建。
+注意：如果是update，则当前product_code关联的ProductDetails表中的商品记录会被删除，并按照新提交的数据重新插入到ProductDetails表中。
 ######2.1 url
 
 	method：POST
