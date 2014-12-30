@@ -71,7 +71,7 @@ DATABASES = None
 if ENV_PROP == 'DEV':
     DATABASES = {
         'default': {
-            'NAME': 'wms',
+            'NAME': 'WMS',
             'ENGINE': 'mysql.connector.django',
             'USER': 'wms_admin',
             'PASSWORD': 'wms_admin',
@@ -85,7 +85,7 @@ if ENV_PROP == 'DEV':
 elif ENV_PROP == 'TEST':
     DATABASES = {
         'default': {
-            'NAME': 'wms',
+            'NAME': 'WMS',
             'ENGINE': 'mysql.connector.django',
             'USER': 'wms_rw',
             'PASSWORD': 'wms_rw',
@@ -99,7 +99,7 @@ elif ENV_PROP == 'TEST':
 elif ENV_PROP == 'PROD':
     DATABASES = {
         'default': {
-            'NAME': 'wms',
+            'NAME': 'WMS',
             'ENGINE': 'mysql.connector.django',
             'USER': 'wms_rw',
             'PASSWORD': 'wms_rw',
