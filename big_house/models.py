@@ -94,18 +94,34 @@ class ReceiptDetails(models.Model):
         db_table = 'T_RECEIPT_DETAILS'
 
 
-class WarehouseDetails(models.Model):
+class WarehouseGoodsDetails(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
     warehouse_code = models.CharField(db_column='WAREHOUS_CODE', null=False, max_length=50)
     goods_code = models.CharField(db_column='QOODS_CODE', null=False, max_length=32)
     qty = models.IntegerField(db_column='QTY', null=False, default=0)
+    picking_qty = models.IntegerField(db_column='PICKING_QTY', null=False, default=0)
+    not_picking_qty = models.IntegerField(db_column='NOT_PICKING_QTY', null=False, default=0)
     create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)
     creator = models.CharField(db_column='CREATOR', null=False, max_length=50)
     update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True)
     updater = models.CharField(db_column='UPDATER', null=False, max_length=50)
 
     class Meta:
-        db_table = 'T_WAREHOUSE_DETAILS'
+        db_table = 'T_W_GOODS_DETAILS'
+
+
+class WarehoseProductDetails(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)
+    warehouse_code = models.CharField(db_column='WAREHOUS_CODE', null=False, max_length=50)
+    product_code = models.CharField(db_column='PRODUCT_CODE', null=False, max_length=50)
+    effective_qty = models.IntegerField(db_column='EFFECTIVE_QTY', null=False, default=0)
+    create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)
+    creator = models.CharField(db_column='CREATOR', null=False, max_length=50)
+    update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True)
+    updater = models.CharField(db_column='UPDATER', null=False, max_length=50)
+
+    class Meta:
+        db_table = 'T_W_PRODUCT_DETAILS'
 
 
 class Goods(models.Model):
