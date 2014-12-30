@@ -10,7 +10,7 @@ urlpatterns = patterns('',
 
     url(r'^admin/', include(admin.site.urls)),
     url(r'^wms/baseinfo/', include('base_info.urls')),
-    url(r'^wms/inbound', include('inbound.urls')),
-    url(r'^wms/outbound', include('outbound.urls')),
-    url(r'^wms/inner', include('inner.urls')),
+    url(r'^wms/inbound/', include('inbound.urls')),
+    url(r'^wms/outbound/', include('outbound.urls')),
+    url(r'^wms/inner/', include('inner.urls')),
 )
