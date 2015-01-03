@@ -107,7 +107,7 @@ def define_product(request):
                         date={'error': 'Attribute[\'details\'] must be a non-empty array.'})
 
     try:
-        querycount = Product.objects.filter(product_code=product_code)
+        querycount = Product.objects.filter(product_code=product_code).count()
         if querycount != 0:
             ProductDetails.objects.filter(product_code=product_code).delete()
             product = Product.objects.get(product_code=product_code)
@@ -161,7 +161,7 @@ def query_goods(request, goods_code):
         goods = Goods.objects.get(goodsCode=code)
         LOG.debug('Query goods information is %s' % goods)
         goodsSeria = GoodsSerializer(goods)
-        message = JSONRenderer().render(goodsSeria.data)
+        message = goodsSeria.data
     except Exception as e:
         LOG.error('Query goods information error. [ERROR] %s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -180,13 +180,12 @@ def query_product(request, product_code):
         details = ProductDetails.objects.filter(product_code=code)
 
         details_array = []
-        renderer = JSONRenderer()
         for detail in details:
             detailSeria = ProductDetailsSerializer(detail)
-            details_array.append(renderer.render(detailSeria.data))
+            details_array.append(detailSeria.data)
         product = Product.objects.get(product_code=code)
         productSeria = ProductSerializer(product)
-        message = renderer.render(productSeria.data)
+        message = productSeria.data
         message['details'] = details_array
     except Exception as e:
         LOG.error('Query product information error. [ERROR] %s' % str(e))
@@ -224,17 +223,17 @@ def query_goods_list(request):
         cur_page = paginator.page(pageNo)
         page_records = cur_page.object_list
         resp_array = []
-        renderer = JSONRenderer()
         for item in page_records:
             goods_seria = GoodsSerializer(item)
-            goods_json = renderer.render(goods_seria.data)
-            resp_array.append(goods_json)
+            #goods_json = renderer.render(goods_seria.data)
+            resp_array.append(goods_seria.data)
         resp_message['records'] = resp_array
         resp_message['recordsCount'] = paginator.count
         resp_message['pageSize'] = pageSize
         resp_message['pageNumber'] = total_page_count
         resp_message['pageNo'] = pageNo
         LOG.info('Current response message is %s' % resp_message)
+        #resp_data = renderer.render(resp_message)
     except Exception as e:
         LOG.error('Query goods information error. [ERROR] %s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -271,11 +270,9 @@ def query_product_list(request):
         cur_page = paginator.page(pageNo)
         page_records = cur_page.object_list
         resp_array = []
-        renderer = JSONRenderer()
         for item in page_records:
             product_seria = ProductSerializer(item)
-            product_json = renderer.render(product_seria.data)
-            resp_array.append(product_json)
+            resp_array.append(product_seria.data)
         resp_message['records'] = resp_array
         resp_message['recordsCount'] = paginator.count
         resp_message['pageSize'] = pageSize
