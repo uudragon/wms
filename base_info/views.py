@@ -1,8 +1,10 @@
 from datetime import datetime
 import logging
+from django.core.paginator import Paginator
 from django.db import transaction
 
 # Create your views here.
+import math
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.renderers import JSONRenderer
@@ -10,6 +12,7 @@ from rest_framework.response import Response
 from big_house.models import Goods, Product, ProductDetails
 from big_house.serializers import GoodsSerializer, ProductDetailsSerializer, ProductSerializer
 from commons.exceptions import ValueIsNoneException
+from uudragon_wms.local.settings import DEFAULT_PAGE_SIZE
 
 LOG = logging.getLogger(__name__)
 
@@ -199,21 +202,44 @@ def query_goods_list(request):
 
     LOG.debug('Current received message is %s' % message)
     
+    pageSize = message.pop('pageSize')
+    if pageSize is None or pageSize == 0:
+        pageSize = DEFAULT_PAGE_SIZE
+    pageNo = message.pop('pageNo')
+    if pageNo is None or pageNo == 0:
+        pageNo = 1
+    
+    resp_message = dict()
     try:
         for key in message.iterkeys():
             key += '__contains'
-        LOG.debug('Condition of query is %s' % message)
-        query_rst = Goods.objects.filter(**message)
+            LOG.debug('Condition of query is %s' % message)
+        query_list = Goods.objects.filter(**message)
+        paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
+        total_page_count = paginator.num_pages
+        if pageNo > total_page_count:
+            pageNo = total_page_count
+        elif pageNo < 1:
+            pageNo = 1
+        cur_page = paginator.page(pageNo)
+        page_records = cur_page.object_list
         resp_array = []
-        for item in query_rst:
+        renderer = JSONRenderer()
+        for item in page_records:
             goods_seria = GoodsSerializer(item)
-            resp_array.append(goods_seria)
+            goods_json = renderer.render(goods_seria.data)
+            resp_array.append(goods_json)
+        resp_message['records'] = resp_array
+        resp_message['recordsCount'] = paginator.count
+        resp_message['pageSize'] = pageSize
+        resp_message['pageNumber'] = total_page_count
+        resp_message['pageNo'] = pageNo
     except Exception as e:
         LOG.error('Query goods information error. [ERROR] %s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query goods information error'},
                         content_type='application/json;charset-utf-8')
-    return Response(status=status.HTTP_200_OK, data=resp_array, content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset-utf-8')
 
 
 @api_view(['POST'])
@@ -222,18 +248,41 @@ def query_product_list(request):
 
     LOG.debug('Current received message is %s' % message)
 
+    pageSize = message.pop('pageSize')
+    if pageSize is None or pageSize == 0:
+        pageSize = DEFAULT_PAGE_SIZE
+    pageNo = message.pop('pageNo')
+    if pageNo is None or pageNo == 0:
+        pageNo = 1
+
+    resp_message = dict()
     try:
         for key in message.iterkeys():
             key += '__contains'
-        LOG.debug('Condition of query is %s' % message)
-        query_rst = Product.objects.filter(**message)
+            LOG.debug('Condition of query is %s' % message)
+        query_list = Product.objects.filter(**message)
+        paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
+        total_page_count = paginator.num_pages
+        if pageNo > total_page_count:
+            pageNo = total_page_count
+        elif pageNo < 1:
+            pageNo = 1
+        cur_page = paginator.page(pageNo)
+        page_records = cur_page.object_list
         resp_array = []
-        for item in query_rst:
+        renderer = JSONRenderer()
+        for item in page_records:
             product_seria = ProductSerializer(item)
-            resp_array.append(product_seria)
+            product_json = renderer.render(product_seria.data)
+            resp_array.append(product_json)
+        resp_message['records'] = resp_array
+        resp_message['recordsCount'] = paginator.count
+        resp_message['pageSize'] = pageSize
+        resp_message['pageNumber'] = total_page_count
+        resp_message['pageNo'] = pageNo
     except Exception as e:
         LOG.error('Query product information error. [ERROR] %s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query product information error'},
                         content_type='application/json;charset-utf-8')
-    return Response(status=status.HTTP_200_OK, data=resp_array, content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset-utf-8')
