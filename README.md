@@ -260,6 +260,8 @@ goods_name | String  | O(可选) | 商品名称
 goods_code | String  | O(可选) | 商品编码
 goods_type|	int|O(可选)|商品类型
 yn|Int|O(可选)|是否失效。默认1。1有效；0失效
+pageSize|Int|Y|每页显示记录数，默认8
+pageNo|Int|Y|当前页号，默认1
 
 样例报文：
 
@@ -274,9 +276,13 @@ yn|Int|O(可选)|是否失效。默认1。1有效；0失效
 
 名称|类型|是否必填|说明
 --|--|--|--
-无|array|N|商品信息列表
+pageSize|Int|Y|每页显示记录数
+pageNo|Int|Y|当前页号
+recordsCount|Int|Y|总记录数
+pageNumber|Int|Y|总页数
+records|Array|N|当前页记录
 
-<商品信息>
+<Records-Item>
 
 名称 | 类型 | 是否必填 | 说明
 ------------ | ------------- | ------------ | --------------
@@ -306,6 +312,76 @@ yn|Int|Y|是否失效。默认1。1有效；0失效
 	‘isbn’:’aaa-aaa-aaaa-aaaa’,
 	‘barcode’:’091-13131-2233141324’,
 	‘product_date’:’2014-12-22 10:00:00’,
+	‘creator’:’aa’,
+	‘create_time’:’ 2014-12-22 10:00:00’,
+	‘updater’:’aa’,
+	‘update_time’:’ 2014-12-22 10:00:00’,
+	‘yn’:1},...]
+
+异常响应：
+	a.HTTP_STATUS_CODE:500 Server Error
+异常报文：
+
+名称 | 类型 | 说明
+------------ | ------------- | ------------
+error| String  | 错误信息
+
+样例报文：
+{‘error’:’Query goods [${goods_code}]  information error.’}
+
+#####6.	商品批量查询接口
+######6.1 url
+	method：POST
+	wms/baseinfo/query_product_list/
+	注意：结尾的’/’不能省略
+######6.2 header
+	Content_Type:application/json;charset=utf-8
+	Accept:application/json
+######6.3 请求参数
+名称 | 类型 | 是否必填 | 说明
+------------ | ------------- | ------------ | --------------
+product_name | String  | O(可选) | 产品名称
+product_code | String  | O(可选) | 产品编码
+yn|Int|O(可选)|是否失效。默认1。1有效；0失效
+pageSize|Int|Y|每页显示记录数，默认8
+pageNo|Int|Y|当前页号，默认1
+
+样例报文：
+
+	{‘product_code’:’book000001’,
+	’product_name’:’书1’,
+	'pageSize':8,
+	'pageNo':1,
+	‘yn’:1}
+######6.4 响应报文
+成功响应：
+
+	HTTP_STATUS_CODE:200
+
+名称|类型|是否必填|说明
+--|--|--|--
+pageSize|Int|Y|每页显示记录数
+pageNo|Int|Y|当前页号
+recordsCount|Int|Y|总记录数
+pageNumber|Int|Y|总页数
+records|Array|N|当前页记录
+
+<Records-Item>
+
+名称 | 类型 | 是否必填 | 说明
+------------ | ------------- | ------------ | --------------
+product_name | String  | Y | 产品名称
+product_code | String  | Y | 产品编码
+creator|String|Y|创建人
+create_time|datetime|Y|创建时间
+updater|String|Y|修改人
+update_time|datetime|Y|修改时间，update时，永远显示当前时间
+yn|Int|Y|是否失效。默认1。1有效；0失效
+
+样例报文：
+
+	[{‘product_code’:’book000001’,
+	’product_name’:’书1’,
 	‘creator’:’aa’,
 	‘create_time’:’ 2014-12-22 10:00:00’,
 	‘updater’:’aa’,
