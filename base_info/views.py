@@ -191,3 +191,49 @@ def query_product(request, product_code):
                         data={'error': 'Query product [%s] information error' % code},
                         content_type='application/json;charset-utf-8')
     return Response(status=status.HTTP_200_OK, data=message, content_type='application/json;charset-utf-8')
+
+
+@api_view(['POST'])
+def query_goods_list(request):
+    message = request.DATA
+
+    LOG.debug('Current received message is %s' % message)
+    
+    try:
+        for key in message.iterkeys():
+            key += '__contains'
+        LOG.debug('Condition of query is %s' % message)
+        query_rst = Goods.objects.filter(**message)
+        resp_array = []
+        for item in query_rst:
+            goods_seria = GoodsSerializer(item)
+            resp_array.append(goods_seria)
+    except Exception as e:
+        LOG.error('Query goods information error. [ERROR] %s' % str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={'error': 'Query goods information error'},
+                        content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_array, content_type='application/json;charset-utf-8')
+
+
+@api_view(['POST'])
+def query_product_list(request):
+    message = request.DATA
+
+    LOG.debug('Current received message is %s' % message)
+
+    try:
+        for key in message.iterkeys():
+            key += '__contains'
+        LOG.debug('Condition of query is %s' % message)
+        query_rst = Product.objects.filter(**message)
+        resp_array = []
+        for item in query_rst:
+            product_seria = ProductSerializer(item)
+            resp_array.append(product_seria)
+    except Exception as e:
+        LOG.error('Query product information error. [ERROR] %s' % str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={'error': 'Query product information error'},
+                        content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_array, content_type='application/json;charset-utf-8')

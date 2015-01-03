@@ -9,4 +9,6 @@ urlpatterns = patterns(
     url(r'^product_define/$', 'define_product'),
     url(r'^query_goods/(.+)/$', 'query_goods'),
     url(r'^query_product/(.+)/$', 'query_product'),
+    url(r'^query_goods_list/$', 'query_goods_list'),
+    url(r'^query_product_list/$', 'query_product_list'),
 )
