@@ -234,6 +234,7 @@ def query_goods_list(request):
         resp_message['pageSize'] = pageSize
         resp_message['pageNumber'] = total_page_count
         resp_message['pageNo'] = pageNo
+        LOG.info('Current response message is %s' % resp_message)
     except Exception as e:
         LOG.error('Query goods information error. [ERROR] %s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
