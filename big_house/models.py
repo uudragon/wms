@@ -19,14 +19,15 @@ class Product(models.Model):
 
 
 class ProductDetails(models.Model):
+    id = models.CharField(db_column='id', primary_key=True, max_length=72)
     product_code = models.CharField(db_column='PRODUCT_CODE', null=False, max_length=32)
     goods_code = models.CharField(db_column='GOODS_CODE', null=False, max_length=32)
-    goods_qty = models.IntegerField(db_column='GOODS_QTY', null=False, default=1)
+    goods_name = models.CharField(db_column='GOODS_NAME', max_length=200, null=False)
+    qty = models.IntegerField(db_column='GOODS_QTY', null=False, default=1)
     is_gift = models.SmallIntegerField(db_column='IS_GIFT', null=False, default=0)
 
     class Meta:
         db_table = 'T_PRODUCT_DETAILS'
-        unique_together = ("product_code", "goods_code")
 
 
 class Warehouse(models.Model):

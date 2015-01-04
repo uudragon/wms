@@ -106,7 +106,7 @@ def define_product(request):
 
     try:
         querycount = Product.objects.filter(product_code=product_code).count()
-        if querycount != 0:
+        if querycount > 0:
             ProductDetails.objects.filter(product_code=product_code).delete()
             product = Product.objects.get(product_code=product_code)
             product.product_name = message.get('product_name')
@@ -132,9 +132,11 @@ def define_product(request):
             if detail.get('goods_code') is None:
                 raise ValueIsNoneException('The goods code can not be none.')
             product_detail = ProductDetails(
+                id='%s%s' % (product_code, detail.get('goods_code')),
                 goods_code=detail.get('goods_code'),
                 product_code=product_code,
-                goods_qty=detail.get('qty'),
+                goods_name=detail.get('goods_name'),
+                qty=detail.get('qty'),
                 is_gift=detail.get('is_gift'),
             )
             product_detail.save()
