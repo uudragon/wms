@@ -1,4 +1,14 @@
 ####商品与产品定义接口说明
+------
+##### 索引
+
+- [商品定义接口](#11-url)
+- [产品定义接口](https://github.com/uudragon/wms/blob/master/README.md#21-url)
+- [商品查询接口](https://github.com/uudragon/wms/blob/master/README.md#31-url)
+- [产品查询接口](https://github.com/uudragon/wms/blob/master/README.md#41-url)
+- [商品批量查询接口](https://github.com/uudragon/wms/blob/master/README.md#51-url)
+- [产品批量查询接口](https://github.com/uudragon/wms/blob/master/README.md#61-url)
+
 #####1.	商品定义接口
 该结构可用于商品定义的创建与修改功能，当所传入的goods_code已经存在于数据库时，会按照传入的goods_code对已有数据进行更新；
 否则按新纪录插入到数据表中
@@ -329,7 +339,7 @@ error| String  | 错误信息
 样例报文：
 {‘error’:’Query goods [${goods_code}]  information error.’}
 
-#####6.	商品批量查询接口
+#####6.	产品批量查询接口
 ######6.1 url
 	method：POST
 	wms/baseinfo/query_product_list/
