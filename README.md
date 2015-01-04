@@ -1,4 +1,14 @@
 ####商品与产品定义接口说明
+
+##### Index
+
+- [商品定义接口](https://github.com/uudragon/wms/blob/master/README.md#1-%E5%95%86%E5%93%81%E5%AE%9A%E4%B9%89%E6%8E%A5%E5%8F%A3)
+- [产品定义接口](https://github.com/uudragon/wms/blob/master/README.md#2-%E4%BA%A7%E5%93%81%E5%AE%9A%E4%B9%89%E6%8E%A5%E5%8F%A3)
+- [商品查询接口](https://github.com/uudragon/wms/blob/master/README.md#3-%E5%95%86%E5%93%81%E6%9F%A5%E8%AF%A2%E6%8E%A5%E5%8F%A3)
+- [产品查询接口](https://github.com/uudragon/wms/blob/master/README.md#4-%E4%BA%A7%E5%93%81%E6%9F%A5%E8%AF%A2%E6%8E%A5%E5%8F%A3)
+- [商品批量查询接口](https://github.com/uudragon/wms/blob/master/README.md#5-%E5%95%86%E5%93%81%E6%89%B9%E9%87%8F%E6%9F%A5%E8%AF%A2%E6%8E%A5%E5%8F%A3)
+- [产品批量查询接口](https://github.com/uudragon/wms/blob/master/README.md#6-%E5%95%86%E5%93%81%E6%89%B9%E9%87%8F%E6%9F%A5%E8%AF%A2%E6%8E%A5%E5%8F%A3)
+
 #####1.	商品定义接口
 该结构可用于商品定义的创建与修改功能，当所传入的goods_code已经存在于数据库时，会按照传入的goods_code对已有数据进行更新；
 否则按新纪录插入到数据表中
@@ -329,7 +339,7 @@ error| String  | 错误信息
 样例报文：
 {‘error’:’Query goods [${goods_code}]  information error.’}
 
-#####6.	商品批量查询接口
+#####6.	产品批量查询接口
 ######6.1 url
 	method：POST
 	wms/baseinfo/query_product_list/
