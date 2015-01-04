@@ -68,17 +68,17 @@ def define_goods(request):
             )
         else:
             goods = Goods.objects.get(goods_code=message.get('goods_code'))
-            goods.goods_type = message.get('goods_type'),
-            goods.goods_name = message.get('goods_name'),
-            goods.goods_price = message.get('goods_price'),
-            goods.goods_unit = message.get('goods_unit'),
-            goods.barcode = message.get('barcode'),
-            goods.isbn = message.get('isbn'),
-            goods.product_date = message.get('product_date'),
-            goods.yn = message.get('yn'),
-            goods.update_time = datetime.now(),
-            goods.updater = message.get('updater'),
-            goods.goods_desc = message.get('goods_desc'),
+            goods.goods_type = message.get('goods_type')
+            goods.goods_name = message.get('goods_name')
+            goods.goods_price = message.get('goods_price')
+            goods.goods_unit = message.get('goods_unit')
+            goods.barcode = message.get('barcode')
+            goods.isbn = message.get('isbn')
+            goods.product_date = message.get('product_date')
+            goods.yn = message.get('yn')
+            goods.update_time = datetime.now()
+            goods.updater = message.get('updater')
+            goods.goods_desc = message.get('goods_desc')
         goods.save()
     except Exception as e:
         LOG.error('Goods Information saved error.\n [ERROR]:%s' % str(e))
