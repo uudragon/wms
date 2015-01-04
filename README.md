@@ -6,8 +6,9 @@
 - [产品定义接口](https://github.com/uudragon/wms/blob/master/README.md#2-产品定义接口)
 - [商品查询接口](https://github.com/uudragon/wms/blob/master/README.md#3-商品查询接口)
 - [产品查询接口](https://github.com/uudragon/wms/blob/master/README.md#4-产品查询接口)
-- [商品批量查询接口](https://github.com/uudragon/wms/blob/master/README.md#5-商品批量查询接口)
-- <a href="https://github.com/uudragon/wms/blob/master/README.md#6-产品批量查询接口">产品批量查询接口</a>
+
+[商品批量查询接口](https://github.com/uudragon/wms/blob/master/README.md#5-商品批量查询接口)
+<a href="https://github.com/uudragon/wms/blob/master/README.md#6-产品批量查询接口">产品批量查询接口</a>
 
 
 #####1.	商品定义接口
