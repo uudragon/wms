@@ -41,7 +41,7 @@ def define_goods(request):
                         date={'error': 'Attribute[\'updater\'] can not be none.'})
 
     try:
-        queryCount = Goods.objects.filter(goodsCode=message.get('goods_code')).count()
+        queryCount = Goods.objects.filter(goods_code=message.get('goods_code')).count()
         if queryCount == 0:
             """
                 if query result is none
@@ -51,34 +51,34 @@ def define_goods(request):
             """
             nowTime = datetime.now()
             goods = Goods(
-                goodsCode=message.get('goods_code'),
-                goodsType=message.get('goods_type'),
-                goodsName=message.get('goods_name'),
-                goodsPrice=message.get('goods_price'),
-                goodsUnit=message.get('goods_unit'),
+                goods_code=message.get('goods_code'),
+                goods_type=message.get('goods_type'),
+                goods_name=message.get('goods_name'),
+                goods_price=message.get('goods_price'),
+                goods_unit=message.get('goods_unit'),
                 barcode=message.get('barcode'),
                 isbn=message.get('isbn'),
-                productDate=message.get('product_date'),
+                product_date=message.get('product_date'),
                 yn=message.get('yn'),
-                createTime=nowTime,
-                updateTime=nowTime,
+                create_time=nowTime,
+                update_time=nowTime,
                 creator=message.get('creator'),
                 updater=message.get('updater'),
-                goodsDesc=message.get('goods_desc'),
+                goods_desc=message.get('goods_desc'),
             )
         else:
-            goods = Goods.objects.get(goodsCode=message.get('goods_code'))
-            goods.goodsType = message.get('goods_type'),
-            goods.goodsName = message.get('goods_name'),
-            goods.goodsPrice = message.get('goods_price'),
-            goods.goodsUnit = message.get('goods_unit'),
+            goods = Goods.objects.get(goods_code=message.get('goods_code'))
+            goods.goods_type = message.get('goods_type'),
+            goods.goods_name = message.get('goods_name'),
+            goods.goods_price = message.get('goods_price'),
+            goods.goods_unit = message.get('goods_unit'),
             goods.barcode = message.get('barcode'),
             goods.isbn = message.get('isbn'),
-            goods.productDate = message.get('product_date'),
+            goods.product_date = message.get('product_date'),
             goods.yn = message.get('yn'),
-            goods.updateTime = datetime.now(),
+            goods.update_time = datetime.now(),
             goods.updater = message.get('updater'),
-            goods.goodsDesc = message.get('goods_desc'),
+            goods.goods_desc = message.get('goods_desc'),
         goods.save()
     except Exception as e:
         LOG.error('Goods Information saved error.\n [ERROR]:%s' % str(e))
@@ -158,7 +158,7 @@ def query_goods(request, goods_code):
     LOG.debug('Current received goods_code is %s' % code)
 
     try:
-        goods = Goods.objects.get(goodsCode=code)
+        goods = Goods.objects.get(goods_code=code)
         LOG.debug('Query goods information is %s' % goods)
         goodsSeria = GoodsSerializer(goods)
         message = goodsSeria.data
@@ -225,8 +225,8 @@ def query_goods_list(request):
         resp_array = []
         for item in page_records:
             goods_seria = GoodsSerializer(item)
-            #goods_json = renderer.render(goods_seria.data)
-            resp_array.append(goods_seria.data)
+            seria_data = goods_seria.data
+            resp_array.append(seria_data)
         resp_message['records'] = resp_array
         resp_message['recordsCount'] = paginator.count
         resp_message['pageSize'] = pageSize
@@ -272,7 +272,8 @@ def query_product_list(request):
         resp_array = []
         for item in page_records:
             product_seria = ProductSerializer(item)
-            resp_array.append(product_seria.data)
+            seria_data = product_seria.data
+            resp_array.append(seria_data)
         resp_message['records'] = resp_array
         resp_message['recordsCount'] = paginator.count
         resp_message['pageSize'] = pageSize
