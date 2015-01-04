@@ -4,10 +4,8 @@ from django.core.paginator import Paginator
 from django.db import transaction
 
 # Create your views here.
-import math
 from rest_framework import status
 from rest_framework.decorators import api_view
-from rest_framework.renderers import JSONRenderer
 from rest_framework.response import Response
 from big_house.models import Goods, Product, ProductDetails
 from big_house.serializers import GoodsSerializer, ProductDetailsSerializer, ProductSerializer
@@ -111,12 +109,12 @@ def define_product(request):
         if querycount != 0:
             ProductDetails.objects.filter(product_code=product_code).delete()
             product = Product.objects.get(product_code=product_code)
-            product.product_name = message.get('product_name'),
-            product.product_code = message.get('product_code'),
-            product.product_desc = message.get('product_desc'),
-            product.updater = message.get('updater'),
-            product.update_time = datetime.now(),
-            product.yn = message.get('yn'),
+            product.product_name = message.get('product_name')
+            product.product_code = message.get('product_code')
+            product.product_desc = message.get('product_desc')
+            product.updater = message.get('updater')
+            product.update_time = datetime.now()
+            product.yn = message.get('yn')
         else:
             nowTime = datetime.now()
             product = Product(
