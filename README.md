@@ -3,7 +3,7 @@
 ##### 索引
 
 - [商品定义接口](#11-url)
-- [产品定义接口](https://github.com/uudragon/wms/blob/master/README.md#21-url)
+- [产品定义接口](#2-产品定义接口)
 - [商品查询接口](https://github.com/uudragon/wms/blob/master/README.md#31-url)
 - [产品查询接口](https://github.com/uudragon/wms/blob/master/README.md#41-url)
 - [商品批量查询接口](https://github.com/uudragon/wms/blob/master/README.md#51-url)
