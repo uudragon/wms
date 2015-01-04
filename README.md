@@ -3,11 +3,11 @@
 ##### 索引
 
 - [商品定义接口](#11-url)
-- [产品定义接口](#2-产品定义接口)
-- [商品查询接口](https://github.com/uudragon/wms/blob/master/README.md#31-url)
-- [产品查询接口](https://github.com/uudragon/wms/blob/master/README.md#41-url)
-- [商品批量查询接口](https://github.com/uudragon/wms/blob/master/README.md#51-url)
-- [产品批量查询接口](https://github.com/uudragon/wms/blob/master/README.md#61-url)
+- [产品定义接口](#21-url)
+- [商品查询接口](#31-url)
+- [产品查询接口](#41-url)
+- [商品批量查询接口](#51-url)
+- [产品批量查询接口](#61-url)
 
 #####1.	商品定义接口
 该结构可用于商品定义的创建与修改功能，当所传入的goods_code已经存在于数据库时，会按照传入的goods_code对已有数据进行更新；
