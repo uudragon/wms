@@ -1,5 +1,5 @@
 ####商品与产品定义接口说明
-
+------
 ##### 索引
 
 - [商品定义接口](https://github.com/uudragon/wms/blob/master/README.md#11-url)
