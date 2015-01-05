@@ -165,7 +165,7 @@ def putin(request):
             updater=message.get('updater'),
             update_time=now_time,
         ).save()
-        warehouse_goods = WarehouseGoodsDetails.object.get(warehouse=warehouse, goods_code)
+        warehouse_goods = WarehouseGoodsDetails.object.get(warehouse=warehouse, goods_code=goods_code)
         if warehouse_goods is not None:
             warehouse_goods.qty += current_qty
             warehouse_goods.updater=message.get('updater')

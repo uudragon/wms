@@ -111,7 +111,7 @@ class WarehouseGoodsDetails(models.Model):
         db_table = 'T_W_GOODS_DETAILS'
 
 
-class WarehoseProductDetails(models.Model):
+class WarehouseProductDetails(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
     warehouse = models.CharField(db_column='WAREHOUSE', null=False, max_length=50)
     product_code = models.CharField(db_column='PRODUCT_CODE', null=False, max_length=50)
