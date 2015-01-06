@@ -661,6 +661,7 @@ error| String  | 错误信息
 名称 | 类型 | 是否必填 | 说明
 ------------ | ------------- | ------------ | --------------
 receipt_code | String  | Y | 入库单编号名称
+receipt_date|String|Y|入库单时间
 receipt_desc|	int|Y|入库单描述
 warehouse|String|Y	|库房编号
 status|int|Y|入库单状态。-1：撤销；0：未入库；1：部分入库；2：入库完成
@@ -688,6 +689,7 @@ update_time|datetime|Y|更新时间
 样例报文：
 
 	{'receipt_code':'receipt0001',
+		'receipt_date':'2015-01-06T00:00:00',
 		'receipt_desc':'入库单1',
 		'warehouse':1,
 		'status':2,

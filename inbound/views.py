@@ -10,7 +10,7 @@ from big_house.models import Receipt, ReceiptDetails, StorageRecord, WarehouseGo
 from big_house.serializers import ReceiptSerializer, ReceiptDetailsSerializer
 from commons.exceptions import ValueIsNoneException
 from uudragon_wms.local.settings import INBOUND_RECEIPT_STATUS_NONE, INBOUND_RECEIPT_DETAIL_STATUS_NONE, \
-    INBOUND_RECEIPT_STATUS_CANCEL, YN_NO, INBOUND_RECEIPT_DETAIL_STATUS_CANCEL, \
+    INBOUND_RECEIPT_STATUS_CANCEL, INBOUND_RECEIPT_DETAIL_STATUS_CANCEL, \
     INBOUND_RECEIPT_DETAIL_STATUS_COMPLETED, INBOUND_RECEIPT_DETAIL_STATUS_PRE_STORAGE, STORAGE_RECORD_TYPE_RECEIPT, \
     INBOUND_RECEIPT_STATUS_COMPLETED, INBOUND_RECEIPT_STATUS_UNCOMPLETED, DEFAULT_PAGE_SIZE, YN_YES
 
@@ -46,8 +46,7 @@ def create_receipt(request):
             creator=message.get('creator'),
             create_time=now_time,
             updater=message.get('updater'),
-            update_time=now_time,
-            yn=YN_YES
+            update_time=now_time
         )
         receipt.save()
         for detail in details:
@@ -57,7 +56,7 @@ def create_receipt(request):
                 id='%s%s' % (code, detail.get('goods_code')),
                 goods_code=detail.get('goods_code'),
                 receipt_code=code,
-                qty=message.get('qty'),
+                qty=detail.get('qty'),
                 actual_qty=0,
                 status=INBOUND_RECEIPT_DETAIL_STATUS_NONE,
                 creator=message.get('creator'),
@@ -87,7 +86,6 @@ def cancel_receipt(request, receipt_code):
         receipt = Receipt.objects.get(code=code)
         if receipt is not None:
             receipt.status = INBOUND_RECEIPT_STATUS_CANCEL
-            receipt.yn = YN_NO
             details = ReceiptDetails.filter(code=code)
             for detail in details:
                 detail.status = INBOUND_RECEIPT_DETAIL_STATUS_CANCEL
