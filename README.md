@@ -447,7 +447,6 @@ updater|String|Y|修改人
 -|-|-|-
 goods_code|String|Y|商品编码
 qty|int|Y|商品数量，预入库数量
-actual_qty|int|Y|当前实际数量，入库数量
 
 
 样例报文：
@@ -457,8 +456,7 @@ actual_qty|int|Y|当前实际数量，入库数量
 	‘warehouse’:'1',
 	'details':[
 		{'goods_code':'goods001',
-		'qty':100,
-		'actual_qty':50}
+		'qty':100}
 	]
 	‘creator’:’aa’,
 	‘updater’:’aa’}
