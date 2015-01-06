@@ -89,7 +89,9 @@ def cancel_receipt(request, receipt_code):
             details = ReceiptDetails.objects.filter(receipt_code=code)
             for detail in details:
                 detail.status = INBOUND_RECEIPT_DETAIL_STATUS_CANCEL
-        transaction.commit()
+                detail.save()
+            receipt.save()
+            transaction.commit()
     except Exception as e:
         LOG.error('Receipt Information cancel error.\n [ERROR]:%s' % str(e))
         transaction.rollback()
