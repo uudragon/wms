@@ -83,10 +83,10 @@ def cancel_receipt(request, receipt_code):
     LOG.debug('Current method is %s, received goods_code is %s' % (__name__, code))
     
     try:
-        receipt = Receipt.objects.get(code=code)
+        receipt = Receipt.objects.get(receipt_code=code)
         if receipt is not None:
             receipt.status = INBOUND_RECEIPT_STATUS_CANCEL
-            details = ReceiptDetails.filter(code=code)
+            details = ReceiptDetails.objects.filter(receipt_code=code)
             for detail in details:
                 detail.status = INBOUND_RECEIPT_DETAIL_STATUS_CANCEL
         transaction.commit()
