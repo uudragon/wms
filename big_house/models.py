@@ -67,7 +67,7 @@ class Receipt(models.Model):
     receipt_code = models.CharField(db_column='CODE', null=False, max_length=50, unique=True)
     receipt_date = models.DateTimeField(db_column='RECEIPT_DATE', null=False)
     receipt_desc = models.CharField(db_column='RECEIPT_DESC', null=True, max_length=255)
-    receipt_stat = models.SmallIntegerField(db_column='RECEIPT_STAT', null=True, default=0)
+    status = models.SmallIntegerField(db_column='STATUS', null=True, default=0)
     warehouse = models.CharField(db_column='WAREHOUSE', null=False, max_length=32)
     create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)
     creator = models.CharField(db_column='CREATOR', null=False, max_length=50)

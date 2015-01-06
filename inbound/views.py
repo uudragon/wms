@@ -12,7 +12,7 @@ from commons.exceptions import ValueIsNoneException
 from uudragon_wms.local.settings import INBOUND_RECEIPT_STATUS_NONE, INBOUND_RECEIPT_DETAIL_STATUS_NONE, \
     INBOUND_RECEIPT_STATUS_CANCEL, YN_NO, INBOUND_RECEIPT_DETAIL_STATUS_CANCEL, \
     INBOUND_RECEIPT_DETAIL_STATUS_COMPLETED, INBOUND_RECEIPT_DETAIL_STATUS_PRE_STORAGE, STORAGE_RECORD_TYPE_RECEIPT, \
-    INBOUND_RECEIPT_STATUS_COMPLETED, INBOUND_RECEIPT_STATUS_UNCOMPLETED, DEFAULT_PAGE_SIZE
+    INBOUND_RECEIPT_STATUS_COMPLETED, INBOUND_RECEIPT_STATUS_UNCOMPLETED, DEFAULT_PAGE_SIZE, YN_YES
 
 LOG = logging.getLogger(__name__)
 
@@ -40,20 +40,19 @@ def create_receipt(request):
                         content_type='application/json;charset-utf-8',
                         date={'error': 'Attribute[\'details\'] must be a non-empty array.'})
 
-    nowTime = datetime.now()
+    now_time = datetime.now()
     try:
         receipt = Receipt(
             receipt_code=code,
-            receipt_date=message.get('receipt_date'),
+            receipt_date=now_time,
             receipt_desc=message.get('receipt_desc'),
-            receipt_stat=message.get('receipt_stat'),
-            warehouse=message.get('warehouse'),
             status=INBOUND_RECEIPT_STATUS_NONE,
+            warehouse=message.get('warehouse'),
             creator=message.get('creator'),
-            create_time=nowTime,
+            create_time=now_time,
             updater=message.get('updater'),
-            update_time=nowTime,
-            yn=message.get('yn')
+            update_time=now_time,
+            yn=YN_YES
         )
         receipt.save()
         for detail in details:
@@ -67,9 +66,9 @@ def create_receipt(request):
                 actual_qty=0,
                 status=INBOUND_RECEIPT_DETAIL_STATUS_NONE,
                 creator=message.get('creator'),
-                create_time=nowTime,
+                create_time=now_time,
                 updater=message.get('updater'),
-                update_time=nowTime
+                update_time=now_time
             )
             receipt_detail.save()
         transaction.commit()
@@ -92,7 +91,7 @@ def cancel_receipt(request, receipt_code):
     try:
         receipt = Receipt.objects.get(code=code)
         if receipt is not None:
-            receipt.state = INBOUND_RECEIPT_STATUS_CANCEL
+            receipt.status = INBOUND_RECEIPT_STATUS_CANCEL
             receipt.yn = YN_NO
             details = ReceiptDetails.filter(code=code)
             for detail in details:
