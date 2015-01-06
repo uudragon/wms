@@ -437,14 +437,29 @@ error| String  | 错误信息
 receipt_code | String  | Y | 入库单编号名称
 receipt_desc|	int|Y|入库单描述
 warehouse|String|Y	|库房编号
+details|array|Y|入库单明细
 creator|String|Y|创建人
 updater|String|Y|修改人
+
+<ReceiptDetails>
+
+名称|类型|是否必填|说明
+-|-|-|-
+goods_code|String|Y|商品编码
+qty|int|Y|商品数量，预入库数量
+actual_qty|int|Y|当前实际数量，入库数量
+
 
 样例报文：
 
 	{‘receipt_code’:’receipt0001’,
 	’receipt_desc’:’入库单1’,
 	‘warehouse’:'1',
+	'details':[
+		{'goods_code':'goods001',
+		'qty':100,
+		'actual_qty':50}
+	]
 	‘creator’:’aa’,
 	‘updater’:’aa’}
 ######7.4 响应报文

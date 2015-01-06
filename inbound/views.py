@@ -29,11 +29,6 @@ def create_receipt(request):
                         content_type='application/json;charset-utf-8',
                         date={'error': 'Attribute[\'receipt_code\'] can not be none.'})
     code = message.get('receipt_code')
-    if message.get('qty') is None:
-        LOG.error('Attribute[\'qty\'] can not be none.')
-        return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
-                        date={'error': 'Attribute[\'qty\'] can not be none.'})
     details = message.get('details')
     if details is None or len(details) == 0:
         return Response(status=status.HTTP_400_BAD_REQUEST,
