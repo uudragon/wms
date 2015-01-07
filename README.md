@@ -67,6 +67,7 @@ yn|Int|Y|是否失效。默认1。1有效；0失效
 	b．	HTTP_STATUS_CODE:500 Server Error
 	
 异常报文：
+
 名称 | 类型 | 说明
 ------------ | ------------- | ------------
 error| String  | 错误信息
@@ -132,6 +133,7 @@ is_gift|Int|Y|是否赠品，1是；0不是。Default：0
 	b.	HTTP_STATUS_CODE:500 Server Error
 
 异常报文：
+
 名称 | 类型 | 说明
 ------------ | ------------- | ------------
 error| String  | 错误信息
@@ -471,6 +473,7 @@ qty|int|Y|商品数量，预入库数量
 	b．	HTTP_STATUS_CODE:500 Server Error
 	
 异常报文：
+
 名称 | 类型 | 说明
 ------------ | ------------- | ------------
 error| String  | 错误信息
@@ -526,16 +529,25 @@ error| String  | 错误信息
 名称 | 类型 | 是否必填 | 说明
 ------------ | ------------- | ------------ | --------------
 receipt_code | String  | Y | 入库单编号名称
-goods_code|	String|Y|商品编号
 warehouse|String|Y	|库房编号
-qty|int|Y|入库商品数量
+details|array|Y|入库商品信息明细
 updater|String|Y|修改人
+
+
+名称|类型|是否必填|说明
+-|-|-|-
+goods_code|String|Y|商品编号
+qty|int|Y|入库数量
+
 
 样例报文：
 
 	{‘receipt_code’:’receipt0001’,
-	’goods_code’:'goods code 1',
 	‘warehouse’:'1',
+	'details':[
+		{'goods_code':'goods001',
+		'qty':10}
+	]
 	‘updater’:’aa’}
 ######9.4 响应报文
 成功响应：
@@ -548,6 +560,7 @@ updater|String|Y|修改人
 	b．	HTTP_STATUS_CODE:500 Server Error
 	
 异常报文：
+
 名称 | 类型 | 说明
 ------------ | ------------- | ------------
 error| String  | 错误信息
@@ -630,6 +643,7 @@ update_time|datetime|Y|更新时间
 	b．	HTTP_STATUS_CODE:500 Server Error
 	
 异常报文：
+
 名称 | 类型 | 说明
 ------------ | ------------- | ------------
 error| String  | 错误信息
@@ -715,6 +729,7 @@ update_time|datetime|Y|更新时间
 	b．	HTTP_STATUS_CODE:500 Server Error
 	
 异常报文：
+
 名称 | 类型 | 说明
 ------------ | ------------- | ------------
 error| String  | 错误信息
