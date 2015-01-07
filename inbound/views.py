@@ -115,78 +115,71 @@ def putin(request):
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
                         date={'error': 'Attribute[\'receipt_code\'] can not be none.'})
-    goods_code = message.get('goods_code')
-    if goods_code is None:
-        LOG.error('Attribute[\'goods_code\'] can not be none.')
-        return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
-                        date={'error': 'Attribute[\'goods_code\'] can not be none.'})
-    current_qty = message.get('qty')
-    if current_qty is None:
-        LOG.error('Attribute[\'qty\'] can not be none.')
-        return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
-                        date={'error': 'Attribute[\'qty\'] can not be none.'})
     warehouse = message.get('warehouse')
     if warehouse is None:
         LOG.error('Attribute[\'warehouse\'] can not be none.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
                         date={'error': 'Attribute[\'warehouse\'] can not be none.'})
+    details = message.get('details')
+    if details is None or len(details) == 0:
+        return Response(status=status.HTTP_200_OK)
     
     now_time = datetime.now()
+    putin_dict = dict()
+    for detail in details:
+        putin_dict[detail.get('goods_code')] = detail.get('qty')
     try:
-        receipt_detail = ReceiptDetails.objects.get(receipt_code=receipt_code, goods_code=goods_code)
-        cur_acutal_qty = receipt_detail.actual_qty + current_qty
-        if receipt_detail.qty < cur_acutal_qty:
-            LOG.error('Actual qty of goods is gt the expect qty.')
-            return Response(status=status.HTTP_400_BAD_REQUEST, 
-                            content_type='application/json;charset-utf-8',
-                            date={'error': 'Actual qty of goods is gt the expect qty.'})
-        elif receipt_detail.qty == cur_acutal_qty:
-            receipt_detail.status = INBOUND_RECEIPT_DETAIL_STATUS_COMPLETED
-        else:
-            receipt_detail.status = INBOUND_RECEIPT_DETAIL_STATUS_PRE_STORAGE
-        receipt_detail.actual_qty = cur_acutal_qty
-        receipt_detail.save()
-        
-        StorageRecord(
-            goods_code=goods_code,
-            goods_qty=current_qty,
-            warehouse=warehouse,
-            code=receipt_code,
-            type=STORAGE_RECORD_TYPE_RECEIPT,
-            creator=message.get('updater'),
-            create_time=now_time,
-            updater=message.get('updater'),
-            update_time=now_time,
-        ).save()
-        warehouse_goods = WarehouseGoodsDetails.object.get(warehouse=warehouse, goods_code=goods_code)
-        if warehouse_goods is not None:
-            warehouse_goods.qty += current_qty
-            warehouse_goods.updater=message.get('updater')
-            warehouse_goods.update_time=now_time
-        else:
-            warehouse_goods = WarehouseGoodsDetails(
-                warehouse=warehouse,
-                goods_code=goods_code,
-                qty=current_qty,
-                picking_qty=0,
-                not_picking_qty=0,
-                creator=message.get('updater'),
-                create_time=now_time,
-                updater=message.get('updater'),
-                update_time=now_time
-            )
-        warehouse_goods.save()
-        transaction.commit()
-        details = ReceiptDetails.objects.filter(receipt_code=receipt_code)
+        receipt_details = ReceiptDetails.objects.filter(receipt_code=receipt_code)
         completed = False
-        for detail in details:
+        for detail in receipt_details:
+            putin_qty = putin_dict.get(detail.goods_code) \
+                if putin_dict.get(detail.goods_code) is not None else 0
+            cur_actual_qty = detail.actual_qty + putin_qty
+            if detail.qty < cur_actual_qty:
+                LOG.error('Actual qty of goods is gt the expect qty.')
+                raise Exception('Actual qty of goods is gt the expect qty.')
+            elif detail.qty == cur_actual_qty:
+                detail.status = INBOUND_RECEIPT_DETAIL_STATUS_COMPLETED
+            else:
+                detail.status = INBOUND_RECEIPT_DETAIL_STATUS_PRE_STORAGE
+            detail.actual_qty = cur_actual_qty
             if detail.qty == detail.actual_qty:
                 completed = True
             else:
                 completed = False
+            
+            if putin_qty > 0:
+                StorageRecord(
+                    goods_code=detail.goods_code,
+                    goods_qty=putin_qty,
+                    warehouse=warehouse,
+                    code=receipt_code,
+                    type=STORAGE_RECORD_TYPE_RECEIPT,
+                    creator=message.get('updater'),
+                    create_time=now_time,
+                    updater=message.get('updater'),
+                    update_time=now_time,
+                ).save()
+                warehouse_goods = WarehouseGoodsDetails.object.get(warehouse=warehouse, goods_code=detail.goods_code)
+                if warehouse_goods is not None:
+                    warehouse_goods.qty += putin_qty
+                    warehouse_goods.updater = message.get('updater')
+                    warehouse_goods.update_time = now_time
+                else:
+                    warehouse_goods = WarehouseGoodsDetails(
+                        warehouse=warehouse,
+                        goods_code=detail.goods_code,
+                        qty=putin_qty,
+                        picking_qty=0,
+                        not_picking_qty=0,
+                        creator=message.get('updater'),
+                        create_time=now_time,
+                        updater=message.get('updater'),
+                        update_time=now_time
+                    )
+                warehouse_goods.save()
+            detail.save()
         receipt = Receipt.objects.get(receipt_code=receipt_code)
         if completed:
             receipt.status = INBOUND_RECEIPT_STATUS_COMPLETED
@@ -199,7 +192,7 @@ def putin(request):
         transaction.rollback()
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         content_type='application/json;charset-utf-8',
-                        date={'error': 'Goods Putin error.'})
+                        date={'error': 'Goods Putin error. reason:%s' % str(e)})
     
     return Response(status=status.HTTP_200_OK)
 
