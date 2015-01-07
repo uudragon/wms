@@ -128,7 +128,8 @@ def putin(request):
     now_time = datetime.now()
     putin_dict = dict()
     for detail in details:
-        putin_dict[detail.get('goods_code')] = detail.get('qty')
+        putin_dict[detail.get('goods_code')] = detail.get('putin_qty')
+    LOG.info('Current putin dict is %s' % putin_dict)
     try:
         receipt_details = ReceiptDetails.objects.filter(receipt_code=receipt_code)
         completed = False
@@ -161,8 +162,10 @@ def putin(request):
                     updater=message.get('updater'),
                     update_time=now_time,
                 ).save()
-                warehouse_goods = WarehouseGoodsDetails.object.get(warehouse=warehouse, goods_code=detail.goods_code)
-                if warehouse_goods is not None:
+                warehouse_goods_array = WarehouseGoodsDetails.objects.filter(
+                    warehouse=warehouse, goods_code=detail.goods_code)
+                if warehouse_goods_array is not None and len(warehouse_goods_array) != 0:
+                    warehouse_goods = warehouse_goods_array[0]
                     warehouse_goods.qty += putin_qty
                     warehouse_goods.updater = message.get('updater')
                     warehouse_goods.update_time = now_time

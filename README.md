@@ -537,7 +537,7 @@ updater|String|Y|修改人
 名称|类型|是否必填|说明
 -|-|-|-
 goods_code|String|Y|商品编号
-qty|int|Y|入库数量
+putin_qty|int|Y|入库数量
 
 
 样例报文：
@@ -546,7 +546,7 @@ qty|int|Y|入库数量
 	‘warehouse’:'1',
 	'details':[
 		{'goods_code':'goods001',
-		'qty':10}
+		'putin_qty':10}
 	]
 	‘updater’:’aa’}
 ######9.4 响应报文
