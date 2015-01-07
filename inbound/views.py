@@ -128,7 +128,7 @@ def putin(request):
     now_time = datetime.now()
     putin_dict = dict()
     for detail in details:
-        putin_dict[detail.get('goods_code')] = detail.get('putin_qty')
+        putin_dict[detail.get('goods_code')] = int(detail.get('putin_qty'))
     LOG.info('Current putin dict is %s' % putin_dict)
     try:
         receipt_details = ReceiptDetails.objects.filter(receipt_code=receipt_code)
