@@ -16,7 +16,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 
 # Environment property. include DEV, TEST, PROD
-ENV_PROP = 'DEV'
+ENV_PROP = 'PROD'
 
 
 # Quick-start development settings - unsuitable for production

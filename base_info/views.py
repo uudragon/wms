@@ -7,10 +7,10 @@ from django.db import transaction
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from big_house.models import Goods, Product, ProductDetails
-from big_house.serializers import GoodsSerializer, ProductDetailsSerializer, ProductSerializer
+from big_house.models import Goods, Product, ProductDetails, Warehouse
+from big_house.serializers import GoodsSerializer, ProductDetailsSerializer, ProductSerializer, WarehouseSerializer
 from commons.exceptions import ValueIsNoneException
-from uudragon_wms.local.settings import DEFAULT_PAGE_SIZE
+from uudragon_wms.local.settings import DEFAULT_PAGE_SIZE, YN_YES
 
 LOG = logging.getLogger(__name__)
 
@@ -285,3 +285,110 @@ def query_product_list(request):
                         data={'error': 'Query product information error'},
                         content_type='application/json;charset-utf-8')
     return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset-utf-8')
+
+
+@api_view(['POST'])
+def save_warehouse(request):
+    message = request.DATA
+
+    LOG.debug('Current received message is %s' % message)
+
+    if message.get('warehouse_name') is None:
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset-utf-8',
+                        date={'error': 'Attribute[\'warehouse_name\'] can not be none.'})
+    if message.get('warehouse_code') is None:
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset-utf-8',
+                        date={'error': 'Attribute[\'warehouse_code\'] can not be none.'})
+    if message.get('creator') is None:
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset-utf-8',
+                        date={'error': 'Attribute[\'creator\'] can not be none.'})
+    if message.get('updater') is None:
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset-utf-8',
+                        date={'error': 'Attribute[\'updater\'] can not be none.'})
+    now_time = datetime.now()
+    try:
+        warehouse = Warehouse(
+            code=message.get('warehouse_code'),
+            name=message.get('warehouse_name'),
+            address=message.get('address'),
+            type=message.get('type'),
+            create_time=now_time,
+            creator=message.get('creator'),
+            updater=message.get('updater'),
+            update_time=now_time,
+            yn=YN_YES
+        )
+        warehouse.save()
+    except Exception as e:
+        LOG.error('Warehouse saved error.\n [ERROR]:%s' % str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        content_type='application/json;charset-utf-8',
+                        date={'error': 'Warehouse saved error.'})
+    return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def query_warehouse(request, warehouse_code):
+    code = warehouse_code
+
+    LOG.debug('Current received warehouse_code is %s' % code)
+
+    try:
+        warehouse = Warehouse.objects.get(code=code)
+        warehouse_seria = WarehouseSerializer(warehouse)
+        message = warehouse_seria.data
+    except Exception as e:
+        LOG.error('Query warehouse information error. [ERROR] %s' % str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={'error': 'Query warehouse [%s] information error' % code},
+                        content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=message, content_type='application/json;charset-utf-8')
+
+
+@api_view(['POST'])
+def query_warehouse_list(request):
+    message = request.DATA
+
+    LOG.debug('Current received message is %s' % message)
+
+    pageSize = message.pop('pageSize')
+    if pageSize is None or pageSize == 0:
+        pageSize = DEFAULT_PAGE_SIZE
+    pageNo = message.pop('pageNo')
+    if pageNo is None or pageNo == 0:
+        pageNo = 1
+
+    resp_message = dict()
+    try:
+        for key in message.iterkeys():
+            key += '__contains'
+            LOG.debug('Condition of query is %s' % message)
+        query_list = Warehouse.objects.filter(**message)
+        paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
+        total_page_count = paginator.num_pages
+        if pageNo > total_page_count:
+            pageNo = total_page_count
+        elif pageNo < 1:
+            pageNo = 1
+        cur_page = paginator.page(pageNo)
+        page_records = cur_page.object_list
+        resp_array = []
+        for item in page_records:
+            warehouse_seria = WarehouseSerializer(item)
+            seria_data = warehouse_seria.data
+            resp_array.append(seria_data)
+        resp_message['records'] = resp_array
+        resp_message['recordsCount'] = paginator.count
+        resp_message['pageSize'] = pageSize
+        resp_message['pageNumber'] = total_page_count
+        resp_message['pageNo'] = pageNo
+    except Exception as e:
+        LOG.error('Query warehouses information error. [ERROR] %s' % str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={'error': 'Query warehouses information error'},
+                        content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=message, content_type='application/json;charset-utf-8')

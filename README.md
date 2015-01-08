@@ -11,6 +11,9 @@
 - [商品入库接口](#91-url)
 - [批量查询入库单接口](#101-url)
 - [按入库单号查询入库单接口](#111-url)
+- [库房定义接口](#121-url)
+- [库房列表查询](#131-url)
+- [按库房号查询库房信息接口](#141-url)
 
 ####商品与产品定义接口说明
 ------
@@ -737,3 +740,195 @@ error| String  | 错误信息
 样例报文：
 
 	{‘error’:’Receipt list query error.’}
+
+####库房管理
+----
+#####12.保存库房信息
+该接口用于用户定义的库房信息。
+######12.1 url
+	method: POST
+	wms/baseinfo/warehouse/save/
+	注意：结尾的’/’不能省略
+######12.2 header
+	Content_Type:application/json;charset=utf-8
+	Accept:application/json
+######12.3 请求参数
+
+名称 | 类型 | 是否必填 | 说明
+------------ | ------------- | ------------ | --------------
+warehouse_code | String  | Y | 库房编号
+warehouse_name|	int|Y|库房名称
+address|String|Y|库房地址
+type|int|Y|库房类型。1：主库；2：备库。默认1
+creator|String|Y|创建人
+updater|String|Y|修改人
+yn|INT|Y|是否生效。1生效；0失效。默认1
+
+样例报文：
+
+	{‘warehouse_code’:’warehouse0001’,
+	’warehouse_name’:’优优龙主库’,
+	‘address’:'北京马驹桥',
+	'type':1,
+	‘creator’:’aa’,
+	‘updater’:’aa’,
+	'yn':1}
+######12.4 响应报文
+成功响应：
+
+	HTTP_STATUS_CODE:200
+
+异常响应：
+
+	a．	HTTP_STATUS_CODE:400 Bad request；
+	b．	HTTP_STATUS_CODE:500 Server Error
+	
+异常报文：
+
+名称 | 类型 | 说明
+------------ | ------------- | ------------
+error| String  | 错误信息
+
+样例报文：
+
+	{‘error’:’Warehouse saved error.’}
+
+#####13.批量查询入库单接口
+按条件批量查询库房信息接口。可用于按给定条件查询当前库房信息信息。
+######13.1 url
+	method: POST
+	wms/baseinfo/warehouses/
+	注意：结尾的’/’不能省略
+######13.2 header
+	Content_Type:application/json;charset=utf-8
+	Accept:application/json
+######13.3 请求参数
+
+名称 | 类型 | 是否必填 | 说明
+------------ | ------------- | ------------ | --------------
+warehouse_code | String  | O(可选) | 库房编号
+yn|INT|O(可选)|是否有效。1有效；0失效
+creator|String|O(可选)|创建人
+updater|String|O(可选)|修改人
+
+样例报文：
+
+	{‘warehouse_code’:’warehouse0001’,
+	’yn’:1,
+	‘creator’:’aa’,
+	‘updater’:’aa’}
+######13.4 响应报文
+成功响应：
+
+	HTTP_STATUS_CODE:200
+
+响应报文说明：
+
+名称|类型|是否必填|说明
+--|--|--|--
+pageSize|Int|Y|每页显示记录数
+pageNo|Int|Y|当前页号
+recordsCount|Int|Y|总记录数
+pageNumber|Int|Y|总页数
+records|Array|N|当前页记录
+
+<Records-Item>
+	
+名称 | 类型 | 是否必填 | 说明
+------------ | ------------- | ------------ | --------------
+warehouse_code | String  | Y | 库房编号
+warehouse_name|String|Y|库房名称
+address|int|Y|库房地址
+type|INT|Y|库房类型。1：主库；2：备库
+creator|String|Y|创建人
+create_time|array|Y|创建时间
+updater|String|Y|修改人
+update_time|datetime|Y|修改时间
+yn|INT|Y|是否生效
+
+样例报文：
+
+	{'pageSize':8,
+	'pageNo':1,
+	'recordsCount':15,
+	'pageNumber':2,
+	'records':[
+		{‘warehouse_code’:’warehouse0001’,
+		’warehouse_name’:’优优龙主库’,
+		‘address’:'北京马驹桥',
+		'type':1,
+		‘creator’:’aa’,
+		‘updater’:’aa’,
+		'yn':1}
+	...]}
+异常响应：
+
+	a．	HTTP_STATUS_CODE:400 Bad request；
+	b．	HTTP_STATUS_CODE:500 Server Error
+	
+异常报文：
+
+名称 | 类型 | 说明
+------------ | ------------- | ------------
+error| String  | 错误信息
+
+样例报文：
+
+	{‘error’:’Warehouse list query error.’}
+
+	
+#####14.按入库单号查询入库单信息
+按给定的库房号查询对应库房信息。
+######14.1 url
+	method: GET
+	wms/baseinfo/warehouse/${warehouse_code}/
+	注意：结尾的’/’不能省略,${warehouse_code}为仓库号
+######14.2 header
+	Content_Type:application/json;charset=utf-8
+	Accept:application/json
+######14.3 请求参数
+
+无
+######14.4 响应报文
+成功响应：
+
+	HTTP_STATUS_CODE:200
+
+响应报文说明：
+
+	
+名称 | 类型 | 是否必填 | 说明
+------------ | ------------- | ------------ | --------------
+warehouse_code | String  | Y | 库房编号
+warehouse_name|String|Y|库房名称
+address|int|Y|库房地址
+type|INT|Y|库房类型。1：主库；2：备库
+creator|String|Y|创建人
+create_time|array|Y|创建时间
+updater|String|Y|修改人
+update_time|datetime|Y|修改时间
+yn|INT|Y|是否生效
+
+样例报文：
+
+	{‘warehouse_code’:’warehouse0001’,
+	’warehouse_name’:’优优龙主库’,
+	‘address’:'北京马驹桥',
+	'type':1,
+	‘creator’:’aa’,
+	‘updater’:’aa’,
+	'yn':1}
+异常响应：
+
+	a．	HTTP_STATUS_CODE:400 Bad request；
+	b．	HTTP_STATUS_CODE:500 Server Error
+	
+异常报文：
+
+名称 | 类型 | 说明
+------------ | ------------- | ------------
+error| String  | 错误信息
+
+样例报文：
+
+	{‘error’:’Warehouse query error.’}
