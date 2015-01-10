@@ -73,7 +73,6 @@ class Receipt(models.Model):
     creator = models.CharField(db_column='CREATOR', null=False, max_length=50)
     update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True)
     updater = models.CharField(db_column='UPDATER', null=False, max_length=50)
-    yn = models.SmallIntegerField(db_column='YN', max_length=4, default=0)
 
     class Meta:
         db_table = 'T_RECEIPT'
