@@ -9,7 +9,7 @@
 按照给定的库房号与产品号信息，指定库房内对应产品进行预拣货。
 ######1.1 url
 	method: POST
-	inner/${warehouse_code}/records/
+	inner/${warehouse_code}/picking/
 	注意：结尾的’/’不能省略,${warehouse_code}为仓库号
 ######1.2 header
 	Content_Type:application/json;charset=utf-8

@@ -24,19 +24,19 @@ def define_goods(request):
     if message.get('goods_name') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
-                        date={'error': 'Attribute[\'goods_name\'] can not be none.'})
+                        data={'error': 'Attribute[\'goods_name\'] can not be none.'})
     if message.get('goods_code') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
-                        date={'error': 'Attribute[\'goods_code\'] can not be none.'})
+                        data={'error': 'Attribute[\'goods_code\'] can not be none.'})
     if message.get('creator') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
-                        date={'error': 'Attribute[\'creator\'] can not be none.'})
+                        data={'error': 'Attribute[\'creator\'] can not be none.'})
     if message.get('updater') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
-                        date={'error': 'Attribute[\'updater\'] can not be none.'})
+                        data={'error': 'Attribute[\'updater\'] can not be none.'})
 
     try:
         queryCount = Goods.objects.filter(goods_code=message.get('goods_code')).count()
@@ -96,13 +96,13 @@ def define_product(request):
     if message.get('product_code') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
-                        date={'error': 'Attribute[\'product_code\'] can not be none.'})
+                        data={'error': 'Attribute[\'product_code\'] can not be none.'})
     product_code = message.get('product_code')
     details = message.get('details')
     if details is None or len(details) == 0:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
-                        date={'error': 'Attribute[\'details\'] must be a non-empty array.'})
+                        data={'error': 'Attribute[\'details\'] must be a non-empty array.'})
 
     try:
         querycount = Product.objects.filter(product_code=product_code).count()
@@ -296,19 +296,19 @@ def save_warehouse(request):
     if message.get('warehouse_name') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
-                        date={'error': 'Attribute[\'warehouse_name\'] can not be none.'})
+                        data={'error': 'Attribute[\'warehouse_name\'] can not be none.'})
     if message.get('warehouse_code') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
-                        date={'error': 'Attribute[\'warehouse_code\'] can not be none.'})
+                        data={'error': 'Attribute[\'warehouse_code\'] can not be none.'})
     if message.get('creator') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
-                        date={'error': 'Attribute[\'creator\'] can not be none.'})
+                        data={'error': 'Attribute[\'creator\'] can not be none.'})
     if message.get('updater') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
-                        date={'error': 'Attribute[\'updater\'] can not be none.'})
+                        data={'error': 'Attribute[\'updater\'] can not be none.'})
     now_time = datetime.now()
     try:
         warehouse = Warehouse.objects.filter(warehouse_code=message.get('warehouse_code')).first()
@@ -336,7 +336,7 @@ def save_warehouse(request):
         LOG.error('Warehouse saved error.\n [ERROR]:%s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         content_type='application/json;charset-utf-8',
-                        date={'error': 'Warehouse saved error.'})
+                        data={'error': 'Warehouse saved error.'})
     return Response(status=status.HTTP_200_OK)
 
 

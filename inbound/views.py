@@ -27,13 +27,13 @@ def create_receipt(request):
     if message.get('receipt_code') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
-                        date={'error': 'Attribute[\'receipt_code\'] can not be none.'})
+                        data={'error': 'Attribute[\'receipt_code\'] can not be none.'})
     code = message.get('receipt_code')
     details = message.get('details')
     if details is None or len(details) == 0:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
-                        date={'error': 'Attribute[\'details\'] must be a non-empty array.'})
+                        data={'error': 'Attribute[\'details\'] must be a non-empty array.'})
 
     now_time = datetime.now()
     try:
@@ -114,13 +114,13 @@ def putin(request):
         LOG.error('Attribute[\'receipt_code\'] can not be none.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
-                        date={'error': 'Attribute[\'receipt_code\'] can not be none.'})
+                        data={'error': 'Attribute[\'receipt_code\'] can not be none.'})
     warehouse = message.get('warehouse')
     if warehouse is None:
         LOG.error('Attribute[\'warehouse\'] can not be none.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
-                        date={'error': 'Attribute[\'warehouse\'] can not be none.'})
+                        data={'error': 'Attribute[\'warehouse\'] can not be none.'})
     details = message.get('details')
     if details is None or len(details) == 0:
         return Response(status=status.HTTP_200_OK)

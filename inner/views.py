@@ -25,7 +25,7 @@ def picking(request, warehouse_code):
     if product_code is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
-                        date={'error': 'Attribute[\'product_code\'] can not be none.'})
+                        data={'error': 'Attribute[\'product_code\'] can not be none.'})
     
     product_detail = ProductDetails.objects.filter(product_code=product_code)
     resp_message = {'picking_qty':0}
