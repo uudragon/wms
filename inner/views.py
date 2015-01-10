@@ -35,7 +35,7 @@ def picking(request, warehouse_code):
         for item in product_detail:
             goods_dict[item.goods_code] = item.qty
             goods_codes.append(item.goods_code)
-        goods_list = WarehouseGoodsDetails.objects.filter(goods_code__in=goods_codes)
+        goods_list = WarehouseGoodsDetails.objects.filter(goods_code__in=goods_codes).filter(warehouse=warehouse_code)
         qtys = []
         for goods in goods_list:
             if goods.goods_code in goods_dict():
