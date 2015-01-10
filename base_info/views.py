@@ -391,4 +391,4 @@ def query_warehouse_list(request):
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query warehouses information error'},
                         content_type='application/json;charset-utf-8')
-    return Response(status=status.HTTP_200_OK, data=message, content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset-utf-8')
