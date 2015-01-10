@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from big_house.models import Product, ProductDetails, Warehouse, StorageRecord, Receipt, ReceiptDetails, \
+from big_house.models import Product, ProductDetails, Warehouse, StorageRecords, Receipt, ReceiptDetails, \
     WarehouseGoodsDetails, WarehouseProductDetails, Goods
 
 __author__ = 'pluto'
@@ -29,7 +29,7 @@ class StorageRecordsSerializer(serializers.ModelSerializer):
     goods_name = serializers.CharField(max_length=255)
 
     class Meta:
-        model = StorageRecord
+        model = StorageRecords
 
 
 class ReceiptSerializer(serializers.ModelSerializer):
