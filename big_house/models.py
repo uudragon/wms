@@ -32,8 +32,8 @@ class ProductDetails(models.Model):
 
 class Warehouse(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
-    code = models.CharField(db_column='CODE', null=False, max_length=99, unique=True)
-    name = models.CharField(db_column='NAME', null=False, max_length=255, unique=True)
+    warehouse_code = models.CharField(db_column='CODE', null=False, max_length=99, unique=True)
+    warehouse_name = models.CharField(db_column='NAME', null=False, max_length=255, unique=True)
     address = models.CharField(db_column='ADDRESS', null=False, max_length=255)
     type = models.SmallIntegerField(db_column='TYPE', null=False, default=1)
     create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)

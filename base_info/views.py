@@ -312,8 +312,8 @@ def save_warehouse(request):
     now_time = datetime.now()
     try:
         warehouse = Warehouse(
-            code=message.get('warehouse_code'),
-            name=message.get('warehouse_name'),
+            warehouse_code=message.get('warehouse_code'),
+            warehouse_name=message.get('warehouse_name'),
             address=message.get('address'),
             type=message.get('type'),
             create_time=now_time,
@@ -338,7 +338,7 @@ def query_warehouse(request, warehouse_code):
     LOG.debug('Current received warehouse_code is %s' % code)
 
     try:
-        warehouse = Warehouse.objects.get(code=code)
+        warehouse = Warehouse.objects.get(warehouse_code=code)
         warehouse_seria = WarehouseSerializer(warehouse)
         message = warehouse_seria.data
     except Exception as e:
