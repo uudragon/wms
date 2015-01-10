@@ -311,17 +311,26 @@ def save_warehouse(request):
                         date={'error': 'Attribute[\'updater\'] can not be none.'})
     now_time = datetime.now()
     try:
-        warehouse = Warehouse(
-            warehouse_code=message.get('warehouse_code'),
-            warehouse_name=message.get('warehouse_name'),
-            address=message.get('address'),
-            type=message.get('type'),
-            create_time=now_time,
-            creator=message.get('creator'),
-            updater=message.get('updater'),
-            update_time=now_time,
-            yn=YN_YES
-        )
+        warehouse = Warehouse.objects.filter(warehouse_code=message.get('warehouse_code')).first()
+        if warehouse is None:
+            warehouse = Warehouse(
+                warehouse_code=message.get('warehouse_code'),
+                warehouse_name=message.get('warehouse_name'),
+                address=message.get('address'),
+                type=message.get('type'),
+                create_time=now_time,
+                creator=message.get('creator'),
+                updater=message.get('updater'),
+                update_time=now_time,
+                yn=YN_YES
+            )
+        else:
+            warehouse.warehouse_name = message.get('warehouse_name')
+            warehouse.address = message.get('address')
+            warehouse.type = message.get('type')
+            warehouse.updater = message.get('updater')
+            warehouse.update_time = now_time
+            warehouse.yn = message.get('yn')
         warehouse.save()
     except Exception as e:
         LOG.error('Warehouse saved error.\n [ERROR]:%s' % str(e))
