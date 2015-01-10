@@ -23,7 +23,10 @@ class WarehouseSerializer(serializers.ModelSerializer):
         model = Warehouse
 
 
-class StorageRecordSerializer(serializers.ModelSerializer):
+class StorageRecordsSerializer(serializers.ModelSerializer):
+
+    warehouse_name = serializers.CharField(max_length=255)
+    goods_name = serializers.CharField(max_length=255)
 
     class Meta:
         model = StorageRecord
@@ -42,12 +45,18 @@ class ReceiptDetailsSerializer(serializers.ModelSerializer):
 
 
 class WarehouseGoodsDetailsSerializer(serializers.ModelSerializer):
+    
+    warehouse_name = serializers.CharField(max_length=255)
+    goods_name = serializers.CharField(max_length=255)
 
     class Meta:
         model = WarehouseGoodsDetails
 
 
 class WarehouseProductDetailsSerializer(serializers.ModelSerializer):
+
+    warehouse_name = serializers.CharField(max_length=255)
+    product_name = serializers.CharField(max_length=255)
     
     class Meta:
         model = WarehouseProductDetails

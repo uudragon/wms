@@ -46,7 +46,7 @@ class Warehouse(models.Model):
         db_table = 'T_WAREHOUSE'
 
 
-class StorageRecord(models.Model):
+class StorageRecords(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
     goods_code = models.CharField(db_column='GOODS_CODE', null=False, max_length=32)
     goods_qty = models.IntegerField(db_column='GOODS_QTY', null=False, default=1)
@@ -115,7 +115,7 @@ class WarehouseProductDetails(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
     warehouse = models.CharField(db_column='WAREHOUSE', null=False, max_length=50)
     product_code = models.CharField(db_column='PRODUCT_CODE', null=False, max_length=50)
-    effective_qty = models.IntegerField(db_column='EFFECTIVE_QTY', null=False, default=0)
+    qty = models.IntegerField(db_column='EFFECTIVE_QTY', null=False, default=0)
     create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)
     creator = models.CharField(db_column='CREATOR', null=False, max_length=50)
     update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True)

@@ -5,5 +5,8 @@ __author__ = 'pluto'
 
 urlpatterns = patterns(
     'inner.views',
-    url(r'^storage_records/$', 'query_storage_records'),
+    url(r'^records/(.+)/$', 'query_records'),
+    url(r'^goods/(.+)/$', 'query_goods'),
+    url(r'^products/(.+)/$', 'query_products'),
+    url(r'^picking/(.+)/$', 'picking'),
 )

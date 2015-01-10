@@ -6,7 +6,7 @@ from django.db import transaction
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from big_house.models import Receipt, ReceiptDetails, StorageRecord, WarehouseGoodsDetails
+from big_house.models import Receipt, ReceiptDetails, StorageRecords, WarehouseGoodsDetails
 from big_house.serializers import ReceiptSerializer, ReceiptDetailsSerializer
 from commons.exceptions import ValueIsNoneException
 from uudragon_wms.local.settings import INBOUND_RECEIPT_STATUS_NONE, INBOUND_RECEIPT_DETAIL_STATUS_NONE, \
@@ -151,7 +151,7 @@ def putin(request):
                 completed = False
             
             if putin_qty > 0:
-                StorageRecord(
+                StorageRecords(
                     goods_code=detail.goods_code,
                     goods_qty=putin_qty,
                     warehouse=warehouse,
