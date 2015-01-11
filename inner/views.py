@@ -36,6 +36,7 @@ def picking(request, warehouse_code):
                 goods_dict[item.goods_code] = item.qty
                 goods_codes.append(item.goods_code)
             goods_list = WarehouseGoodsDetails.objects.filter(goods_code__in=goods_codes).filter(warehouse=warehouse_code)
+            LOG.debug('WarehouseGoodsDetails list is %s' % goods_list)
             qtys = []
             for goods in goods_list:
                 if goods.goods_code in goods_dict:
@@ -45,6 +46,8 @@ def picking(request, warehouse_code):
                     qtys.append(picking_qty)
                 else:
                     qtys.append(0)
+            
+            LOG.debug('Current picking qty list is %s' % qtys)
 
             picking_qty = min(*qtys)
             if picking_qty != 0:
