@@ -266,7 +266,11 @@ def query_receipt(request, receipt_code):
         for detail in details:
             detail_seria = ReceiptDetailsSerializer(detail)
             details_array.append(detail_seria.data)
-        receipt = Receipt.objects.get(receipt_code=code)
+        receipt = Receipt.objects.extra(
+            select={'warehouse_name': 't_warehouse.name'},
+            tables=['t_warehouse'],
+            where=['t_receipt.warehouse=t_warehouse.code']
+        ).filter(receipt_code=code).first()
         receipt_seria = ReceiptSerializer(receipt)
         message = receipt_seria.data
         message['details'] = details_array
