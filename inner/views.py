@@ -35,7 +35,8 @@ def picking(request, warehouse_code):
             for item in product_detail:
                 goods_dict[item.goods_code] = item.qty
                 goods_codes.append(item.goods_code)
-            goods_list = WarehouseGoodsDetails.objects.filter(goods_code__in=goods_codes).filter(warehouse=warehouse_code)
+            goods_list = WarehouseGoodsDetails.objects.filter(goods_code__in=goods_codes).filter(
+                warehouse=warehouse_code).select_for_update()
             LOG.debug('WarehouseGoodsDetails list is %s' % goods_list)
             qtys = []
             for goods in goods_list:
@@ -64,19 +65,20 @@ def picking(request, warehouse_code):
                     goods.updater = message.get('updater')
                     goods.update_time = now_time
                     goods.save()
-                product_detail = WarehouseProductDetails.objects.filter(product_code=product_code).first()
+                product_detail = WarehouseProductDetails.objects.filter(
+                    product_code=product_code).select_for_update().first()
                 if product_detail is not None:
                     product_detail.qty += picking_qty
                     product_detail.updater = message.get('updater')
                     product_detail.update_time = now_time
                 else:
                     product_detail = WarehouseProductDetails(product_code=product_code, 
-                                            warehouse=warehouse_code,
-                                            qty=picking_qty,
-                                            create_time=now_time,
-                                            creator=message.get('updater'),
-                                            update_time=now_time,
-                                            updater=message.get('updater'))
+                                        warehouse=warehouse_code,
+                                        qty=picking_qty,
+                                        create_time=now_time,
+                                        creator=message.get('updater'),
+                                        update_time=now_time,
+                                        updater=message.get('updater'))
                 product_detail.save()
                 transaction.commit()
                 resp_message['picking_qty'] = picking_qty
@@ -191,7 +193,7 @@ def query_goods(request, warehouse_code):
 
 
 @api_view(['POST'])
-def query_product(request, warehouse_code):
+def query_products(request, warehouse_code):
     warehouse = warehouse_code
 
     message = request.DATA
