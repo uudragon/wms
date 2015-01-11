@@ -167,6 +167,7 @@ def putin(request):
                 if warehouse_goods_array is not None and len(warehouse_goods_array) != 0:
                     warehouse_goods = warehouse_goods_array[0]
                     warehouse_goods.qty += putin_qty
+                    warehouse_goods.not_picking_qty += putin_qty
                     warehouse_goods.updater = message.get('updater')
                     warehouse_goods.update_time = now_time
                 else:
@@ -175,7 +176,7 @@ def putin(request):
                         goods_code=detail.goods_code,
                         qty=putin_qty,
                         picking_qty=0,
-                        not_picking_qty=0,
+                        not_picking_qty=putin_qty,
                         creator=message.get('updater'),
                         create_time=now_time,
                         updater=message.get('updater'),
