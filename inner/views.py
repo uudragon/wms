@@ -48,8 +48,14 @@ def picking(request, warehouse_code):
                     qtys.append(0)
             
             LOG.debug('Current picking qty list is %s' % qtys)
-
-            picking_qty = min(*qtys)
+            
+            if len(qtys) > 1:
+                picking_qty = min(*qtys)
+            elif len(qtys) == 0:
+                picking_qty = 0
+            else:
+                picking_qty = qtys[0]
+                
             if picking_qty != 0:
                 now_time = datetime.now()
                 for goods in goods_list:
