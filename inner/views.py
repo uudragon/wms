@@ -70,14 +70,14 @@ def picking(request, warehouse_code):
                     product_detail.updater = message.get('updater')
                     product_detail.update_time = now_time
                 else:
-                    
-                    WarehouseProductDetails(product_code=product_code, 
+                    product_detail = WarehouseProductDetails(product_code=product_code, 
                                             warehouse=warehouse_code,
                                             qty=picking_qty,
                                             create_time=now_time,
                                             creator=message.get('updater'),
                                             update_time=now_time,
                                             updater=message.get('updater'))
+                product_detail.save()
                 transaction.commit()
                 resp_message['picking_qty'] = picking_qty
     except Exception as e:
