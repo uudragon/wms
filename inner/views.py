@@ -26,27 +26,27 @@ def picking(request, warehouse_code):
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
                         data={'error': 'Attribute[\'product_code\'] can not be none.'})
-    
-    product_detail = ProductDetails.objects.filter(product_code=product_code)
-    resp_message = {'picking_qty':0}
-    if product_detail is not None and len(product_detail) > 0:
-        goods_dict = dict()
-        goods_codes = []
-        for item in product_detail:
-            goods_dict[item.goods_code] = item.qty
-            goods_codes.append(item.goods_code)
-        goods_list = WarehouseGoodsDetails.objects.filter(goods_code__in=goods_codes).filter(warehouse=warehouse_code)
-        qtys = []
-        for goods in goods_list:
-            if goods.goods_code in goods_dict():
-                picking_qty = (goods.not_picking_qty / goods_dict.get(goods.goods_code)) \
-                    if (goods_dict.get(goods.goods_code) is not None 
-                        and goods_dict.get(goods.goods_code) != 0) else 0
-                qtys.append(picking_qty)
-            else:
-                qtys.append(0)
-        picking_qty = min(*qtys)
-        try:
+    try:
+        product_detail = ProductDetails.objects.filter(product_code=product_code)
+        resp_message = {'picking_qty':0}
+        if product_detail is not None and len(product_detail) > 0:
+            goods_dict = dict()
+            goods_codes = []
+            for item in product_detail:
+                goods_dict[item.goods_code] = item.qty
+                goods_codes.append(item.goods_code)
+            goods_list = WarehouseGoodsDetails.objects.filter(goods_code__in=goods_codes).filter(warehouse=warehouse_code)
+            qtys = []
+            for goods in goods_list:
+                if goods.goods_code in goods_dict():
+                    picking_qty = (goods.not_picking_qty / goods_dict.get(goods.goods_code)) \
+                        if (goods_dict.get(goods.goods_code) is not None
+                            and goods_dict.get(goods.goods_code) != 0) else 0
+                    qtys.append(picking_qty)
+                else:
+                    qtys.append(0)
+
+            picking_qty = min(*qtys)
             if picking_qty != 0:
                 now_time = datetime.now()
                 for goods in goods_list:
@@ -71,12 +71,12 @@ def picking(request, warehouse_code):
                                             updater=message.get('updater'))
                 transaction.commit()
                 resp_message['picking_qty'] = picking_qty
-        except Exception as e:
-            LOG.error('Picking operation error.\n [ERROR]:%s' % str(e))
-            transaction.rollback()
-            return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                            content_type='application/json;charset-utf-8',
-                            date={'error': 'Picking operation error. reason:%s' % str(e)})
+    except Exception as e:
+        LOG.error('Picking operation error.\n [ERROR]:%s' % str(e))
+        transaction.rollback()
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        content_type='application/json;charset-utf-8',
+                        date={'error': 'Picking operation error. reason:%s' % str(e)})
     return Response(status=status.HTTP_200_OK, data=resp_message)
 
 
