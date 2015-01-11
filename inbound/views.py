@@ -257,9 +257,9 @@ def query_receipt(request, receipt_code):
 
     try:
         details = ReceiptDetails.objects.extra(
-            select={'warehouse_name': 't_warehouse.name'},
-            tables=['t_warehouse'],
-            where=['t_receipt.warehouse=t_warehouse.code']
+            select={'goods_name': 't_goods.name'},
+            tables=['t_goods'],
+            where=['t_receipt_details.goods_code=t_goods.goods_code']
         ).filter(receipt_code=code)
 
         details_array = []
