@@ -12,7 +12,7 @@ from commons.exceptions import ValueIsNoneException
 from uudragon_wms.local.settings import INBOUND_RECEIPT_STATUS_NONE, INBOUND_RECEIPT_DETAIL_STATUS_NONE, \
     INBOUND_RECEIPT_STATUS_CANCEL, INBOUND_RECEIPT_DETAIL_STATUS_CANCEL, \
     INBOUND_RECEIPT_DETAIL_STATUS_COMPLETED, INBOUND_RECEIPT_DETAIL_STATUS_PRE_STORAGE, STORAGE_RECORD_TYPE_RECEIPT, \
-    INBOUND_RECEIPT_STATUS_COMPLETED, INBOUND_RECEIPT_STATUS_UNCOMPLETED, DEFAULT_PAGE_SIZE, YN_YES
+    INBOUND_RECEIPT_STATUS_COMPLETED, INBOUND_RECEIPT_STATUS_UNCOMPLETED, DEFAULT_PAGE_SIZE
 
 LOG = logging.getLogger(__name__)
 
@@ -219,7 +219,11 @@ def query_receipt_list(request):
         for key in message.iterkeys():
             key += '__contains'
             LOG.debug('Condition of query is %s' % message)
-        query_list = Receipt.objects.filter(**message)
+        query_list = Receipt.objects.extra(
+            select={'warehouse_name': 't_warehouse.name'},
+            tables=['t_warehouse'],
+            where=['t_receipt.warehouse=t_warehouse.code']
+        ).filter(**message)
         paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
         total_page_count = paginator.num_pages
         if pageNo > total_page_count:
