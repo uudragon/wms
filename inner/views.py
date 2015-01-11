@@ -38,7 +38,7 @@ def picking(request, warehouse_code):
             goods_list = WarehouseGoodsDetails.objects.filter(goods_code__in=goods_codes).filter(warehouse=warehouse_code)
             qtys = []
             for goods in goods_list:
-                if goods.goods_code in goods_dict():
+                if goods.goods_code in goods_dict:
                     picking_qty = (goods.not_picking_qty / goods_dict.get(goods.goods_code)) \
                         if (goods_dict.get(goods.goods_code) is not None
                             and goods_dict.get(goods.goods_code) != 0) else 0
