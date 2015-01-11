@@ -33,6 +33,8 @@ class StorageRecordsSerializer(serializers.ModelSerializer):
 
 
 class ReceiptSerializer(serializers.ModelSerializer):
+    
+    warehouse_name = serializers.CharField(max_length=255)
 
     class Meta:
         model = Receipt
