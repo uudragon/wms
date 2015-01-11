@@ -256,7 +256,11 @@ def query_receipt(request, receipt_code):
     LOG.debug('Current received receipt_code is %s' % code)
 
     try:
-        details = ReceiptDetails.objects.filter(receipt_code=code)
+        details = ReceiptDetails.objects.extra(
+            select={'warehouse_name': 't_warehouse.name'},
+            tables=['t_warehouse'],
+            where=['t_receipt.warehouse=t_warehouse.code']
+        ).filter(receipt_code=code)
 
         details_array = []
         for detail in details:
