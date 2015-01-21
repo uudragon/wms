@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from big_house.models import Product, ProductDetails, Warehouse, StorageRecords, Receipt, ReceiptDetails, \
-    WarehouseGoodsDetails, WarehouseProductDetails, Goods
+    WarehouseGoodsDetails, WarehouseProductDetails, Goods, Shipment, ShipmentDetails
 
 __author__ = 'pluto'
 
@@ -70,3 +70,17 @@ class GoodsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Goods
+        
+
+class ShipmentSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Shipment
+
+
+class ShipmentDetailsSerializer(serializers.ModelSerializer):
+
+    goods_name = serializers.CharField(max_length=255, read_only=True)
+    
+    class Meta:
+        model = ShipmentDetails
