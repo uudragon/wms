@@ -23,7 +23,7 @@ class Product(models.Model):
     product_code = models.CharField(db_column='PRODUCT_CODE', null=False, max_length=36, unique=True)
     product_name = models.CharField(db_column='PRODUCT_NAME', null=False, max_length=200)
     package_code = models.CharField(db_column='PACKAGE_CODE', null=False, max_length=50)
-    product_level = models.InterField(db_column='PRODUCT_LEVEL', null=False, default=1)
+    product_level = models.IntegerField(db_column='PRODUCT_LEVEL', null=False, default=1)
     product_desc = models.CharField(db_column='PRODUCT_DESC', null=True, max_length=500)
     create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)
     creator = models.CharField(db_column='CREATOR', null=False, max_length=50)
@@ -177,7 +177,7 @@ class Shipment(models.Model):
     shipped_qty = models.IntegerField(db_column='SHIPPED_QTY', null=False, default=0)
     express_code = models.CharField(db_column='EXPRESS_CODE', null=True, max_length=50)
     express_orders_no = models.CharField(db_column='EXPRESS_ORDERS_NO', null=True, max_length=100, unique=True)
-    express_name = models.CHarField(db_column='EXPRESS_NAME', null=True, max_length=255)
+    express_name = models.CharField(db_column='EXPRESS_NAME', null=True, max_length=255)
     express_cost = models.DecimalField(db_column='EXPRESS_COST', null=True, max_digits=20,
                                        decimal_places=2, default=0.00)
     sent_date = models.CharField(db_column='SENT_DATE', null=True, max_length=10)
