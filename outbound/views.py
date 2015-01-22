@@ -58,6 +58,7 @@ def save_shipment(request):
             shipment.express_orders_no = message.get('express_orders_no')
             shipment.express_name = message.get('express_name')
             shipment.express_cost = message.get('express_cost')
+            shipment.sent_date = message.get('sent_date')
             shipment.courier = message.get('courier')
             shipment.courier_tel = message.get('courier_tel')
             shipment.updater = message.get('updater')
@@ -172,14 +173,18 @@ def split(request):
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
                         data={'error': 'Attribute[\'customer_name\'] can not be none.'})
+    if message.get('effective_date') is None:
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset-utf-8',
+                        data={'error': 'Attribute[\'effective_date\'] can not be none.'})
     if message.get('address') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
                         data={'error': 'Attribute[\'address\'] can not be none.'})
-    if message.get('phone') is None:
+    if message.get('customer_tel') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
-                        data={'error': 'Attribute[\'phone\'] can not be none.'})
+                        data={'error': 'Attribute[\'customer_tel\'] can not be none.'})
     if message.get('details') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
@@ -211,7 +216,7 @@ def split(request):
                 entry = dict()
                 entry[item.goods_code] = item
                 goods_dict[item.product_level] = entry
-        LOG.debug('Current goods_')
+        LOG.debug('Current goods_dict is %s' % goods_dict)
         strptime = time.strptime(message.get('effective_date'), '%Y-%m-%d')
         effective_month = strptime.tm_mon
         now_time = datetime.now()
@@ -235,8 +240,10 @@ def split(request):
                     detail.save()
                 shipment = Shipment(
                     shipment_no=shipment_no,
+                    orders_no=message.get('orders_no'),
                     customer_no=message.get('customer_no'),
                     customer_name=message.get('customer_name'),
+                    address=message.get('address'),
                     customer_tel=message.get('customer_tel'),
                     has_invoie=message.get('has_invoice'),
                     amount=message.get('amount'),
@@ -281,8 +288,10 @@ def split(request):
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
+                orders_no=message.get('orders_no'),
                 customer_no=message.get('customer_no'),
                 customer_name=message.get('customer_name'),
+                address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
                 has_invoie=message.get('has_invoice'),
                 amount=message.get('amount'),
@@ -320,8 +329,10 @@ def split(request):
                     detail.save()
                 shipment = Shipment(
                     shipment_no=shipment_no,
+                    orders_no=message.get('orders_no'),
                     customer_no=message.get('customer_no'),
                     customer_name=message.get('customer_name'),
+                    address=message.get('address'),
                     customer_tel=message.get('customer_tel'),
                     has_invoie=message.get('has_invoice'),
                     amount=message.get('amount'),
@@ -366,8 +377,10 @@ def split(request):
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
+                orders_no=message.get('orders_no'),
                 customer_no=message.get('customer_no'),
                 customer_name=message.get('customer_name'),
+                address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
                 has_invoie=message.get('has_invoice'),
                 amount=message.get('amount'),
@@ -405,8 +418,10 @@ def split(request):
                     detail.save()
                 shipment = Shipment(
                     shipment_no=shipment_no,
+                    orders_no=message.get('orders_no'),
                     customer_no=message.get('customer_no'),
                     customer_name=message.get('customer_name'),
+                    address=message.get('address'),
                     customer_tel=message.get('customer_tel'),
                     has_invoie=message.get('has_invoice'),
                     amount=message.get('amount'),
@@ -451,8 +466,10 @@ def split(request):
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
+                orders_no=message.get('orders_no'),
                 customer_no=message.get('customer_no'),
                 customer_name=message.get('customer_name'),
+                address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
                 has_invoie=message.get('has_invoice'),
                 amount=message.get('amount'),
@@ -490,8 +507,10 @@ def split(request):
                     detail.save()
                 shipment = Shipment(
                     shipment_no=shipment_no,
+                    orders_no=message.get('orders_no'),
                     customer_no=message.get('customer_no'),
                     customer_name=message.get('customer_name'),
+                    address=message.get('address'),
                     customer_tel=message.get('customer_tel'),
                     has_invoie=message.get('has_invoice'),
                     amount=message.get('amount'),
@@ -537,8 +556,10 @@ def split(request):
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
+                orders_no=message.get('orders_no'),
                 customer_no=message.get('customer_no'),
                 customer_name=message.get('customer_name'),
+                address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
                 has_invoie=message.get('has_invoice'),
                 amount=message.get('amount'),
@@ -576,8 +597,10 @@ def split(request):
                     detail.save()
                 shipment = Shipment(
                     shipment_no=shipment_no,
+                    orders_no=message.get('orders_no'),
                     customer_no=message.get('customer_no'),
                     customer_name=message.get('customer_name'),
+                    address=message.get('address'),
                     customer_tel=message.get('customer_tel'),
                     has_invoie=message.get('has_invoice'),
                     amount=message.get('amount'),
@@ -623,8 +646,10 @@ def split(request):
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
+                orders_no=message.get('orders_no'),
                 customer_no=message.get('customer_no'),
                 customer_name=message.get('customer_name'),
+                address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
                 has_invoie=message.get('has_invoice'),
                 amount=message.get('amount'),
@@ -662,8 +687,10 @@ def split(request):
                     detail.save()
                 shipment = Shipment(
                     shipment_no=shipment_no,
+                    orders_no=message.get('orders_no'),
                     customer_no=message.get('customer_no'),
                     customer_name=message.get('customer_name'),
+                    address=message.get('address'),
                     customer_tel=message.get('customer_tel'),
                     has_invoie=message.get('has_invoice'),
                     amount=message.get('amount'),
@@ -710,8 +737,10 @@ def split(request):
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
+                orders_no=message.get('orders_no'),
                 customer_no=message.get('customer_no'),
                 customer_name=message.get('customer_name'),
+                address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
                 has_invoie=message.get('has_invoice'),
                 amount=message.get('amount'),
@@ -749,8 +778,10 @@ def split(request):
                     detail.save()
                 shipment = Shipment(
                     shipment_no=shipment_no,
+                    orders_no=message.get('orders_no'),
                     customer_no=message.get('customer_no'),
                     customer_name=message.get('customer_name'),
+                    address=message.get('address'),
                     customer_tel=message.get('customer_tel'),
                     has_invoie=message.get('has_invoice'),
                     amount=message.get('amount'),
@@ -797,8 +828,10 @@ def split(request):
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
+                orders_no=message.get('orders_no'),
                 customer_no=message.get('customer_no'),
                 customer_name=message.get('customer_name'),
+                address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
                 has_invoie=message.get('has_invoice'),
                 amount=message.get('amount'),
@@ -836,8 +869,10 @@ def split(request):
                     detail.save()
                 shipment = Shipment(
                     shipment_no=shipment_no,
+                    orders_no=message.get('orders_no'),
                     customer_no=message.get('customer_no'),
                     customer_name=message.get('customer_name'),
+                    address=message.get('address'),
                     customer_tel=message.get('customer_tel'),
                     has_invoie=message.get('has_invoice'),
                     amount=message.get('amount'),
@@ -884,8 +919,10 @@ def split(request):
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
+                orders_no=message.get('orders_no'),
                 customer_no=message.get('customer_no'),
                 customer_name=message.get('customer_name'),
+                address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
                 has_invoie=message.get('has_invoice'),
                 amount=message.get('amount'),
@@ -923,8 +960,10 @@ def split(request):
                     detail.save()
                 shipment = Shipment(
                     shipment_no=shipment_no,
+                    orders_no=message.get('orders_no'),
                     customer_no=message.get('customer_no'),
                     customer_name=message.get('customer_name'),
+                    address=message.get('address'),
                     customer_tel=message.get('customer_tel'),
                     has_invoie=message.get('has_invoice'),
                     amount=message.get('amount'),
@@ -969,8 +1008,10 @@ def split(request):
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
+                orders_no=message.get('orders_no'),
                 customer_no=message.get('customer_no'),
                 customer_name=message.get('customer_name'),
+                address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
                 has_invoie=message.get('has_invoice'),
                 amount=message.get('amount'),
