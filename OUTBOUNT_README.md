@@ -380,7 +380,7 @@ courier_tel|String|O|快递员电话
 sent_date|String|O|发货时间
 create_time|String|Y|创建时间
 creator|String|Y|创建人
-update_time|String|修改时间
+update_time|String|Y|修改时间
 updater|String|Y|需改人
 status|int|Y|发货单状态。-1：无效；0：待审核；1：待发货；2：备货中；3：发货中；4：已发货
 
