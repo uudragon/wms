@@ -246,7 +246,7 @@ def split(request):
                 shipment = Shipment(
                     shipment_no=shipment_no,
                     orders_no=message.get('orders_no'),
-                    customer_no=message.get('customer_no'),
+                    customer_no=message.get('customer_code'),
                     customer_name=message.get('customer_name'),
                     address=message.get('address'),
                     customer_tel=message.get('customer_tel'),
@@ -298,7 +298,7 @@ def split(request):
             shipment = Shipment(
                 shipment_no=shipment_no,
                 orders_no=message.get('orders_no'),
-                customer_no=message.get('customer_no'),
+                customer_no=message.get('customer_code'),
                 customer_name=message.get('customer_name'),
                 address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
@@ -343,7 +343,7 @@ def split(request):
                 shipment = Shipment(
                     shipment_no=shipment_no,
                     orders_no=message.get('orders_no'),
-                    customer_no=message.get('customer_no'),
+                    customer_no=message.get('customer_code'),
                     customer_name=message.get('customer_name'),
                     address=message.get('address'),
                     customer_tel=message.get('customer_tel'),
@@ -395,7 +395,7 @@ def split(request):
             shipment = Shipment(
                 shipment_no=shipment_no,
                 orders_no=message.get('orders_no'),
-                customer_no=message.get('customer_no'),
+                customer_no=message.get('customer_code'),
                 customer_name=message.get('customer_name'),
                 address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
@@ -444,7 +444,7 @@ def split(request):
                 shipment = Shipment(
                     shipment_no=shipment_no,
                     orders_no=message.get('orders_no'),
-                    customer_no=message.get('customer_no'),
+                    customer_no=message.get('customer_code'),
                     customer_name=message.get('customer_name'),
                     address=message.get('address'),
                     customer_tel=message.get('customer_tel'),
@@ -496,7 +496,7 @@ def split(request):
             shipment = Shipment(
                 shipment_no=shipment_no,
                 orders_no=message.get('orders_no'),
-                customer_no=message.get('customer_no'),
+                customer_no=message.get('customer_code'),
                 customer_name=message.get('customer_name'),
                 address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
@@ -541,7 +541,7 @@ def split(request):
                 shipment = Shipment(
                     shipment_no=shipment_no,
                     orders_no=message.get('orders_no'),
-                    customer_no=message.get('customer_no'),
+                    customer_no=message.get('customer_code'),
                     customer_name=message.get('customer_name'),
                     address=message.get('address'),
                     customer_tel=message.get('customer_tel'),
@@ -594,7 +594,7 @@ def split(request):
             shipment = Shipment(
                 shipment_no=shipment_no,
                 orders_no=message.get('orders_no'),
-                customer_no=message.get('customer_no'),
+                customer_no=message.get('customer_code'),
                 customer_name=message.get('customer_name'),
                 address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
@@ -639,7 +639,7 @@ def split(request):
                 shipment = Shipment(
                     shipment_no=shipment_no,
                     orders_no=message.get('orders_no'),
-                    customer_no=message.get('customer_no'),
+                    customer_no=message.get('customer_code'),
                     customer_name=message.get('customer_name'),
                     address=message.get('address'),
                     customer_tel=message.get('customer_tel'),
@@ -692,7 +692,7 @@ def split(request):
             shipment = Shipment(
                 shipment_no=shipment_no,
                 orders_no=message.get('orders_no'),
-                customer_no=message.get('customer_no'),
+                customer_no=message.get('customer_code'),
                 customer_name=message.get('customer_name'),
                 address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
@@ -737,7 +737,7 @@ def split(request):
                 shipment = Shipment(
                     shipment_no=shipment_no,
                     orders_no=message.get('orders_no'),
-                    customer_no=message.get('customer_no'),
+                    customer_no=message.get('customer_code'),
                     customer_name=message.get('customer_name'),
                     address=message.get('address'),
                     customer_tel=message.get('customer_tel'),
@@ -791,7 +791,7 @@ def split(request):
             shipment = Shipment(
                 shipment_no=shipment_no,
                 orders_no=message.get('orders_no'),
-                customer_no=message.get('customer_no'),
+                customer_no=message.get('customer_code'),
                 customer_name=message.get('customer_name'),
                 address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
@@ -836,7 +836,7 @@ def split(request):
                 shipment = Shipment(
                     shipment_no=shipment_no,
                     orders_no=message.get('orders_no'),
-                    customer_no=message.get('customer_no'),
+                    customer_no=message.get('customer_code'),
                     customer_name=message.get('customer_name'),
                     address=message.get('address'),
                     customer_tel=message.get('customer_tel'),
@@ -890,7 +890,7 @@ def split(request):
             shipment = Shipment(
                 shipment_no=shipment_no,
                 orders_no=message.get('orders_no'),
-                customer_no=message.get('customer_no'),
+                customer_no=message.get('customer_code'),
                 customer_name=message.get('customer_name'),
                 address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
@@ -935,7 +935,7 @@ def split(request):
                 shipment = Shipment(
                     shipment_no=shipment_no,
                     orders_no=message.get('orders_no'),
-                    customer_no=message.get('customer_no'),
+                    customer_no=message.get('customer_code'),
                     customer_name=message.get('customer_name'),
                     address=message.get('address'),
                     customer_tel=message.get('customer_tel'),
@@ -989,7 +989,7 @@ def split(request):
             shipment = Shipment(
                 shipment_no=shipment_no,
                 orders_no=message.get('orders_no'),
-                customer_no=message.get('customer_no'),
+                customer_no=message.get('customer_code'),
                 customer_name=message.get('customer_name'),
                 address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
@@ -1034,7 +1034,7 @@ def split(request):
                 shipment = Shipment(
                     shipment_no=shipment_no,
                     orders_no=message.get('orders_no'),
-                    customer_no=message.get('customer_no'),
+                    customer_no=message.get('customer_code'),
                     customer_name=message.get('customer_name'),
                     address=message.get('address'),
                     customer_tel=message.get('customer_tel'),
@@ -1086,7 +1086,7 @@ def split(request):
             shipment = Shipment(
                 shipment_no=shipment_no,
                 orders_no=message.get('orders_no'),
-                customer_no=message.get('customer_no'),
+                customer_no=message.get('customer_code'),
                 customer_name=message.get('customer_name'),
                 address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
