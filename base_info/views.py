@@ -113,6 +113,7 @@ def define_product(request):
             product.product_code = message.get('product_code')
             product.product_desc = message.get('product_desc')
             product.product_level = message.get('product_level')
+            product.package_code = message.get('package_code') if message.get('package_code') is not None else 'default'
             product.updater = message.get('updater')
             product.update_time = datetime.now()
             product.yn = message.get('yn')
@@ -123,6 +124,7 @@ def define_product(request):
                 product_code=message.get('product_code'),
                 product_level=message.get('product_level'),
                 product_desc=message.get('product_desc'),
+                package_code=message.get('package_code') if message.get('package_code') is not None else 'default',
                 creator=message.get('creator'),
                 create_time=nowTime,
                 updater=message.get('updater'),
