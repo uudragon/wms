@@ -227,7 +227,7 @@ def split(request):
                 LOG.debug('Current level is %s' % level)
                 shipment_no = uuid.uuid4()
                 total_qty = 0
-                for goods_code, goods_detail in goods_entry.item():
+                for goods_code, goods_detail in goods_entry.items():
                     rid = '%s%s' % (shipment_no, goods_code)
                     detail = ShipmentDetails(
                         id=rid,
@@ -316,7 +316,7 @@ def split(request):
                 LOG.debug('Current level is %s' % level)
                 shipment_no = uuid.uuid4()
                 total_qty = 0
-                for goods_code, goods_detail in goods_entry.item():
+                for goods_code, goods_detail in goods_entry.items():
                     rid = '%s%s' % (shipment_no, goods_code)
                     detail = ShipmentDetails(
                         id=rid,
@@ -409,7 +409,7 @@ def split(request):
                     LOG.debug('Current level is %s' % level)
                 shipment_no = uuid.uuid4()
                 total_qty = 0
-                for goods_code, goods_detail in goods_entry.item():
+                for goods_code, goods_detail in goods_entry.items():
                     rid = '%s%s' % (shipment_no, goods_code)
                     detail = ShipmentDetails(
                         id=rid,
@@ -498,7 +498,7 @@ def split(request):
                 LOG.debug('Current level is %s' % level)
                 shipment_no = uuid.uuid4()
                 total_qty = 0
-                for goods_code, goods_detail in goods_entry.item():
+                for goods_code, goods_detail in goods_entry.items():
                     rid = '%s%s' % (shipment_no, goods_code)
                     detail = ShipmentDetails(
                         id=rid,
@@ -588,7 +588,7 @@ def split(request):
                 LOG.debug('Current level is %s' % level)
                 shipment_no = uuid.uuid4()
                 total_qty = 0
-                for goods_code, goods_detail in goods_entry.item():
+                for goods_code, goods_detail in goods_entry.items():
                     rid = '%s%s' % (shipment_no, goods_code)
                     detail = ShipmentDetails(
                         id=rid,
@@ -678,7 +678,7 @@ def split(request):
                 LOG.debug('Current level is %s' % level)
                 shipment_no = uuid.uuid4()
                 total_qty = 0
-                for goods_code, goods_detail in goods_entry.item():
+                for goods_code, goods_detail in goods_entry.items():
                     rid = '%s%s' % (shipment_no, goods_code)
                     detail = ShipmentDetails(
                         id=rid,
@@ -769,7 +769,7 @@ def split(request):
                 LOG.debug('Current level is %s' % level)
                 shipment_no = uuid.uuid4()
                 total_qty = 0
-                for goods_code, goods_detail in goods_entry.item():
+                for goods_code, goods_detail in goods_entry.items():
                     rid = '%s%s' % (shipment_no, goods_code)
                     detail = ShipmentDetails(
                         id=rid,
@@ -860,7 +860,7 @@ def split(request):
                 LOG.debug('Current level is %s' % level)
                 shipment_no = uuid.uuid4()
                 total_qty = 0
-                for goods_code, goods_detail in goods_entry.item():
+                for goods_code, goods_detail in goods_entry.items():
                     rid = '%s%s' % (shipment_no, goods_code)
                     detail = ShipmentDetails(
                         id=rid,
@@ -951,7 +951,7 @@ def split(request):
                 LOG.debug('Current level is %s' % level)
                 shipment_no = uuid.uuid4()
                 total_qty = 0
-                for goods_code, goods_detail in goods_entry.item():
+                for goods_code, goods_detail in goods_entry.items():
                     rid = '%s%s' % (shipment_no, goods_code)
                     detail = ShipmentDetails(
                         id=rid,
