@@ -16,7 +16,7 @@
 	Accept:application/json
 ######1.3 请求参数
 名称|类型|是否必填|说明
--|-|-|-
+---|---|---|---
 orders_no|String|Y|订单号
 customer_code|String|Y|客户编号
 customer_name|String|Y|客户姓名
@@ -29,10 +29,10 @@ creator|String|Y|创建人
 updater|String|Y|需改人
 details|array|Y|订单明细
 
-Details
+`Details:`
 
 名称|类型|是否必填|说明
--|-|-|-
+---|---|---|---
 product_code|String|Y|产品编号
 
 样例报文：
@@ -61,7 +61,7 @@ product_code|String|Y|产品编号
 发货单列表
 
 名称|类型|是否必填|说明
--|-|-|-
+---|---|---|---
 orders_no|String|Y|订单号
 shipment_no|String|Y|发货单号
 customer_code|String|Y|客户编号
@@ -143,7 +143,7 @@ shipmenet_no|String|Y|出库单号
 响应报文说明：
 
 名称|类型|是否必填|说明
--|-|-|-
+---|---|---|---
 orders_no|String|Y|订单号
 shipment_no|String|Y|发货单号
 customer_code|String|Y|客户编号
@@ -167,9 +167,10 @@ updater|String|Y|需改人
 status|int|Y|发货单状态。-1：无效；0：待审核；1：待发货；2：备货中；3：发货中；4：已发货
 details|array|Y|发货明细
 
-Details
+`Details`
+
 名称|类型|是否必填|说明
--|-|-|-
+---|---|---|---
 shipment_no|String|Y|出库单号
 goods_code|String|Y|商品编号
 is_gift|int|Y|是否赠品。0：否；1：是
@@ -236,7 +237,7 @@ error| String  | 错误信息
 	Accept:application/json
 ######3.3 请求参数
 名称|类型|是否必填|说明
--|-|-|-
+---|---|---|---
 orders_no|String|Y|订单号
 shipment_no|String|Y|发货单号
 customer_code|String|Y|客户编号
@@ -262,7 +263,7 @@ details|array|Y|发货明细
 
 Details
 名称|类型|是否必填|说明
--|-|-|-
+---|---|---|---
 shipment_no|String|Y|出库单号
 goods_code|String|Y|商品编号
 is_gift|int|Y|是否赠品。0：否；1：是
@@ -351,7 +352,7 @@ error| String  | 错误信息
 响应报文说明：
 
 名称|类型|是否必填|说明
---|--|--|--
+---|---|---|---
 pageSize|Int|Y|每页显示记录数
 pageNo|Int|Y|当前页号
 recordsCount|Int|Y|总记录数
@@ -361,7 +362,7 @@ records|Array|N|当前页记录
 <Records-Item>
 
 名称|类型|是否必填|说明
--|-|-|-
+---|---|---|---
 orders_no|String|Y|订单号
 shipment_no|String|Y|发货单号
 customer_code|String|Y|客户编号
@@ -380,7 +381,7 @@ courier_tel|String|O|快递员电话
 sent_date|String|O|发货时间
 create_time|String|Y|创建时间
 creator|String|Y|创建人
-update_time|String|修改时间
+update_time|String|Y|修改时间
 updater|String|Y|需改人
 status|int|Y|发货单状态。-1：无效；0：待审核；1：待发货；2：备货中；3：发货中；4：已发货
 
