@@ -167,7 +167,8 @@ updater|String|Y|需改人
 status|int|Y|发货单状态。-1：无效；0：待审核；1：待发货；2：备货中；3：发货中；4：已发货
 details|array|Y|发货明细
 
-Details
+`Details`
+
 名称|类型|是否必填|说明
 ---|---|---|---
 shipment_no|String|Y|出库单号
