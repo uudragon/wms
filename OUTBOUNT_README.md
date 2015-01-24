@@ -9,7 +9,7 @@
 接收客服系统发送的订单信息，按照一定规则将其拆分成发货单并返回将发货单信息返回给客服系统
 ######1.1 url
 	method: POST
-	outbound/split/
+	wms/outbound/split/
 	注意：结尾的’/’不能省略
 ######1.2 header
 	Content_Type:application/json;charset=utf-8
@@ -122,7 +122,7 @@ error| String  | 错误信息
 按给定的出库单号查询对应的出库单信息
 ######2.1 url
 	method: GET
-	outbound/shipment/${shipment_no}/
+	wms/outbound/shipment/${shipment_no}/
 	注意：结尾的’/’不能省略, ${shipment_no}为出库单号
 ######2.2 header
 	Content_Type:application/json;charset=utf-8
@@ -229,7 +229,7 @@ error| String  | 错误信息
 该接口用于保存用户对于出库单的修改
 ######3.1 url
 	method: POST
-	outbound/shipment/save/
+	wms/outbound/shipment/save/
 	注意：结尾的’/’不能省略
 ######3.2 header
 	Content_Type:application/json;charset=utf-8
@@ -331,7 +331,7 @@ error| String  | 错误信息
 该接口用于批量查询出库单
 ######4.1 url
 	method: POST
-	inner/shipments/
+	wms/outbound/shipments/
 	注意：结尾的’/’不能省略
 ######4.2 header
 	Content_Type:application/json;charset=utf-8
