@@ -234,10 +234,10 @@ def split(request):
                         shipment_no=shipment_no,
                         code=goods_code,
                         type=1,
-                        qty=goods_detail.get('qty'),
+                        qty=goods_detail.qty,
                         status=0
                     )
-                    total_qty += goods_detail.get('qty')
+                    total_qty += goods_detail.qty
                     detail.save()
                 shipment = Shipment(
                     shipment_no=shipment_no,
@@ -282,10 +282,10 @@ def split(request):
                     shipment_no=shipment_no,
                     code=goods_code,
                     type=1,
-                    qty=goods_detail.get('qty'),
+                    qty=goods_detail.qty,
                     status=0
                 )
-                total_qty += goods_detail.get('qty')
+                total_qty += goods_detail.qty
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
@@ -323,10 +323,10 @@ def split(request):
                         shipment_no=shipment_no,
                         code=goods_code,
                         type=1,
-                        qty=goods_detail.get('qty'),
+                        qty=goods_detail.qty,
                         status=0
                     )
-                    total_qty += goods_detail.get('qty')
+                    total_qty += goods_detail.qty
                     detail.save()
                 shipment = Shipment(
                     shipment_no=shipment_no,
@@ -371,10 +371,10 @@ def split(request):
                     shipment_no=shipment_no,
                     code=goods_code,
                     type=1,
-                    qty=goods_detail.get('qty'),
+                    qty=goods_detail.qty,
                     status=0
                 )
-                total_qty += goods_detail.get('qty')
+                total_qty += goods_detail.qty
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
@@ -416,10 +416,10 @@ def split(request):
                         shipment_no=shipment_no,
                         code=goods_code,
                         type=1,
-                        qty=goods_detail.get('qty'),
+                        qty=goods_detail.qty,
                         status=0
                     )
-                    total_qty += goods_detail.get('qty')
+                    total_qty += goods_detail.qty
                     detail.save()
                 shipment = Shipment(
                     shipment_no=shipment_no,
@@ -464,10 +464,10 @@ def split(request):
                     shipment_no=shipment_no,
                     code=goods_code,
                     type=1,
-                    qty=goods_detail.get('qty'),
+                    qty=goods_detail.qty,
                     status=0
                 )
-                total_qty += goods_detail.get('qty')
+                total_qty += ggoods_detail.qty
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
@@ -505,10 +505,10 @@ def split(request):
                         shipment_no=shipment_no,
                         code=goods_code,
                         type=1,
-                        qty=goods_detail.get('qty'),
+                        qty=goods_detail.qty,
                         status=0
                     )
-                    total_qty += goods_detail.get('qty')
+                    total_qty += goods_detail.qty
                     detail.save()
                 shipment = Shipment(
                     shipment_no=shipment_no,
@@ -554,10 +554,10 @@ def split(request):
                     shipment_no=shipment_no,
                     code=goods_code,
                     type=1,
-                    qty=goods_detail.get('qty'),
+                    qty=goods_detail.qty,
                     status=0
                 )
-                total_qty += goods_detail.get('qty')
+                total_qty += goods_detail.qty
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
@@ -595,10 +595,10 @@ def split(request):
                         shipment_no=shipment_no,
                         code=goods_code,
                         type=1,
-                        qty=goods_detail.get('qty'),
+                        qty=goods_detail.qty,
                         status=0
                     )
-                    total_qty += goods_detail.get('qty')
+                    total_qty += goods_detail.qty
                     detail.save()
                 shipment = Shipment(
                     shipment_no=shipment_no,
@@ -644,10 +644,10 @@ def split(request):
                     shipment_no=shipment_no,
                     code=goods_code,
                     type=1,
-                    qty=goods_detail.get('qty'),
+                    qty=goods_detail.qty,
                     status=0
                 )
-                total_qty += goods_detail.get('qty')
+                total_qty += goods_detail.qty
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
@@ -685,10 +685,10 @@ def split(request):
                         shipment_no=shipment_no,
                         code=goods_code,
                         type=1,
-                        qty=goods_detail.get('qty'),
+                        qty=goods_detail.qty,
                         status=0
                     )
-                    total_qty += goods_detail.get('qty')
+                    total_qty += goods_detail.qty
                     detail.save()
                 shipment = Shipment(
                     shipment_no=shipment_no,
@@ -735,10 +735,10 @@ def split(request):
                     shipment_no=shipment_no,
                     code=goods_code,
                     type=1,
-                    qty=goods_detail.get('qty'),
+                    qty=goods_detail.qty,
                     status=0
                 )
-                total_qty += goods_detail.get('qty')
+                total_qty += goods_detail.qty
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
@@ -776,10 +776,10 @@ def split(request):
                         shipment_no=shipment_no,
                         code=goods_code,
                         type=1,
-                        qty=goods_detail.get('qty'),
+                        qty=goods_detail.qty,
                         status=0
                     )
-                    total_qty += goods_detail.get('qty')
+                    total_qty += goods_detail.qty
                     detail.save()
                 shipment = Shipment(
                     shipment_no=shipment_no,
@@ -826,10 +826,10 @@ def split(request):
                     shipment_no=shipment_no,
                     code=goods_code,
                     type=1,
-                    qty=goods_detail.get('qty'),
+                    qty=goods_detail.qty,
                     status=0
                 )
-                total_qty += goods_detail.get('qty')
+                total_qty += goods_detail.qty
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
@@ -867,10 +867,10 @@ def split(request):
                         shipment_no=shipment_no,
                         code=goods_code,
                         type=1,
-                        qty=goods_detail.get('qty'),
+                        qty=goods_detail.qty,
                         status=0
                     )
-                    total_qty += goods_detail.get('qty')
+                    total_qty += goods_detail.qty
                     detail.save()
                 shipment = Shipment(
                     shipment_no=shipment_no,
@@ -917,10 +917,10 @@ def split(request):
                     shipment_no=shipment_no,
                     code=goods_code,
                     type=1,
-                    qty=goods_detail.get('qty'),
+                    qty=goods_detail.qty,
                     status=0
                 )
-                total_qty += goods_detail.get('qty')
+                total_qty += goods_detail.qty
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
@@ -1006,10 +1006,10 @@ def split(request):
                     shipment_no=shipment_no,
                     code=goods_code,
                     type=1,
-                    qty=goods_detail.get('qty'),
+                    qty=goods_detail.qty,
                     status=0
                 )
-                total_qty += goods_detail.get('qty')
+                total_qty += goods_detail.qty
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
