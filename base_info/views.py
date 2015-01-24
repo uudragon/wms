@@ -112,6 +112,7 @@ def define_product(request):
             product.product_name = message.get('product_name')
             product.product_code = message.get('product_code')
             product.product_desc = message.get('product_desc')
+            product.product_level = message.get('product_level')
             product.updater = message.get('updater')
             product.update_time = datetime.now()
             product.yn = message.get('yn')
@@ -120,6 +121,7 @@ def define_product(request):
             product = Product(
                 product_name=message.get('product_name'),
                 product_code=message.get('product_code'),
+                product_level=message.get('product_level'),
                 product_desc=message.get('product_desc'),
                 creator=message.get('creator'),
                 create_time=nowTime,
