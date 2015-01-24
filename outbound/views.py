@@ -232,9 +232,13 @@ def split(request):
                     detail = ShipmentDetails(
                         id=rid,
                         shipment_no=shipment_no,
-                        code=goods_code,
-                        type=1,
+                        goods_code=goods_code,
+                        is_gift=goods_detail.is_gift,
                         qty=goods_detail.qty,
+                        create_time=now_time,
+                        creator=message.get('creator'),
+                        update_time=now_time,
+                        updater=message.get('updater'),
                         status=0
                     )
                     total_qty += goods_detail.qty
@@ -280,9 +284,13 @@ def split(request):
                 detail = ShipmentDetails(
                     id=rid,
                     shipment_no=shipment_no,
-                    code=goods_code,
-                    type=1,
+                    goods_code=goods_code,
+                    is_gift=goods_detail.is_gift,
                     qty=goods_detail.qty,
+                    create_time=now_time,
+                    creator=message.get('creator'),
+                    update_time=now_time,
+                    updater=message.get('updater'),
                     status=0
                 )
                 total_qty += goods_detail.qty
@@ -321,9 +329,13 @@ def split(request):
                     detail = ShipmentDetails(
                         id=rid,
                         shipment_no=shipment_no,
-                        code=goods_code,
-                        type=1,
+                        goods_code=goods_code,
+                        is_gift=goods_detail.is_gift,
                         qty=goods_detail.qty,
+                        create_time=now_time,
+                        creator=message.get('creator'),
+                        update_time=now_time,
+                        updater=message.get('updater'),
                         status=0
                     )
                     total_qty += goods_detail.qty
@@ -369,9 +381,13 @@ def split(request):
                 detail = ShipmentDetails(
                     id=rid,
                     shipment_no=shipment_no,
-                    code=goods_code,
-                    type=1,
+                    goods_code=goods_code,
+                    is_gift=goods_detail.is_gift,
                     qty=goods_detail.qty,
+                    create_time=now_time,
+                    creator=message.get('creator'),
+                    update_time=now_time,
+                    updater=message.get('updater'),
                     status=0
                 )
                 total_qty += goods_detail.qty
@@ -414,9 +430,13 @@ def split(request):
                     detail = ShipmentDetails(
                         id=rid,
                         shipment_no=shipment_no,
-                        code=goods_code,
-                        type=1,
+                        goods_code=goods_code,
+                        is_gift=goods_detail.is_gift,
                         qty=goods_detail.qty,
+                        create_time=now_time,
+                        creator=message.get('creator'),
+                        update_time=now_time,
+                        updater=message.get('updater'),
                         status=0
                     )
                     total_qty += goods_detail.qty
@@ -462,12 +482,16 @@ def split(request):
                 detail = ShipmentDetails(
                     id=rid,
                     shipment_no=shipment_no,
-                    code=goods_code,
-                    type=1,
+                    goods_code=goods_code,
+                    is_gift=goods_detail.is_gift,
                     qty=goods_detail.qty,
+                    create_time=now_time,
+                    creator=message.get('creator'),
+                    update_time=now_time,
+                    updater=message.get('updater'),
                     status=0
                 )
-                total_qty += ggoods_detail.qty
+                total_qty += goods_detail.qty
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
@@ -503,9 +527,13 @@ def split(request):
                     detail = ShipmentDetails(
                         id=rid,
                         shipment_no=shipment_no,
-                        code=goods_code,
-                        type=1,
+                        goods_code=goods_code,
+                        is_gift=goods_detail.is_gift,
                         qty=goods_detail.qty,
+                        create_time=now_time,
+                        creator=message.get('creator'),
+                        update_time=now_time,
+                        updater=message.get('updater'),
                         status=0
                     )
                     total_qty += goods_detail.qty
@@ -552,9 +580,13 @@ def split(request):
                 detail = ShipmentDetails(
                     id=rid,
                     shipment_no=shipment_no,
-                    code=goods_code,
-                    type=1,
+                    goods_code=goods_code,
+                    is_gift=goods_detail.is_gift,
                     qty=goods_detail.qty,
+                    create_time=now_time,
+                    creator=message.get('creator'),
+                    update_time=now_time,
+                    updater=message.get('updater'),
                     status=0
                 )
                 total_qty += goods_detail.qty
@@ -593,9 +625,13 @@ def split(request):
                     detail = ShipmentDetails(
                         id=rid,
                         shipment_no=shipment_no,
-                        code=goods_code,
-                        type=1,
+                        goods_code=goods_code,
+                        is_gift=goods_detail.is_gift,
                         qty=goods_detail.qty,
+                        create_time=now_time,
+                        creator=message.get('creator'),
+                        update_time=now_time,
+                        updater=message.get('updater'),
                         status=0
                     )
                     total_qty += goods_detail.qty
@@ -642,9 +678,13 @@ def split(request):
                 detail = ShipmentDetails(
                     id=rid,
                     shipment_no=shipment_no,
-                    code=goods_code,
-                    type=1,
+                    goods_code=goods_code,
+                    is_gift=goods_detail.is_gift,
                     qty=goods_detail.qty,
+                    create_time=now_time,
+                    creator=message.get('creator'),
+                    update_time=now_time,
+                    updater=message.get('updater'),
                     status=0
                 )
                 total_qty += goods_detail.qty
@@ -683,9 +723,13 @@ def split(request):
                     detail = ShipmentDetails(
                         id=rid,
                         shipment_no=shipment_no,
-                        code=goods_code,
-                        type=1,
+                        goods_code=goods_code,
+                        is_gift=goods_detail.is_gift,
                         qty=goods_detail.qty,
+                        create_time=now_time,
+                        creator=message.get('creator'),
+                        update_time=now_time,
+                        updater=message.get('updater'),
                         status=0
                     )
                     total_qty += goods_detail.qty
@@ -733,9 +777,13 @@ def split(request):
                 detail = ShipmentDetails(
                     id=rid,
                     shipment_no=shipment_no,
-                    code=goods_code,
-                    type=1,
+                    goods_code=goods_code,
+                    is_gift=goods_detail.is_gift,
                     qty=goods_detail.qty,
+                    create_time=now_time,
+                    creator=message.get('creator'),
+                    update_time=now_time,
+                    updater=message.get('updater'),
                     status=0
                 )
                 total_qty += goods_detail.qty
@@ -774,9 +822,13 @@ def split(request):
                     detail = ShipmentDetails(
                         id=rid,
                         shipment_no=shipment_no,
-                        code=goods_code,
-                        type=1,
+                        goods_code=goods_code,
+                        is_gift=goods_detail.is_gift,
                         qty=goods_detail.qty,
+                        create_time=now_time,
+                        creator=message.get('creator'),
+                        update_time=now_time,
+                        updater=message.get('updater'),
                         status=0
                     )
                     total_qty += goods_detail.qty
@@ -824,9 +876,13 @@ def split(request):
                 detail = ShipmentDetails(
                     id=rid,
                     shipment_no=shipment_no,
-                    code=goods_code,
-                    type=1,
+                    goods_code=goods_code,
+                    is_gift=goods_detail.is_gift,
                     qty=goods_detail.qty,
+                    create_time=now_time,
+                    creator=message.get('creator'),
+                    update_time=now_time,
+                    updater=message.get('updater'),
                     status=0
                 )
                 total_qty += goods_detail.qty
@@ -865,9 +921,13 @@ def split(request):
                     detail = ShipmentDetails(
                         id=rid,
                         shipment_no=shipment_no,
-                        code=goods_code,
-                        type=1,
+                        goods_code=goods_code,
+                        is_gift=goods_detail.is_gift,
                         qty=goods_detail.qty,
+                        create_time=now_time,
+                        creator=message.get('creator'),
+                        update_time=now_time,
+                        updater=message.get('updater'),
                         status=0
                     )
                     total_qty += goods_detail.qty
@@ -915,9 +975,13 @@ def split(request):
                 detail = ShipmentDetails(
                     id=rid,
                     shipment_no=shipment_no,
-                    code=goods_code,
-                    type=1,
+                    goods_code=goods_code,
+                    is_gift=goods_detail.is_gift,
                     qty=goods_detail.qty,
+                    create_time=now_time,
+                    creator=message.get('creator'),
+                    update_time=now_time,
+                    updater=message.get('updater'),
                     status=0
                 )
                 total_qty += goods_detail.qty
@@ -956,9 +1020,13 @@ def split(request):
                     detail = ShipmentDetails(
                         id=rid,
                         shipment_no=shipment_no,
-                        code=goods_code,
-                        type=1,
+                        goods_code=goods_code,
+                        is_gift=goods_detail.is_gift,
                         qty=goods_detail.qty,
+                        create_time=now_time,
+                        creator=message.get('creator'),
+                        update_time=now_time,
+                        updater=message.get('updater'),
                         status=0
                     )
                     total_qty += goods_detail.qty
@@ -1004,9 +1072,13 @@ def split(request):
                 detail = ShipmentDetails(
                     id=rid,
                     shipment_no=shipment_no,
-                    code=goods_code,
-                    type=1,
+                    goods_code=goods_code,
+                    is_gift=goods_detail.is_gift,
                     qty=goods_detail.qty,
+                    create_time=now_time,
+                    creator=message.get('creator'),
+                    update_time=now_time,
+                    updater=message.get('updater'),
                     status=0
                 )
                 total_qty += goods_detail.qty
