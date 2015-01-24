@@ -204,7 +204,7 @@ def split(request):
     try:
         query_list = ProductDetails.objects.extra(
             select={'product_level': 't_product.product_level'},
-            tables=['t_product', 't_product_details'],
+            tables=['t_product'],
             where=['t_product_details.product_code=t_product.product_code and t_product.package_code=%s'],
             params=[message.get('package_code')])
         goods_dict = dict()
