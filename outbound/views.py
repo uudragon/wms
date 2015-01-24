@@ -163,7 +163,7 @@ def split(request):
     if message.get('status') != 5:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
-                        data={'error': 'The value of Attribute[\'status\'] is error, expect 2 or 3 but actual %s'
+                        data={'error': 'The value of Attribute[\'status\'] is error, expect 5 but actual %s'
                                        % message.get('status')})
     if message.get('customer_code') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
