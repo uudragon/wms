@@ -29,7 +29,7 @@ creator|String|Y|创建人
 updater|String|Y|需改人
 details|array|Y|订单明细
 
-Details
+`Details:`
 
 名称|类型|是否必填|说明
 ---|---|---|---
