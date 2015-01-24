@@ -361,7 +361,7 @@ records|Array|N|当前页记录
 <Records-Item>
 
 名称|类型|是否必填|说明
--|-|-|-
+---|---|---|---
 orders_no|String|Y|订单号
 shipment_no|String|Y|发货单号
 customer_code|String|Y|客户编号
