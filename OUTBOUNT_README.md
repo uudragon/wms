@@ -351,7 +351,7 @@ error| String  | 错误信息
 响应报文说明：
 
 名称|类型|是否必填|说明
---|--|--|--
+---|---|---|---
 pageSize|Int|Y|每页显示记录数
 pageNo|Int|Y|当前页号
 recordsCount|Int|Y|总记录数
