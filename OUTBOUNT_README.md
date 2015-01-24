@@ -16,7 +16,7 @@
 	Accept:application/json
 ######1.3 请求参数
 名称|类型|是否必填|说明
--|-|-|-
+---|---|---|---
 orders_no|String|Y|订单号
 customer_code|String|Y|客户编号
 customer_name|String|Y|客户姓名
@@ -32,7 +32,7 @@ details|array|Y|订单明细
 Details
 
 名称|类型|是否必填|说明
--|-|-|-
+---|---|---|---
 product_code|String|Y|产品编号
 
 样例报文：
@@ -61,7 +61,7 @@ product_code|String|Y|产品编号
 发货单列表
 
 名称|类型|是否必填|说明
--|-|-|-
+---|---|---|---
 orders_no|String|Y|订单号
 shipment_no|String|Y|发货单号
 customer_code|String|Y|客户编号
@@ -143,7 +143,7 @@ shipmenet_no|String|Y|出库单号
 响应报文说明：
 
 名称|类型|是否必填|说明
--|-|-|-
+---|---|---|---
 orders_no|String|Y|订单号
 shipment_no|String|Y|发货单号
 customer_code|String|Y|客户编号
@@ -169,7 +169,7 @@ details|array|Y|发货明细
 
 Details
 名称|类型|是否必填|说明
--|-|-|-
+---|---|---|---
 shipment_no|String|Y|出库单号
 goods_code|String|Y|商品编号
 is_gift|int|Y|是否赠品。0：否；1：是
@@ -236,7 +236,7 @@ error| String  | 错误信息
 	Accept:application/json
 ######3.3 请求参数
 名称|类型|是否必填|说明
--|-|-|-
+---|---|---|---
 orders_no|String|Y|订单号
 shipment_no|String|Y|发货单号
 customer_code|String|Y|客户编号
@@ -262,7 +262,7 @@ details|array|Y|发货明细
 
 Details
 名称|类型|是否必填|说明
--|-|-|-
+---|---|---|---
 shipment_no|String|Y|出库单号
 goods_code|String|Y|商品编号
 is_gift|int|Y|是否赠品。0：否；1：是
