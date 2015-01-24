@@ -209,6 +209,7 @@ def split(request):
             params=[message.get('package_code')])
         goods_dict = dict()
         for item in query_list:
+            LOG.debug('Item of query result is %s' % item)
             if item.product_level in goods_dict:
                 entry = goods_dict.get(item.product_level)
                 entry[item.goods_code] = item
