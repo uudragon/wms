@@ -223,11 +223,11 @@ def split(request):
         now_time = datetime.now()
         shipments = []
         if effective_month in (9, 10, 11):
-            for level, goods_dict in goods_dict.items():
+            for level, goods_entry in goods_dict.items():
                 LOG.debug('Current level is %s' % level)
                 shipment_no = uuid.uuid4()
                 total_qty = 0
-                for goods_code, goods_detail in goods_dict.item():
+                for goods_code, goods_detail in goods_entry.item():
                     rid = '%s%s' % (shipment_no, goods_code)
                     detail = ShipmentDetails(
                         id=rid,
@@ -312,11 +312,11 @@ def split(request):
             shipment.save()
             shipment_seria = ShipmentSerializer(shipment).data
             shipments.append(shipment_seria)
-            for level, goods_dict in goods_dict.items():
+            for level, goods_entry in goods_dict.items():
                 LOG.debug('Current level is %s' % level)
                 shipment_no = uuid.uuid4()
                 total_qty = 0
-                for goods_code, goods_detail in goods_dict.item():
+                for goods_code, goods_detail in goods_entry.item():
                     rid = '%s%s' % (shipment_no, goods_code)
                     detail = ShipmentDetails(
                         id=rid,
@@ -405,7 +405,11 @@ def split(request):
                 LOG.debug('Current level is %s' % level)
                 shipment_no = uuid.uuid4()
                 total_qty = 0
-                for goods_code, goods_detail in goods_dict.item():
+                for level, goods_entry in goods_dict.items():
+                    LOG.debug('Current level is %s' % level)
+                shipment_no = uuid.uuid4()
+                total_qty = 0
+                for goods_code, goods_detail in goods_entry.item():
                     rid = '%s%s' % (shipment_no, goods_code)
                     detail = ShipmentDetails(
                         id=rid,
@@ -490,11 +494,11 @@ def split(request):
             shipment.save()
             shipment_seria = ShipmentSerializer(shipment).data
             shipments.append(shipment_seria)
-            for level, goods_dict in goods_dict.items():
+            for level, goods_entry in goods_dict.items():
                 LOG.debug('Current level is %s' % level)
                 shipment_no = uuid.uuid4()
                 total_qty = 0
-                for goods_code, goods_detail in goods_dict.item():
+                for goods_code, goods_detail in goods_entry.item():
                     rid = '%s%s' % (shipment_no, goods_code)
                     detail = ShipmentDetails(
                         id=rid,
@@ -580,11 +584,11 @@ def split(request):
             shipment.save()
             shipment_seria = ShipmentSerializer(shipment).data
             shipments.append(shipment_seria)
-            for level, goods_dict in goods_dict.items():
+            for level, goods_entry in goods_dict.items():
                 LOG.debug('Current level is %s' % level)
                 shipment_no = uuid.uuid4()
                 total_qty = 0
-                for goods_code, goods_detail in goods_dict.item():
+                for goods_code, goods_detail in goods_entry.item():
                     rid = '%s%s' % (shipment_no, goods_code)
                     detail = ShipmentDetails(
                         id=rid,
@@ -670,11 +674,11 @@ def split(request):
             shipment.save()
             shipment_seria = ShipmentSerializer(shipment).data
             shipments.append(shipment_seria)
-            for level, goods_dict in goods_dict.items():
+            for level, goods_entry in goods_dict.items():
                 LOG.debug('Current level is %s' % level)
                 shipment_no = uuid.uuid4()
                 total_qty = 0
-                for goods_code, goods_detail in goods_dict.item():
+                for goods_code, goods_detail in goods_entry.item():
                     rid = '%s%s' % (shipment_no, goods_code)
                     detail = ShipmentDetails(
                         id=rid,
@@ -761,11 +765,11 @@ def split(request):
             shipment.save()
             shipment_seria = ShipmentSerializer(shipment).data
             shipments.append(shipment_seria)
-            for level, goods_dict in goods_dict.items():
+            for level, goods_entry in goods_dict.items():
                 LOG.debug('Current level is %s' % level)
                 shipment_no = uuid.uuid4()
                 total_qty = 0
-                for goods_code, goods_detail in goods_dict.item():
+                for goods_code, goods_detail in goods_entry.item():
                     rid = '%s%s' % (shipment_no, goods_code)
                     detail = ShipmentDetails(
                         id=rid,
@@ -852,11 +856,11 @@ def split(request):
             shipment.save()
             shipment_seria = ShipmentSerializer(shipment).data
             shipments.append(shipment_seria)
-            for level, goods_dict in goods_dict.items():
+            for level, goods_entry in goods_dict.items():
                 LOG.debug('Current level is %s' % level)
                 shipment_no = uuid.uuid4()
                 total_qty = 0
-                for goods_code, goods_detail in goods_dict.item():
+                for goods_code, goods_detail in goods_entry.item():
                     rid = '%s%s' % (shipment_no, goods_code)
                     detail = ShipmentDetails(
                         id=rid,
@@ -943,11 +947,11 @@ def split(request):
             shipment.save()
             shipment_seria = ShipmentSerializer(shipment).data
             shipments.append(shipment_seria)
-            for level, goods_dict in goods_dict.items():
+            for level, goods_entry in goods_dict.items():
                 LOG.debug('Current level is %s' % level)
                 shipment_no = uuid.uuid4()
                 total_qty = 0
-                for goods_code, goods_detail in goods_dict.item():
+                for goods_code, goods_detail in goods_entry.item():
                     rid = '%s%s' % (shipment_no, goods_code)
                     detail = ShipmentDetails(
                         id=rid,
