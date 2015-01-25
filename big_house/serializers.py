@@ -1,8 +1,23 @@
 from rest_framework import serializers
 from big_house.models import Product, ProductDetails, Warehouse, StorageRecords, Receipt, ReceiptDetails, \
-    WarehouseGoodsDetails, WarehouseProductDetails, Goods, Shipment, ShipmentDetails
+    WarehouseGoodsDetails, WarehouseProductDetails, Goods, Shipment, ShipmentDetails, ProductPackage, \
+    ProductPackageDetails
 
 __author__ = 'pluto'
+
+
+class ProductPackageSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = ProductPackage
+
+
+class ProductPackageDetailsSerializer(serializers.ModelSerializer):
+    
+    product_name = serializers.CharField(max_length=100)
+
+    class Meta:
+        model = ProductPackageDetails
 
 
 class ProductSerializer(serializers.ModelSerializer):

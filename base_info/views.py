@@ -7,8 +7,9 @@ from django.db import transaction
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from big_house.models import Goods, Product, ProductDetails, Warehouse
-from big_house.serializers import GoodsSerializer, ProductDetailsSerializer, ProductSerializer, WarehouseSerializer
+from big_house.models import Goods, Product, ProductDetails, Warehouse, ProductPackage, ProductPackageDetails
+from big_house.serializers import GoodsSerializer, ProductDetailsSerializer, ProductSerializer, WarehouseSerializer, \
+    ProductPackageDetailsSerializer, ProductPackageSerializer
 from commons.exceptions import ValueIsNoneException
 from uudragon_wms.local.settings import DEFAULT_PAGE_SIZE, YN_YES
 
@@ -113,7 +114,6 @@ def define_product(request):
             product.product_code = message.get('product_code')
             product.product_desc = message.get('product_desc')
             product.product_level = message.get('product_level')
-            product.package_code = message.get('package_code') if message.get('package_code') is not None else 'default'
             product.updater = message.get('updater')
             product.update_time = datetime.now()
             product.yn = message.get('yn')
@@ -124,7 +124,6 @@ def define_product(request):
                 product_code=message.get('product_code'),
                 product_level=message.get('product_level'),
                 product_desc=message.get('product_desc'),
-                package_code=message.get('package_code') if message.get('package_code') is not None else 'default',
                 creator=message.get('creator'),
                 create_time=nowTime,
                 updater=message.get('updater'),
@@ -405,3 +404,142 @@ def query_warehouse_list(request):
                         data={'error': 'Query warehouses information error'},
                         content_type='application/json;charset-utf-8')
     return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset-utf-8')
+
+
+@api_view(['POST'])
+def query_packages(request):
+    message = request.DATA
+
+    LOG.debug('Current received message is %s' % message)
+
+    pageSize = message.pop('pageSize')
+    if pageSize is None or pageSize == 0:
+        pageSize = DEFAULT_PAGE_SIZE
+    pageNo = message.pop('pageNo')
+    if pageNo is None or pageNo == 0:
+        pageNo = 1
+
+    resp_message = dict()
+    try:
+        for key in message.iterkeys():
+            key += '__contains'
+            LOG.debug('Condition of query is %s' % message)
+        query_list = ProductPackage.objects.filter(**message)
+        paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
+        total_page_count = paginator.num_pages
+        if pageNo > total_page_count:
+            pageNo = total_page_count
+        elif pageNo < 1:
+            pageNo = 1
+        cur_page = paginator.page(pageNo)
+        page_records = cur_page.object_list
+        resp_array = []
+        for item in page_records:
+            package_seria = ProductPackageSerializer(item)
+            seria_data = package_seria.data
+            resp_array.append(seria_data)
+        resp_message['records'] = resp_array
+        resp_message['recordsCount'] = paginator.count
+        resp_message['pageSize'] = pageSize
+        resp_message['pageNumber'] = total_page_count
+        resp_message['pageNo'] = pageNo
+    except Exception as e:
+        LOG.error('Query package information error. [ERROR] %s' % str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={'error': 'Query package information error'},
+                        content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset-utf-8')
+
+
+@api_view(['GET'])
+def query_package(request, package_code):
+    code = package_code
+
+    LOG.debug('Current received package_code is %s' % code)
+
+    try:
+        details = ProductPackageDetails.objects.extra(
+            select={'product_name': 't_product.product_name'},
+            tables=['t_product'],
+            where=['t_product_package_details.product_code=t_product.product_code']
+        ).filter(package_code=code)
+
+        details_array = []
+        for detail in details:
+            detailSeria = ProductPackageDetailsSerializer(detail)
+            details_array.append(detailSeria.data)
+        package = ProductPackage.objects.get(package_code=code)
+        packageSeria = ProductPackageSerializer(package)
+        message = packageSeria.data
+        message['details'] = details_array
+    except Exception as e:
+        LOG.error('Query product information error. [ERROR] %s' % str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={'error': 'Query product [%s] information error' % code},
+                        content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=message, content_type='application/json;charset-utf-8')
+    
+
+
+@api_view(['POST'])
+@transaction.commit_manually
+def save_package(request):
+    message = request.DATA
+
+    LOG.debug('Current received message is %s' % message)
+
+    if message.get('package_code') is None:
+        LOG.error('Attribute[\'package_code\'] can not be none.')
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset-utf-8',
+                        data={'error': 'Attribute[\'package_code\'] can not be none.'})
+    package_code = message.get('package_code')
+    details = message.get('details')
+    if details is None or len(details) == 0:
+        LOG.error('Attribute[\'details\'] must be a non-empty array.')
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset-utf-8',
+                        data={'error': 'Attribute[\'details\'] must be a non-empty array.'})
+
+    try:
+        package = ProductPackage.objects.filter(package_code=package_code).first()
+        if package is not None:
+            ProductPackageDetails.objects.filter(package_code=package_code).delete()
+            package.package_name = message.get('package_name')
+            package.package_code = message.get('package_code')
+            package.package_desc = message.get('package_desc')
+            package.updater = message.get('updater')
+            package.update_time = datetime.now()
+            package.yn = message.get('yn')
+        else:
+            nowTime = datetime.now()
+            package = ProductPackage(
+                package_name=message.get('package_name'),
+                package_code=message.get('package_code'),
+                package_desc=message.get('package_desc'),
+                creator=message.get('creator'),
+                create_time=nowTime,
+                updater=message.get('updater'),
+                update_time=nowTime,
+                yn=message.get('yn'),
+            )
+        package.save()
+        for detail in details:
+            if detail.get('product_code') is None:
+                raise ValueIsNoneException('The product code can not be none.')
+            package_detail = ProductPackageDetails(
+                id='%s%s' % (package_code, detail.get('product_code')),
+                product_code=detail.get('product_code'),
+                package_code=package_code,
+                qty=detail.get('qty')
+            )
+            package_detail.save()
+        transaction.commit()
+    except Exception as e:
+        LOG.error('Package Information saved error.\n [ERROR]:%s' % str(e))
+        transaction.rollback()
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        content_type='application/json;charset-utf-8',
+                        date={'error': 'Package Information saved error.'})
+
+    return Response(status=status.HTTP_200_OK)
