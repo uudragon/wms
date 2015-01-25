@@ -24,19 +24,19 @@ def define_goods(request):
 
     if message.get('goods_name') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'goods_name\'] can not be none.'})
     if message.get('goods_code') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'goods_code\'] can not be none.'})
     if message.get('creator') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'creator\'] can not be none.'})
     if message.get('updater') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'updater\'] can not be none.'})
 
     try:
@@ -96,13 +96,13 @@ def define_product(request):
 
     if message.get('product_code') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'product_code\'] can not be none.'})
     product_code = message.get('product_code')
     details = message.get('details')
     if details is None or len(details) == 0:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'details\'] must be a non-empty array.'})
 
     try:
@@ -148,7 +148,7 @@ def define_product(request):
         LOG.error('Product Information saved error.\n [ERROR]:%s' % str(e))
         transaction.rollback()
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         date={'error': 'Product Information saved error.'})
 
     return Response(status=status.HTTP_200_OK)
@@ -170,7 +170,7 @@ def query_goods(request, goods_code):
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query goods [%s] information error' % code},
                         content_type='application/json;charset=utf-8')
-    return Response(status=status.HTTP_200_OK, data=message, content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=message, content_type='application/json;charset=utf-8')
 
 
 @api_view(['GET'])
@@ -195,7 +195,7 @@ def query_product(request, product_code):
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query product [%s] information error' % code},
                         content_type='application/json;charset=utf-8')
-    return Response(status=status.HTTP_200_OK, data=message, content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=message, content_type='application/json;charset=utf-8')
 
 
 @api_view(['POST'])
@@ -242,7 +242,7 @@ def query_goods_list(request):
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query goods information error'},
                         content_type='application/json;charset=utf-8')
-    return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset=utf-8')
 
 
 @api_view(['POST'])
@@ -287,7 +287,7 @@ def query_product_list(request):
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query product information error'},
                         content_type='application/json;charset=utf-8')
-    return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset=utf-8')
 
 
 @api_view(['POST'])
@@ -298,19 +298,19 @@ def save_warehouse(request):
 
     if message.get('warehouse_name') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'warehouse_name\'] can not be none.'})
     if message.get('warehouse_code') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'warehouse_code\'] can not be none.'})
     if message.get('creator') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'creator\'] can not be none.'})
     if message.get('updater') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'updater\'] can not be none.'})
     now_time = datetime.now()
     try:
@@ -338,7 +338,7 @@ def save_warehouse(request):
     except Exception as e:
         LOG.error('Warehouse saved error.\n [ERROR]:%s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Warehouse saved error.'})
     return Response(status=status.HTTP_200_OK)
 
@@ -358,7 +358,7 @@ def query_warehouse(request, warehouse_code):
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query warehouse [%s] information error' % code},
                         content_type='application/json;charset=utf-8')
-    return Response(status=status.HTTP_200_OK, data=message, content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=message, content_type='application/json;charset=utf-8')
 
 
 @api_view(['POST'])
@@ -403,7 +403,7 @@ def query_warehouse_list(request):
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query warehouses information error'},
                         content_type='application/json;charset=utf-8')
-    return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset=utf-8')
 
 
 @api_view(['POST'])
@@ -448,7 +448,7 @@ def query_packages(request):
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query package information error'},
                         content_type='application/json;charset=utf-8')
-    return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset=utf-8')
 
 
 @api_view(['GET'])
@@ -477,7 +477,7 @@ def query_package(request, package_code):
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query product [%s] information error' % code},
                         content_type='application/json;charset=utf-8')
-    return Response(status=status.HTTP_200_OK, data=message, content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=message, content_type='application/json;charset=utf-8')
     
 
 
@@ -491,14 +491,14 @@ def save_package(request):
     if message.get('package_code') is None:
         LOG.error('Attribute[\'package_code\'] can not be none.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'package_code\'] can not be none.'})
     package_code = message.get('package_code')
     details = message.get('details')
     if details is None or len(details) == 0:
         LOG.error('Attribute[\'details\'] must be a non-empty array.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'details\'] must be a non-empty array.'})
 
     try:
