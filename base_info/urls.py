@@ -14,4 +14,7 @@ urlpatterns = patterns(
     url(r'^warehouse/save/$', 'save_warehouse'),
     url(r'^warehouses/$', 'query_warehouse_list'),
     url(r'^warehouse/(.+)/$', 'query_warehouse'),
+    url(r'^package/save/$', 'save_package'),
+    url(r'^package/(.+)/$', 'query_package'),
+    url(r'^packages/$', 'packages'),
 )
