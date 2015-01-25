@@ -6,6 +6,9 @@
 - [产品查询接口](#41-url)
 - [商品批量查询接口](#51-url)
 - [产品批量查询接口](#61-url)
+- [套餐定义](#71-url)
+- [单笔套餐查询接口](#81-url)
+- [套餐批量查询接口](#91-url)
 
 ####商品与产品定义接口说明
 ------
@@ -541,7 +544,7 @@ error| String  | 错误信息
 {‘error’:’ Query package [${package_code}]  information error..’}
 
 
-#####9.	产品批量查询接口
+#####9.	套餐批量查询接口
 ######9.1 url
 	method：POST
 	wms/baseinfo/packages/
