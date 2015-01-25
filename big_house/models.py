@@ -32,7 +32,6 @@ class Product(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
     product_code = models.CharField(db_column='PRODUCT_CODE', null=False, max_length=36, unique=True)
     product_name = models.CharField(db_column='PRODUCT_NAME', null=False, max_length=200)
-    package_code = models.CharField(db_column='PACKAGE_CODE', null=False, max_length=50)
     product_level = models.IntegerField(db_column='PRODUCT_LEVEL', null=False, default=1)
     product_desc = models.CharField(db_column='PRODUCT_DESC', null=True, max_length=500)
     create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)
