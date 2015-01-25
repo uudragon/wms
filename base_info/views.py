@@ -82,7 +82,7 @@ def define_goods(request):
     except Exception as e:
         LOG.error('Goods Information saved error.\n [ERROR]:%s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         date={'error': 'Goods Information saved error.'})
 
     return Response(status=status.HTTP_200_OK)
@@ -169,7 +169,7 @@ def query_goods(request, goods_code):
         LOG.error('Query goods information error. [ERROR] %s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query goods [%s] information error' % code},
-                        content_type='application/json;charset-utf-8')
+                        content_type='application/json;charset=utf-8')
     return Response(status=status.HTTP_200_OK, data=message, content_type='application/json;charset-utf-8')
 
 
@@ -194,7 +194,7 @@ def query_product(request, product_code):
         LOG.error('Query product information error. [ERROR] %s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query product [%s] information error' % code},
-                        content_type='application/json;charset-utf-8')
+                        content_type='application/json;charset=utf-8')
     return Response(status=status.HTTP_200_OK, data=message, content_type='application/json;charset-utf-8')
 
 
@@ -241,7 +241,7 @@ def query_goods_list(request):
         LOG.error('Query goods information error. [ERROR] %s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query goods information error'},
-                        content_type='application/json;charset-utf-8')
+                        content_type='application/json;charset=utf-8')
     return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset-utf-8')
 
 
@@ -286,7 +286,7 @@ def query_product_list(request):
         LOG.error('Query product information error. [ERROR] %s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query product information error'},
-                        content_type='application/json;charset-utf-8')
+                        content_type='application/json;charset=utf-8')
     return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset-utf-8')
 
 
@@ -357,7 +357,7 @@ def query_warehouse(request, warehouse_code):
         LOG.error('Query warehouse information error. [ERROR] %s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query warehouse [%s] information error' % code},
-                        content_type='application/json;charset-utf-8')
+                        content_type='application/json;charset=utf-8')
     return Response(status=status.HTTP_200_OK, data=message, content_type='application/json;charset-utf-8')
 
 
@@ -402,7 +402,7 @@ def query_warehouse_list(request):
         LOG.error('Query warehouses information error. [ERROR] %s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query warehouses information error'},
-                        content_type='application/json;charset-utf-8')
+                        content_type='application/json;charset=utf-8')
     return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset-utf-8')
 
 
@@ -447,7 +447,7 @@ def query_packages(request):
         LOG.error('Query package information error. [ERROR] %s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query package information error'},
-                        content_type='application/json;charset-utf-8')
+                        content_type='application/json;charset=utf-8')
     return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset-utf-8')
 
 
@@ -476,7 +476,7 @@ def query_package(request, package_code):
         LOG.error('Query product information error. [ERROR] %s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query product [%s] information error' % code},
-                        content_type='application/json;charset-utf-8')
+                        content_type='application/json;charset=utf-8')
     return Response(status=status.HTTP_200_OK, data=message, content_type='application/json;charset-utf-8')
     
 
@@ -539,7 +539,7 @@ def save_package(request):
         LOG.error('Package Information saved error.\n [ERROR]:%s' % str(e))
         transaction.rollback()
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         date={'error': 'Package Information saved error.'})
 
     return Response(status=status.HTTP_200_OK)
