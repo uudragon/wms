@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import time
-from big_house.models import ProductDetails, ShipmentDetails, Shipment
+from big_house.models import ProductDetails, ShipmentDetails, Shipment, ProductPackageDetails
 from big_house.serializers import ShipmentDetailsSerializer, ShipmentSerializer
 from uudragon_wms.local.settings import DEFAULT_PAGE_SIZE
 
@@ -185,14 +185,10 @@ def split(request):
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
                         data={'error': 'Attribute[\'customer_tel\'] can not be none.'})
-    if message.get('details') is None:
+    if message.get('package_code') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
-                        data={'error': 'Attribute[\'details\'] can not be none.'})
-    if len(message.get('details')) == 0:
-        return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
-                        data={'error': 'Attribute[\'details\'] can not be empty.'})
+                        data={'error': 'Attribute[\'package_code\'] can not be none.'})
     if message.get('creator') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset-utf-8',
@@ -202,912 +198,55 @@ def split(request):
                         content_type='application/json;charset-utf-8',
                         data={'error': 'Attribute[\'updater\'] can not be none.'})
     try:
-        query_list = ProductDetails.objects.extra(
+        package_details = ProductPackageDetails.objects.extra(
             select={'product_level': 't_product.product_level'},
             tables=['t_product'],
-            where=['t_product_details.product_code=t_product.product_code and t_product.package_code=%s'],
-            params=[message.get('package_code')])
-        goods_dict = dict()
-        for item in query_list:
-            LOG.debug('Item of query result is %s' % item)
-            if item.product_level in goods_dict:
-                entry = goods_dict.get(item.product_level)
-                entry[item.goods_code] = item
+            where=['t_product_package_details.product_code=t_product.product_code'],
+        ).filter(message('package_code'))
+        products_dict = dict()
+        for package_detail in package_details:
+            if package_detail.product_level in products_dict:
+                entry = products_dict.get(package_detail.product_level)
+                LOG.debug('The product_code is %s, package_code is %s' % (package_detail.product_code, 
+                                                                          package_detail.package_code))
+                entry[package_detail.product_code] = package_detail
             else:
                 entry = dict()
-                entry[item.goods_code] = item
-                goods_dict[item.product_level] = entry
-        LOG.debug('Current goods_dict is %s' % goods_dict)
+                entry[package_detail.product_code] = package_detail
+                products_dict[package_detail.product_level] = entry
+        LOG.debug('Current count of the products_dict is %s' % len(products_dict))
         strptime = time.strptime(message.get('effective_date'), '%Y-%m-%d')
         effective_month = strptime.tm_mon
-        now_time = datetime.now()
-        shipments = []
         if effective_month in (9, 10, 11):
-            for level, goods_entry in goods_dict.items():
-                LOG.debug('Current level is %s' % level)
-                shipment_no = uuid.uuid4()
-                total_qty = 0
-                for goods_code, goods_detail in goods_entry.items():
-                    rid = '%s%s' % (shipment_no, goods_code)
-                    detail = ShipmentDetails(
-                        id=rid,
-                        shipment_no=shipment_no,
-                        goods_code=goods_code,
-                        is_gift=goods_detail.is_gift,
-                        qty=goods_detail.qty,
-                        create_time=now_time,
-                        creator=message.get('creator'),
-                        update_time=now_time,
-                        updater=message.get('updater'),
-                        status=0
-                    )
-                    total_qty += goods_detail.qty
-                    detail.save()
-                shipment = Shipment(
-                    shipment_no=shipment_no,
-                    orders_no=message.get('orders_no'),
-                    customer_no=message.get('customer_code'),
-                    customer_name=message.get('customer_name'),
-                    address=message.get('address'),
-                    customer_tel=message.get('customer_tel'),
-                    has_invoice=int(message.get('has_invoice')),
-                    amount=message.get('amount'),
-                    shipped_qty=total_qty,
-                    express_code='',
-                    express_orders_no='',
-                    express_name='',
-                    express_cost=0.00,
-                    courier='',
-                    courier_tel='',
-                    create_time=now_time,
-                    creator=message.get('creator'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                shipment.save()
-                shipment_seria = ShipmentSerializer(shipment).data
-                shipments.append(shipment_seria)
+            in_one_list = []
         elif effective_month == 12:
-            first = [goods_dict.pop(1), goods_dict.pop(2)]
-            first_dict = dict()
-            for item in first:
-                if item.goods_code in first_dict:
-                    first_dict.get(item.goods_code).qty += item.qty
-                else:
-                    first_dict[item.goods_code] = item
-            LOG.debug('Current first shipment is %s' % first_dict)
-            total_qty = 0
-            shipment_no = uuid.uuid4()
-            for goods_code, goods_detail in first_dict.items():
-                rid = '%s%s' % (shipment_no, goods_code)
-                detail = ShipmentDetails(
-                    id=rid,
-                    shipment_no=shipment_no,
-                    goods_code=goods_code,
-                    is_gift=goods_detail.is_gift,
-                    qty=goods_detail.qty,
-                    create_time=now_time,
-                    creator=message.get('creator'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                total_qty += goods_detail.qty
-                detail.save()
-            shipment = Shipment(
-                shipment_no=shipment_no,
-                orders_no=message.get('orders_no'),
-                customer_no=message.get('customer_code'),
-                customer_name=message.get('customer_name'),
-                address=message.get('address'),
-                customer_tel=message.get('customer_tel'),
-                has_invoice=int(message.get('has_invoice')),
-                amount=message.get('amount'),
-                shipped_qty=total_qty,
-                express_code='',
-                express_orders_no='',
-                express_name='',
-                express_cost=0.00,
-                courier='',
-                courier_tel='',
-                create_time=now_time,
-                creator=message.get('creator'),
-                update_time=now_time,
-                updater=message.get('updater'),
-                status=0
-            )
-            shipment.save()
-            shipment_seria = ShipmentSerializer(shipment).data
-            shipments.append(shipment_seria)
-            for level, goods_entry in goods_dict.items():
-                LOG.debug('Current level is %s' % level)
-                shipment_no = uuid.uuid4()
-                total_qty = 0
-                for goods_code, goods_detail in goods_entry.items():
-                    rid = '%s%s' % (shipment_no, goods_code)
-                    detail = ShipmentDetails(
-                        id=rid,
-                        shipment_no=shipment_no,
-                        goods_code=goods_code,
-                        is_gift=goods_detail.is_gift,
-                        qty=goods_detail.qty,
-                        create_time=now_time,
-                        creator=message.get('creator'),
-                        update_time=now_time,
-                        updater=message.get('updater'),
-                        status=0
-                    )
-                    total_qty += goods_detail.qty
-                    detail.save()
-                shipment = Shipment(
-                    shipment_no=shipment_no,
-                    orders_no=message.get('orders_no'),
-                    customer_no=message.get('customer_code'),
-                    customer_name=message.get('customer_name'),
-                    address=message.get('address'),
-                    customer_tel=message.get('customer_tel'),
-                    has_invoice=int(message.get('has_invoice')),
-                    amount=message.get('amount'),
-                    shipped_qty=total_qty,
-                    express_code='',
-                    express_orders_no='',
-                    express_name='',
-                    express_cost=0.00,
-                    courier='',
-                    courier_tel='',
-                    create_time=now_time,
-                    creator=message.get('creator'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                shipment.save()
-                shipment_seria = ShipmentSerializer(shipment).data
-                shipments.append(shipment_seria)
+            in_one_list = [products_dict.pop(1), products_dict.pop(2)]
         elif effective_month == 1:
-            first = [goods_dict.pop(1), goods_dict.pop(2), goods_dict.pop(3)]
-            first_dict = dict()
-            for item in first:
-                if item.goods_code in first_dict:
-                    first_dict.get(item.goods_code).qty += item.qty
-                else:
-                    first_dict[item.goods_code] = item
-            LOG.debug('Current first shipment is %s' % first_dict)
-            total_qty = 0
-            shipment_no = uuid.uuid4()
-            for goods_code, goods_detail in first_dict.items():
-                rid = '%s%s' % (shipment_no, goods_code)
-                detail = ShipmentDetails(
-                    id=rid,
-                    shipment_no=shipment_no,
-                    goods_code=goods_code,
-                    is_gift=goods_detail.is_gift,
-                    qty=goods_detail.qty,
-                    create_time=now_time,
-                    creator=message.get('creator'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                total_qty += goods_detail.qty
-                detail.save()
-            shipment = Shipment(
-                shipment_no=shipment_no,
-                orders_no=message.get('orders_no'),
-                customer_no=message.get('customer_code'),
-                customer_name=message.get('customer_name'),
-                address=message.get('address'),
-                customer_tel=message.get('customer_tel'),
-                has_invoice=int(message.get('has_invoice')),
-                amount=message.get('amount'),
-                shipped_qty=total_qty,
-                express_code='',
-                express_orders_no='',
-                express_name='',
-                express_cost=0.00,
-                courier='',
-                courier_tel='',
-                create_time=now_time,
-                creator=message.get('creator'),
-                update_time=now_time,
-                updater=message.get('updater'),
-                status=0
-            )
-            shipment.save()
-            shipment_seria = ShipmentSerializer(shipment).data
-            shipments.append(shipment_seria)
-            for level, goods_dict in goods_dict.items():
-                LOG.debug('Current level is %s' % level)
-                shipment_no = uuid.uuid4()
-                total_qty = 0
-                for level, goods_entry in goods_dict.items():
-                    LOG.debug('Current level is %s' % level)
-                shipment_no = uuid.uuid4()
-                total_qty = 0
-                for goods_code, goods_detail in goods_entry.items():
-                    rid = '%s%s' % (shipment_no, goods_code)
-                    detail = ShipmentDetails(
-                        id=rid,
-                        shipment_no=shipment_no,
-                        goods_code=goods_code,
-                        is_gift=goods_detail.is_gift,
-                        qty=goods_detail.qty,
-                        create_time=now_time,
-                        creator=message.get('creator'),
-                        update_time=now_time,
-                        updater=message.get('updater'),
-                        status=0
-                    )
-                    total_qty += goods_detail.qty
-                    detail.save()
-                shipment = Shipment(
-                    shipment_no=shipment_no,
-                    orders_no=message.get('orders_no'),
-                    customer_no=message.get('customer_code'),
-                    customer_name=message.get('customer_name'),
-                    address=message.get('address'),
-                    customer_tel=message.get('customer_tel'),
-                    has_invoice=int(message.get('has_invoice')),
-                    amount=message.get('amount'),
-                    shipped_qty=total_qty,
-                    express_code='',
-                    express_orders_no='',
-                    express_name='',
-                    express_cost=0.00,
-                    courier='',
-                    courier_tel='',
-                    create_time=now_time,
-                    creator=message.get('creator'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                shipment.save()
-                shipment_seria = ShipmentSerializer(shipment).data
-                shipments.append(shipment_seria)
+            in_one_list = [products_dict.pop(1), products_dict.pop(2), products_dict.pop(3)]
         elif effective_month == 2:
-            first = [goods_dict.pop(1), goods_dict.pop(2), goods_dict.pop(3), goods_dict.pop(4)]
-            first_dict = dict()
-            for item in first:
-                if item.goods_code in first_dict:
-                    first_dict.get(item.goods_code).qty += item.qty
-                else:
-                    first_dict[item.goods_code] = item
-            LOG.debug('Current first shipment is %s' % first_dict)
-            total_qty = 0
-            shipment_no = uuid.uuid4()
-            for goods_code, goods_detail in first_dict.items():
-                rid = '%s%s' % (shipment_no, goods_code)
-                detail = ShipmentDetails(
-                    id=rid,
-                    shipment_no=shipment_no,
-                    goods_code=goods_code,
-                    is_gift=goods_detail.is_gift,
-                    qty=goods_detail.qty,
-                    create_time=now_time,
-                    creator=message.get('creator'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                total_qty += goods_detail.qty
-                detail.save()
-            shipment = Shipment(
-                shipment_no=shipment_no,
-                orders_no=message.get('orders_no'),
-                customer_no=message.get('customer_code'),
-                customer_name=message.get('customer_name'),
-                address=message.get('address'),
-                customer_tel=message.get('customer_tel'),
-                has_invoice=int(message.get('has_invoice')),
-                amount=message.get('amount'),
-                shipped_qty=total_qty,
-                express_code='',
-                express_orders_no='',
-                express_name='',
-                express_cost=0.00,
-                courier='',
-                courier_tel='',
-                create_time=now_time,
-                creator=message.get('creator'),
-                update_time=now_time,
-                updater=message.get('updater'),
-                status=0
-            )
-            shipment.save()
-            shipment_seria = ShipmentSerializer(shipment).data
-            shipments.append(shipment_seria)
-            for level, goods_entry in goods_dict.items():
-                LOG.debug('Current level is %s' % level)
-                shipment_no = uuid.uuid4()
-                total_qty = 0
-                for goods_code, goods_detail in goods_entry.items():
-                    rid = '%s%s' % (shipment_no, goods_code)
-                    detail = ShipmentDetails(
-                        id=rid,
-                        shipment_no=shipment_no,
-                        goods_code=goods_code,
-                        is_gift=goods_detail.is_gift,
-                        qty=goods_detail.qty,
-                        create_time=now_time,
-                        creator=message.get('creator'),
-                        update_time=now_time,
-                        updater=message.get('updater'),
-                        status=0
-                    )
-                    total_qty += goods_detail.qty
-                    detail.save()
-                shipment = Shipment(
-                    shipment_no=shipment_no,
-                    orders_no=message.get('orders_no'),
-                    customer_no=message.get('customer_code'),
-                    customer_name=message.get('customer_name'),
-                    address=message.get('address'),
-                    customer_tel=message.get('customer_tel'),
-                    has_invoice=int(message.get('has_invoice')),
-                    amount=message.get('amount'),
-                    shipped_qty=total_qty,
-                    express_code='',
-                    express_orders_no='',
-                    express_name='',
-                    express_cost=0.00,
-                    courier='',
-                    courier_tel='',
-                    create_time=now_time,
-                    creator=message.get('creator'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                shipment.save()
-                shipment_seria = ShipmentSerializer(shipment).data
-                shipments.append(shipment_seria)
+            in_one_list = [products_dict.pop(1), products_dict.pop(2), products_dict.pop(3), products_dict.pop(4)]
         elif effective_month == 3:
-            first = [goods_dict.pop(1), goods_dict.pop(2), goods_dict.pop(3), 
-                     goods_dict.pop(4), goods_dict.pop(5)]
-            first_dict = dict()
-            for item in first:
-                if item.goods_code in first_dict:
-                    first_dict.get(item.goods_code).qty += item.qty
-                else:
-                    first_dict[item.goods_code] = item
-            LOG.debug('Current first shipment is %s' % first_dict)
-            total_qty = 0
-            shipment_no = uuid.uuid4()
-            for goods_code, goods_detail in first_dict.items():
-                rid = '%s%s' % (shipment_no, goods_code)
-                detail = ShipmentDetails(
-                    id=rid,
-                    shipment_no=shipment_no,
-                    goods_code=goods_code,
-                    is_gift=goods_detail.is_gift,
-                    qty=goods_detail.qty,
-                    create_time=now_time,
-                    creator=message.get('creator'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                total_qty += goods_detail.qty
-                detail.save()
-            shipment = Shipment(
-                shipment_no=shipment_no,
-                orders_no=message.get('orders_no'),
-                customer_no=message.get('customer_code'),
-                customer_name=message.get('customer_name'),
-                address=message.get('address'),
-                customer_tel=message.get('customer_tel'),
-                has_invoice=int(message.get('has_invoice')),
-                amount=message.get('amount'),
-                shipped_qty=total_qty,
-                express_code='',
-                express_orders_no='',
-                express_name='',
-                express_cost=0.00,
-                courier='',
-                courier_tel='',
-                create_time=now_time,
-                creator=message.get('creator'),
-                update_time=now_time,
-                updater=message.get('updater'),
-                status=0
-            )
-            shipment.save()
-            shipment_seria = ShipmentSerializer(shipment).data
-            shipments.append(shipment_seria)
-            for level, goods_entry in goods_dict.items():
-                LOG.debug('Current level is %s' % level)
-                shipment_no = uuid.uuid4()
-                total_qty = 0
-                for goods_code, goods_detail in goods_entry.items():
-                    rid = '%s%s' % (shipment_no, goods_code)
-                    detail = ShipmentDetails(
-                        id=rid,
-                        shipment_no=shipment_no,
-                        goods_code=goods_code,
-                        is_gift=goods_detail.is_gift,
-                        qty=goods_detail.qty,
-                        create_time=now_time,
-                        creator=message.get('creator'),
-                        update_time=now_time,
-                        updater=message.get('updater'),
-                        status=0
-                    )
-                    total_qty += goods_detail.qty
-                    detail.save()
-                shipment = Shipment(
-                    shipment_no=shipment_no,
-                    orders_no=message.get('orders_no'),
-                    customer_no=message.get('customer_code'),
-                    customer_name=message.get('customer_name'),
-                    address=message.get('address'),
-                    customer_tel=message.get('customer_tel'),
-                    has_invoice=int(message.get('has_invoice')),
-                    amount=message.get('amount'),
-                    shipped_qty=total_qty,
-                    express_code='',
-                    express_orders_no='',
-                    express_name='',
-                    express_cost=0.00,
-                    courier='',
-                    courier_tel='',
-                    create_time=now_time,
-                    creator=message.get('creator'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                shipment.save()
-                shipment_seria = ShipmentSerializer(shipment).data
-                shipments.append(shipment_seria)
+            in_one_list = [products_dict.pop(1), products_dict.pop(2), products_dict.pop(3), 
+                     products_dict.pop(4), products_dict.pop(5)]
         elif effective_month == 4:
-            first = [goods_dict.pop(1), goods_dict.pop(2), goods_dict.pop(3), 
-                     goods_dict.pop(4), goods_dict.pop(5), goods_dict.pop(6)]
-            first_dict = dict()
-            for item in first:
-                if item.goods_code in first_dict:
-                    first_dict.get(item.goods_code).qty += item.qty
-                else:
-                    first_dict[item.goods_code] = item
-            LOG.debug('Current first shipment is %s' % first_dict)
-            total_qty = 0
-            shipment_no = uuid.uuid4()
-            for goods_code, goods_detail in first_dict.items():
-                rid = '%s%s' % (shipment_no, goods_code)
-                detail = ShipmentDetails(
-                    id=rid,
-                    shipment_no=shipment_no,
-                    goods_code=goods_code,
-                    is_gift=goods_detail.is_gift,
-                    qty=goods_detail.qty,
-                    create_time=now_time,
-                    creator=message.get('creator'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                total_qty += goods_detail.qty
-                detail.save()
-            shipment = Shipment(
-                shipment_no=shipment_no,
-                orders_no=message.get('orders_no'),
-                customer_no=message.get('customer_code'),
-                customer_name=message.get('customer_name'),
-                address=message.get('address'),
-                customer_tel=message.get('customer_tel'),
-                has_invoice=int(message.get('has_invoice')),
-                amount=message.get('amount'),
-                shipped_qty=total_qty,
-                express_code='',
-                express_orders_no='',
-                express_name='',
-                express_cost=0.00,
-                courier='',
-                courier_tel='',
-                create_time=now_time,
-                creator=message.get('creator'),
-                update_time=now_time,
-                updater=message.get('updater'),
-                status=0
-            )
-            shipment.save()
-            shipment_seria = ShipmentSerializer(shipment).data
-            shipments.append(shipment_seria)
-            for level, goods_entry in goods_dict.items():
-                LOG.debug('Current level is %s' % level)
-                shipment_no = uuid.uuid4()
-                total_qty = 0
-                for goods_code, goods_detail in goods_entry.items():
-                    rid = '%s%s' % (shipment_no, goods_code)
-                    detail = ShipmentDetails(
-                        id=rid,
-                        shipment_no=shipment_no,
-                        goods_code=goods_code,
-                        is_gift=goods_detail.is_gift,
-                        qty=goods_detail.qty,
-                        create_time=now_time,
-                        creator=message.get('creator'),
-                        update_time=now_time,
-                        updater=message.get('updater'),
-                        status=0
-                    )
-                    total_qty += goods_detail.qty
-                    detail.save()
-                shipment = Shipment(
-                    shipment_no=shipment_no,
-                    orders_no=message.get('orders_no'),
-                    customer_no=message.get('customer_code'),
-                    customer_name=message.get('customer_name'),
-                    address=message.get('address'),
-                    customer_tel=message.get('customer_tel'),
-                    has_invoice=int(message.get('has_invoice')),
-                    amount=message.get('amount'),
-                    shipped_qty=total_qty,
-                    express_code='',
-                    express_orders_no='',
-                    express_name='',
-                    express_cost=0.00,
-                    courier='',
-                    courier_tel='',
-                    create_time=now_time,
-                    creator=message.get('creator'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                shipment.save()
-                shipment_seria = ShipmentSerializer(shipment).data
-                shipments.append(shipment_seria)
+            in_one_list = [products_dict.pop(1), products_dict.pop(2), products_dict.pop(3), 
+                     products_dict.pop(4), products_dict.pop(5), products_dict.pop(6)]
         elif effective_month == 5:
-            first = [goods_dict.pop(1), goods_dict.pop(2), goods_dict.pop(3),
-                     goods_dict.pop(4), goods_dict.pop(5), goods_dict.pop(6), 
-                     goods_dict.pop(7)]
-            first_dict = dict()
-            for item in first:
-                if item.goods_code in first_dict:
-                    first_dict.get(item.goods_code).qty += item.qty
-                else:
-                    first_dict[item.goods_code] = item
-            LOG.debug('Current first shipment is %s' % first_dict)
-            total_qty = 0
-            shipment_no = uuid.uuid4()
-            for goods_code, goods_detail in first_dict.items():
-                rid = '%s%s' % (shipment_no, goods_code)
-                detail = ShipmentDetails(
-                    id=rid,
-                    shipment_no=shipment_no,
-                    goods_code=goods_code,
-                    is_gift=goods_detail.is_gift,
-                    qty=goods_detail.qty,
-                    create_time=now_time,
-                    creator=message.get('creator'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                total_qty += goods_detail.qty
-                detail.save()
-            shipment = Shipment(
-                shipment_no=shipment_no,
-                orders_no=message.get('orders_no'),
-                customer_no=message.get('customer_code'),
-                customer_name=message.get('customer_name'),
-                address=message.get('address'),
-                customer_tel=message.get('customer_tel'),
-                has_invoice=int(message.get('has_invoice')),
-                amount=message.get('amount'),
-                shipped_qty=total_qty,
-                express_code='',
-                express_orders_no='',
-                express_name='',
-                express_cost=0.00,
-                courier='',
-                courier_tel='',
-                create_time=now_time,
-                creator=message.get('creator'),
-                update_time=now_time,
-                updater=message.get('updater'),
-                status=0
-            )
-            shipment.save()
-            shipment_seria = ShipmentSerializer(shipment).data
-            shipments.append(shipment_seria)
-            for level, goods_entry in goods_dict.items():
-                LOG.debug('Current level is %s' % level)
-                shipment_no = uuid.uuid4()
-                total_qty = 0
-                for goods_code, goods_detail in goods_entry.items():
-                    rid = '%s%s' % (shipment_no, goods_code)
-                    detail = ShipmentDetails(
-                        id=rid,
-                        shipment_no=shipment_no,
-                        goods_code=goods_code,
-                        is_gift=goods_detail.is_gift,
-                        qty=goods_detail.qty,
-                        create_time=now_time,
-                        creator=message.get('creator'),
-                        update_time=now_time,
-                        updater=message.get('updater'),
-                        status=0
-                    )
-                    total_qty += goods_detail.qty
-                    detail.save()
-                shipment = Shipment(
-                    shipment_no=shipment_no,
-                    orders_no=message.get('orders_no'),
-                    customer_no=message.get('customer_code'),
-                    customer_name=message.get('customer_name'),
-                    address=message.get('address'),
-                    customer_tel=message.get('customer_tel'),
-                    has_invoice=int(message.get('has_invoice')),
-                    amount=message.get('amount'),
-                    shipped_qty=total_qty,
-                    express_code='',
-                    express_orders_no='',
-                    express_name='',
-                    express_cost=0.00,
-                    courier='',
-                    courier_tel='',
-                    create_time=now_time,
-                    creator=message.get('creator'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                shipment.save()
-                shipment_seria = ShipmentSerializer(shipment).data
-                shipments.append(shipment_seria)
+            in_one_list = [products_dict.pop(1), products_dict.pop(2), products_dict.pop(3),
+                     products_dict.pop(4), products_dict.pop(5), products_dict.pop(6), 
+                     products_dict.pop(7)]
         elif effective_month == 6:
-            first = [goods_dict.pop(1), goods_dict.pop(2), goods_dict.pop(3),
-                     goods_dict.pop(4), goods_dict.pop(5), goods_dict.pop(6),
-                     goods_dict.pop(7), goods_dict.pop(8)]
-            first_dict = dict()
-            for item in first:
-                if item.goods_code in first_dict:
-                    first_dict.get(item.goods_code).qty += item.qty
-                else:
-                    first_dict[item.goods_code] = item
-            LOG.debug('Current first shipment is %s' % first_dict)
-            total_qty = 0
-            shipment_no = uuid.uuid4()
-            for goods_code, goods_detail in first_dict.items():
-                rid = '%s%s' % (shipment_no, goods_code)
-                detail = ShipmentDetails(
-                    id=rid,
-                    shipment_no=shipment_no,
-                    goods_code=goods_code,
-                    is_gift=goods_detail.is_gift,
-                    qty=goods_detail.qty,
-                    create_time=now_time,
-                    creator=message.get('creator'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                total_qty += goods_detail.qty
-                detail.save()
-            shipment = Shipment(
-                shipment_no=shipment_no,
-                orders_no=message.get('orders_no'),
-                customer_no=message.get('customer_code'),
-                customer_name=message.get('customer_name'),
-                address=message.get('address'),
-                customer_tel=message.get('customer_tel'),
-                has_invoice=int(message.get('has_invoice')),
-                amount=message.get('amount'),
-                shipped_qty=total_qty,
-                express_code='',
-                express_orders_no='',
-                express_name='',
-                express_cost=0.00,
-                courier='',
-                courier_tel='',
-                create_time=now_time,
-                creator=message.get('creator'),
-                update_time=now_time,
-                updater=message.get('updater'),
-                status=0
-            )
-            shipment.save()
-            shipment_seria = ShipmentSerializer(shipment).data
-            shipments.append(shipment_seria)
-            for level, goods_entry in goods_dict.items():
-                LOG.debug('Current level is %s' % level)
-                shipment_no = uuid.uuid4()
-                total_qty = 0
-                for goods_code, goods_detail in goods_entry.items():
-                    rid = '%s%s' % (shipment_no, goods_code)
-                    detail = ShipmentDetails(
-                        id=rid,
-                        shipment_no=shipment_no,
-                        goods_code=goods_code,
-                        is_gift=goods_detail.is_gift,
-                        qty=goods_detail.qty,
-                        create_time=now_time,
-                        creator=message.get('creator'),
-                        update_time=now_time,
-                        updater=message.get('updater'),
-                        status=0
-                    )
-                    total_qty += goods_detail.qty
-                    detail.save()
-                shipment = Shipment(
-                    shipment_no=shipment_no,
-                    orders_no=message.get('orders_no'),
-                    customer_no=message.get('customer_code'),
-                    customer_name=message.get('customer_name'),
-                    address=message.get('address'),
-                    customer_tel=message.get('customer_tel'),
-                    has_invoice=int(message.get('has_invoice')),
-                    amount=message.get('amount'),
-                    shipped_qty=total_qty,
-                    express_code='',
-                    express_orders_no='',
-                    express_name='',
-                    express_cost=0.00,
-                    courier='',
-                    courier_tel='',
-                    create_time=now_time,
-                    creator=message.get('creator'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                shipment.save()
-                shipment_seria = ShipmentSerializer(shipment).data
-                shipments.append(shipment_seria)
+            in_one_list = [products_dict.pop(1), products_dict.pop(2), products_dict.pop(3),
+                     products_dict.pop(4), products_dict.pop(5), products_dict.pop(6),
+                     products_dict.pop(7), products_dict.pop(8)]
         elif effective_month == 7:
-            first = [goods_dict.pop(1), goods_dict.pop(2), goods_dict.pop(3),
-                     goods_dict.pop(4), goods_dict.pop(5), goods_dict.pop(6),
-                     goods_dict.pop(7), goods_dict.pop(8), goods_dict.pop(9)]
-            first_dict = dict()
-            for item in first:
-                if item.goods_code in first_dict:
-                    first_dict.get(item.goods_code).qty += item.qty
-                else:
-                    first_dict[item.goods_code] = item
-            LOG.debug('Current first shipment is %s' % first_dict)
-            total_qty = 0
-            shipment_no = uuid.uuid4()
-            for goods_code, goods_detail in first_dict.items():
-                rid = '%s%s' % (shipment_no, goods_code)
-                detail = ShipmentDetails(
-                    id=rid,
-                    shipment_no=shipment_no,
-                    goods_code=goods_code,
-                    is_gift=goods_detail.is_gift,
-                    qty=goods_detail.qty,
-                    create_time=now_time,
-                    creator=message.get('creator'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                total_qty += goods_detail.qty
-                detail.save()
-            shipment = Shipment(
-                shipment_no=shipment_no,
-                orders_no=message.get('orders_no'),
-                customer_no=message.get('customer_code'),
-                customer_name=message.get('customer_name'),
-                address=message.get('address'),
-                customer_tel=message.get('customer_tel'),
-                has_invoice=int(message.get('has_invoice')),
-                amount=message.get('amount'),
-                shipped_qty=total_qty,
-                express_code='',
-                express_orders_no='',
-                express_name='',
-                express_cost=0.00,
-                courier='',
-                courier_tel='',
-                create_time=now_time,
-                creator=message.get('creator'),
-                update_time=now_time,
-                updater=message.get('updater'),
-                status=0
-            )
-            shipment.save()
-            shipment_seria = ShipmentSerializer(shipment).data
-            shipments.append(shipment_seria)
-            for level, goods_entry in goods_dict.items():
-                LOG.debug('Current level is %s' % level)
-                shipment_no = uuid.uuid4()
-                total_qty = 0
-                for goods_code, goods_detail in goods_entry.items():
-                    rid = '%s%s' % (shipment_no, goods_code)
-                    detail = ShipmentDetails(
-                        id=rid,
-                        shipment_no=shipment_no,
-                        goods_code=goods_code,
-                        is_gift=goods_detail.is_gift,
-                        qty=goods_detail.qty,
-                        create_time=now_time,
-                        creator=message.get('creator'),
-                        update_time=now_time,
-                        updater=message.get('updater'),
-                        status=0
-                    )
-                    total_qty += goods_detail.qty
-                    detail.save()
-                shipment = Shipment(
-                    shipment_no=shipment_no,
-                    orders_no=message.get('orders_no'),
-                    customer_no=message.get('customer_code'),
-                    customer_name=message.get('customer_name'),
-                    address=message.get('address'),
-                    customer_tel=message.get('customer_tel'),
-                    has_invoice=int(message.get('has_invoice')),
-                    amount=message.get('amount'),
-                    shipped_qty=total_qty,
-                    express_code='',
-                    express_orders_no='',
-                    express_name='',
-                    express_cost=0.00,
-                    courier='',
-                    courier_tel='',
-                    create_time=now_time,
-                    creator=message.get('creator'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                shipment.save()
-                shipment_seria = ShipmentSerializer(shipment).data
-                shipments.append(shipment_seria)
+            in_one_list = [products_dict.pop(1), products_dict.pop(2), products_dict.pop(3),
+                     products_dict.pop(4), products_dict.pop(5), products_dict.pop(6),
+                     products_dict.pop(7), products_dict.pop(8), products_dict.pop(9)]
         else:
-            first = goods_dict.values()
-            first_dict = dict()
-            for item in first:
-                if item.goods_code in first_dict:
-                    first_dict.get(item.goods_code).qty += item.qty
-                else:
-                    first_dict[item.goods_code] = item
-            LOG.debug('Current first shipment is %s' % first_dict)
-            total_qty = 0
-            shipment_no = uuid.uuid4()
-            for goods_code, goods_detail in first_dict.items():
-                rid = '%s%s' % (shipment_no, goods_code)
-                detail = ShipmentDetails(
-                    id=rid,
-                    shipment_no=shipment_no,
-                    goods_code=goods_code,
-                    is_gift=goods_detail.is_gift,
-                    qty=goods_detail.qty,
-                    create_time=now_time,
-                    creator=message.get('creator'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                total_qty += goods_detail.qty
-                detail.save()
-            shipment = Shipment(
-                shipment_no=shipment_no,
-                orders_no=message.get('orders_no'),
-                customer_no=message.get('customer_code'),
-                customer_name=message.get('customer_name'),
-                address=message.get('address'),
-                customer_tel=message.get('customer_tel'),
-                has_invoice=int(message.get('has_invoice')),
-                amount=message.get('amount'),
-                shipped_qty=total_qty,
-                express_code='',
-                express_orders_no='',
-                express_name='',
-                express_cost=0.00,
-                courier='',
-                courier_tel='',
-                create_time=now_time,
-                creator=message.get('creator'),
-                update_time=now_time,
-                updater=message.get('updater'),
-                status=0
-            )
-            shipment.save()
-            shipment_seria = ShipmentSerializer(shipment).data
-            shipments.append(shipment_seria)
+            in_one_list = products_dict.values()
+            products_dict.clear()
+        shipments = assemble_shipments(in_one_list, products_dict, message)
         transaction.commit()
     except Exception as e:
         LOG.error('Orders split error.\n [ERROR]:%s' % str(e))
@@ -1116,3 +255,108 @@ def split(request):
                         content_type='application/json;charset-utf-8',
                         date={'error': 'Orders split error.'})
     return Response(status=status.HTTP_200_OK, data=shipments, content_type='application/json;charset-utf-8')
+
+
+@transaction.commit_manually
+def assemble_shipments(in_one_list=[], products_dict={}, message={}):
+    in_one_dict = dict()
+    for item in in_one_list:
+        if item.product_code in in_one_dict:
+            in_one_dict.get(item.goods_code).qty += item.qty
+        else:
+            in_one_dict[item.goods_code] = item
+    LOG.debug('Current first shipment is %s' % in_one_dict)
+    shipment_no = uuid.uuid4()
+    now_time = datetime.now()
+    total_qty = 0
+    shipments = []
+    if len(in_one_list) == 0:
+        for product_code, product in in_one_dict.items():
+            rid = '%s%s' % (shipment_no, product_code)
+            detail = ShipmentDetails(
+                id=rid,
+                shipment_no=shipment_no,
+                product_code=product_code,
+                qty=product.qty,
+                is_product=1,
+                is_gift=0,
+                create_time=now_time,
+                creator=message.get('creator'),
+                update_time=now_time,
+                updater=message.get('updater'),
+                status=0
+            )
+            total_qty += product.qty
+            detail.save()
+        shipment = Shipment(
+            shipment_no=shipment_no,
+            orders_no=message.get('orders_no'),
+            customer_no=message.get('customer_code'),
+            customer_name=message.get('customer_name'),
+            address=message.get('address'),
+            customer_tel=message.get('customer_tel'),
+            has_invoice=int(message.get('has_invoice')),
+            amount=message.get('amount'),
+            shipped_qty=total_qty,
+            express_code='',
+            express_orders_no='',
+            express_name='',
+            express_cost=0.00,
+            courier='',
+            courier_tel='',
+            create_time=now_time,
+            creator=message.get('creator'),
+            update_time=now_time,
+            updater=message.get('updater'),
+            status=0
+        )
+        shipment.save()
+        shipment_seria = ShipmentSerializer(shipment).data
+        shipments.append(shipment_seria)
+    for level, package_detail in products_dict.items():
+        LOG.debug('Current level is %s' % level)
+        shipment_no = uuid.uuid4()
+        total_qty = 0
+        for product_code, product in package_detail.items():
+            rid = '%s%s' % (shipment_no, product_code)
+            detail = ShipmentDetails(
+                id=rid,
+                shipment_no=shipment_no,
+                product_code=product_code,
+                qty=product.qty,
+                is_product=1,
+                is_gift=0,
+                create_time=now_time,
+                creator=message.get('creator'),
+                update_time=now_time,
+                updater=message.get('updater'),
+                status=0
+            )
+            total_qty += product.qty
+            detail.save()
+        shipment = Shipment(
+            shipment_no=shipment_no,
+            orders_no=message.get('orders_no'),
+            customer_no=message.get('customer_code'),
+            customer_name=message.get('customer_name'),
+            address=message.get('address'),
+            customer_tel=message.get('customer_tel'),
+            has_invoice=int(message.get('has_invoice')),
+            amount=message.get('amount'),
+            shipped_qty=total_qty,
+            express_code='',
+            express_orders_no='',
+            express_name='',
+            express_cost=0.00,
+            courier='',
+            courier_tel='',
+            create_time=now_time,
+            creator=message.get('creator'),
+            update_time=now_time,
+            updater=message.get('updater'),
+            status=0
+        )
+        shipment.save()
+        shipment_seria = ShipmentSerializer(shipment).data
+        shipments.append(shipment_seria)
+    return shipments

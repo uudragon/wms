@@ -25,15 +25,9 @@ address|String|Y|客户地址
 customer_tel|String|Y|客户电话
 amount|decimal|Y|付款金额
 has_invoice|int|Y|是否有发票。0：无；1：有
+package_code|String|Y|套餐编号。0：无；1：有
 creator|String|Y|创建人
 updater|String|Y|需改人
-details|array|Y|订单明细
-
-`Details:`
-
-名称|类型|是否必填|说明
----|---|---|---
-product_code|String|Y|产品编号
 
 样例报文：
 
@@ -45,11 +39,9 @@ product_code|String|Y|产品编号
 	'customer_tel':'18600000000',
 	'amount':110.11,
 	'has_invoice':0,
+	'package_code':'pack00001',
 	'creator':'admin',
-	'updater':'admin',
-	'details':[{
-	    'product_code':'product001'
-	 }]}
+	'updater':'admin'}
 
 ######1.4 响应报文
 成功响应：
@@ -115,7 +107,7 @@ error| String  | 错误信息
 
 样例报文：
 
-	{‘error’:’Orders split error.’}
+	{'error':'Orders split error.'}
 
 ----
 #####2.按出库单号查询出库单信息
