@@ -38,7 +38,7 @@ updater|String|Y|需改人
 	{'orders_no':'001010101',
 	'customer_code':'user001',
 	'customer_name':'yonghu1',
-	'effective_date':'2014-012-31T00:00:00',
+	'effective_date':'2014-12-31',
 	'address':'北京市天安门',
 	'customer_tel':'18600000000',
 	'amount':110.11,

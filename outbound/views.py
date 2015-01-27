@@ -272,7 +272,7 @@ def split(request):
                 products_dict[package_detail.product_level] = entry
                 LOG.debug('>>>>>>>>>>>1')
         LOG.debug('Current count of the products_dict is %s' % len(products_dict))
-        strptime = time.strptime(message.get('effective_date'), '%Y-%m-%d')
+        strptime = time.strptime(message.get('effective_date'), '%Y-%m-%d %H:%M:%S.%f')
         effective_month = strptime.tm_mon
         if effective_month in (9, 10, 11):
             in_one_list = []
