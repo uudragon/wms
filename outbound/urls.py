@@ -9,4 +9,8 @@ urlpatterns = patterns(
     url(r'^shipment/save/$', 'save_shipment'),
     url(r'^shipments/$', 'query_shipments'),
     url(r'^shipment/(.+)/$', 'query_shipment'),
+    url(r'^shipment/(.+)/check/$', 'check'),
+    url(r'^shipment/(.+)/prepared/$', 'prepared'),
+    url(r'^shipment/(.+)/picking/$', 'picking'),
+    url(r'^shipment/(.+)/sent/$', 'sent'),
 )
