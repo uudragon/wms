@@ -258,6 +258,7 @@ def split(request):
             tables=['t_product'],
             where=['t_product_package_details.product_code=t_product.product_code'],
         ).filter(message('package_code'))
+        LOG.debug('Query records count is %s' % len(package_details))
         products_dict = dict()
         for package_detail in package_details:
             if package_detail.product_level in products_dict:
@@ -269,6 +270,7 @@ def split(request):
                 entry = dict()
                 entry[package_detail.product_code] = package_detail
                 products_dict[package_detail.product_level] = entry
+                LOG.debug('>>>>>>>>>>>1')
         LOG.debug('Current count of the products_dict is %s' % len(products_dict))
         strptime = time.strptime(message.get('effective_date'), '%Y-%m-%d')
         effective_month = strptime.tm_mon
