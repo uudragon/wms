@@ -83,6 +83,7 @@ class StorageRecords(models.Model):
     creator = models.CharField(db_column='CREATOR', null=False, max_length=50)
     update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True)
     updater = models.CharField(db_column='UPDATER', null=False, max_length=50)
+    status = models.IntegerField(db_column='STATUS', null=False, max_length=4, default=1)
 
     class Meta:
         db_table = 'T_STORAGE_RECORD'
