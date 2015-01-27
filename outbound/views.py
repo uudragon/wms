@@ -257,7 +257,7 @@ def split(request):
             select={'product_level': 't_product.product_level'},
             tables=['t_product'],
             where=['t_product_package_details.product_code=t_product.product_code'],
-        ).filter(message('package_code'))
+        ).filter(message.get('package_code'))
         LOG.debug('Query records count is %s' % len(package_details))
         products_dict = dict()
         for package_detail in package_details:
