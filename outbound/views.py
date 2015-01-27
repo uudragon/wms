@@ -8,17 +8,80 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import time
-from big_house.models import ProductDetails, ShipmentDetails, Shipment, ProductPackageDetails
+from big_house.models import ProductDetails, ShipmentDetails, Shipment, ProductPackageDetails, Product, Goods, \
+    WarehouseGoodsDetails, WarehouseProductDetails, StorageRecords
 from big_house.serializers import ShipmentDetailsSerializer, ShipmentSerializer
-from uudragon_wms.local.settings import DEFAULT_PAGE_SIZE
+from uudragon_wms.local.settings import DEFAULT_PAGE_SIZE, STORAGE_RECORD_TYPE_OUTPUT
 
 
 LOG = logging.getLogger(__name__)
 
 
 @api_view(['POST'])
-@transaction.commit_manually
 def save_shipment(request):
+    message = request.DATA
+
+    LOG.info('Current received message is %s.' % message)
+
+    try:
+        shipment = Shipment.objects.filter(shipment_no=message.get('shipment_no')).first()
+        now_time = datetime.now()
+        if shipment is not None:
+            if shipment.status != 0:
+                return Response(status=status.HTTP_200_OK)
+            ShipmentDetails.objects.filter(shipment_no=message.get('shipment_no')).delete()
+            shipment.sent_date = message.get('sent_date')
+            shipment.updater = message.get('updater')
+            shipment.update_time = now_time
+        else:
+            shipment = Shipment(
+                shipment_no=message.get('shipment_no'),
+                orders_no=message.get('orders_no'),
+                customer_no=message.get('customer_code'),
+                customer_name=message.get('customer_name'),
+                address=message.get('address'),
+                customer_tel=message.get('customer_tel'),
+                has_invoice=int(message.get('has_invoice')),
+                amount=message.get('amount'),
+                create_time=now_time,
+                creator=message.get('creator'),
+                update_time=now_time,
+                updater=message.get('updater'),
+                status=0
+            )
+        rece_details = message.get('details')
+        total_qty = 0
+        for rece_detail in rece_details:
+            shipment_detail = ShipmentDetails(
+                id='%s%s' % (rece_detail.get('shipment_no'), rece_detail.get('goods_code')),
+                shipment_no=rece_detail.get('shipment_no'),
+                code=rece_detail.get('code'),
+                is_product=rece_detail.get('is_product'),
+                is_gift=rece_detail.get('is_gift'),
+                qty=rece_detail.get('qty'),
+                status=rece_detail.get('status'),
+                creator=message.get('updater'),
+                updater=message.get('updater'),
+                create_time=now_time,
+                update_time=now_time
+            )
+            shipment_detail.save()
+            total_qty += shipment_detail.qty
+        shipment.total_qty = total_qty
+        shipment.save()
+        transaction.commit()
+    except Exception as e:
+        LOG.error('Save shipment information error. [ERROR] %s' % str(e))
+        transaction.rollback()
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={'error': 'Save shipment information error'},
+                        content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@transaction.commit_manually
+def check(request):
     message = request.DATA
     
     LOG.info('Current received message is %s.' % message)
@@ -26,50 +89,34 @@ def save_shipment(request):
     try:
         shipment = Shipment.objects.filter(shipment_no=message.get('shipment_no')).first()
         if shipment is not None:
-            detail_dict = dict()
-            shipment_details = ShipmentDetails.objects.filter(shipment_no=message.get('shipment_no'))
+            ShipmentDetails.objects.filter(shipment_no=message.get('shipment_no')).delete()
             now_time = datetime.now()
-            for shipment_detail in shipment_details:
-                detail_dict[shipment_detail.get('goods_code')] = shipment_detail
             rece_details = message.get('details')
             for rece_detail in rece_details:
-                if rece_detail.get('goods_code') in detail_dict:
-                    shipment_detail = detail_dict.get(rece_detail.get('goods_code'))
-                    shipment_detail.is_gift = rece_detail.get('is_gift')
-                    shipment_detail.qty = rece_detail.get('qty')
-                    shipment_detail.status = rece_detail.get('status')
-                    shipment_detail.updater = message.get('updater')
-                    shipment_detail.update_time = now_time
-                else:
-                    shipment_detail = ShipmentDetails(
-                        id='%s%s' % (rece_detail.get('shipment_no'), rece_detail.get('goods_code')),
-                        shipment_no=rece_detail.get('shipment_no'),
-                        goods_code=rece_detail.get('goods_code'),
-                        is_gift=rece_detail.get('is_gift'),
-                        qty=rece_detail.get('qty'),
-                        status=rece_detail.get('status'),
-                        creator=message.get('updater'),
-                        updater=message.get('updater'),
-                        create_time=now_time,
-                        update_time=now_time
-                    )
+                shipment_detail = ShipmentDetails(
+                    id='%s%s' % (rece_detail.get('shipment_no'), rece_detail.get('goods_code')),
+                    shipment_no=rece_detail.get('shipment_no'),
+                    code=rece_detail.get('code'),
+                    is_product=rece_detail.get('is_product'),
+                    is_gift=rece_detail.get('is_gift'),
+                    qty=rece_detail.get('qty'),
+                    status=rece_detail.get('status'),
+                    creator=message.get('updater'),
+                    updater=message.get('updater'),
+                    create_time=now_time,
+                    update_time=now_time
+                )
                 shipment_detail.save()
-            shipment.express_code = message.get('express_code')
-            shipment.express_orders_no = message.get('express_orders_no')
-            shipment.express_name = message.get('express_name')
-            shipment.express_cost = message.get('express_cost')
-            shipment.sent_date = message.get('sent_date')
-            shipment.courier = message.get('courier')
-            shipment.courier_tel = message.get('courier_tel')
             shipment.updater = message.get('updater')
             shipment.update_time = now_time
+            shipment.status = 1
             shipment.save()
             transaction.commit()
     except Exception as e:
-        LOG.error('Save shipment information error. [ERROR] %s' % str(e))
+        LOG.error('Check error. [ERROR] %s' % str(e))
         transaction.rollback()
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        data={'error': 'Save shipment information error'},
+                        data={'error': 'Check error'},
                         content_type='application/json;charset-utf-8')
     return Response(status=status.HTTP_200_OK)
 
@@ -132,14 +179,21 @@ def query_shipment(request, shipment_no):
     shipment = Shipment.objects.get(shipment_no=shipment_no)
     shipment_seria = ShipmentSerializer(shipment).data
     LOG.debut('Current shipment serialized is %s' % shipment_seria)
-    shipment_details = ShipmentDetails.objects.extra(
-        select={'goods_name': 't_goods.goods_name'},
-        tables=['t_shipment_details', 't_goods'],
-        where=['t_shipment_details.goods_code=t_goods.goods_code']
-    ).filter(shipment_no=shipment_no)
+    # shipment_details = ShipmentDetails.objects.extra(
+    #     select={'goods_name': 't_goods.goods_name'},
+    #     tables=['t_shipment_details', 't_goods'],
+    #     where=['t_shipment_details.goods_code=t_goods.goods_code']
+    # ).filter(shipment_no=shipment_no)
+    shipment_details = ShipmentDetails.objects.filter(shipment_no=shipment_no)
     details_seria = []
     for detail in shipment_details:
         seria = ShipmentDetailsSerializer(detail)
+        if detail.is_product:
+            product = Product.objects.filter(product_code=detail.code).first()
+            seria.name = product.product_name
+        elif detail.is_gift:
+            goods = Goods.objects.filter(goods_code=detail.code).first()
+            seria.name = goods.goods_name
         details_seria.append(seria.data)
     shipment_seria['details'] = details_seria
     return Response(status=status.HTTP_200_OK, data=shipment_seria, content_type='application/json;charset-utf-8')
@@ -360,3 +414,150 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
         shipment_seria = ShipmentSerializer(shipment).data
         shipments.append(shipment_seria)
     return shipments
+
+
+@api_view(['POST'])
+@transaction.commit_manually
+def prepared(request, shipment_no):
+    LOG.info('Current prepared shipment is %s' % shipment_no)
+    
+    message = request.DATA
+
+    LOG.info('Current received message is %s' % message)
+    
+    shipment_seria = None
+    try:
+        shipment = Shipment.objects.filter(status=1).filter(shipment_no=shipment_no)
+        if shipment is not None:
+            shipment.status = 2
+            shipment.updater = message.get('updater')
+            now_time = datetime.now()
+            shipment.update_time = now_time
+            shipment.save()
+            transaction.commit()
+            shipment_seria = ShipmentSerializer(shipment).data
+            details = ShipmentDetails.objects.filter(shipment_no=shipment_no)
+            details_seria = []
+            for detail in details:
+                seria = ShipmentDetailsSerializer(detail)
+                if detail.is_product:
+                    product = Product.objects.filter(product_code=detail.code).first()
+                    seria.name = product.product_name
+                elif detail.is_gift:
+                    goods = Goods.objects.filter(goods_code=detail.code).first()
+                    seria.name = goods.goods_name
+                details_seria.append(seria.data)
+            shipment_seria['details'] = details_seria
+    except Exception as e:
+        LOG.error('Shipment prepared error, message is %s' % str(e))
+        transaction.rollback()
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        content_type='application/json;charset-utf-8',
+                        date={'error': 'Shipment prepared error.'})
+    return Response(status=status.HTTP_200_OK, data=shipment_seria, content_type='application/json;charset-utf-8')
+
+
+@api_view(['POST'])
+@transaction.commit_manually
+def picking(request, shipment_no):
+    LOG.info('Current prepared shipment is %s' % shipment_no)
+
+    message = request.DATA
+
+    LOG.info('Current received message is %s' % message)
+    
+    try:
+        shipment = Shipment.objects.filter(shipment_no=shipment_no).first()
+        shipment_details = ShipmentDetails.objects.filter(shipment_no=shipment_no)
+        out_goods = dict()
+        for item in shipment_details:
+            if item.is_gift:
+                goods = WarehouseGoodsDetails.objects.filter(goods_code=item.code).filter(
+                    warehouse=shipment.warehouse).first()
+                goods.qty -= item.qty
+                goods.not_picking_qty -= item.qty
+                goods.save()
+                if goods.goods_code in out_goods:
+                    out_goods[goods.goods_code] += item.qty
+                else:
+                    out_goods[goods.goods_code] = item.qty
+            elif item.is_product:
+                product = WarehouseProductDetails.objects.filter(product_code=item.code).filter(
+                    warehouse=shipment.warehouse).first()
+                product.qty -= item.qty
+                product_details = ProductDetails.objects.filter(product_code=product.product_code)
+                for detail in product_details:
+                    goods = WarehouseGoodsDetails.objects.filter(goods_code=detail.goods_code).filter(
+                        warehouse=shipment.warehouse).first()
+                    goods.qty -= detail.qty
+                    goods.picking_qty -= detail.qty
+                    goods.save()
+                    if goods.goods_code in out_goods:
+                        out_goods[goods.goods_code] += item.qty
+                    else:
+                        out_goods[goods.goods_code] = item.qty
+                product.save()
+        LOG.info('Current output goods is %s' % out_goods)
+        now_time = datetime.now()
+        shipment.status = 3
+        shipment.updater = message.get('updater')
+        shipment.update_time = now_time
+        for goods_code, qty in out_goods.items():
+            storage_record = StorageRecords(
+                goods_code=goods_code,
+                goods_qty=qty,
+                code=shipment_no,
+                warehouse=shipment.warehouse,
+                type=STORAGE_RECORD_TYPE_OUTPUT,
+                create_time=now_time,
+                creator=message.get('updater'),
+                update_time=now_time,
+                updater=message.get('updater'),
+                status=0
+            )
+            storage_record.save()
+        transaction.commit()
+    except Exception as e:
+        LOG.error('Picking error, message is %s' % str(e))
+        transaction.rollback()
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        content_type='application/json;charset-utf-8',
+                        date={'error': 'Picking error.'})
+    return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@transaction.commit_manually
+def sent(request, shipment_no):
+    LOG.info('Current prepared shipment is %s' % shipment_no)
+
+    message = request.DATA
+
+    LOG.info('Current received message is %s' % message)
+    try:
+        now_time = datetime.now()
+        shipment = Shipment.objects.filter(shipment_no=shipment_no).first()
+        shipment.express_code = message.get('express_code')
+        shipment.express_orders_no = message.get('express_orders_no')
+        shipment.express_name = message.get('express_name')
+        shipment.express_cost = message.get('express_cost')
+        shipment.courier = message.get('courier')
+        shipment.courier_tel = message.get('courier_tel')
+        shipment.status = 4
+        shipment.updater = message.get('updater')
+        shipment.update_time = now_time
+        shipment.save()
+        records = StorageRecords.objects.filter(code=shipment_no)
+        for record in records:
+            record.status = 1
+            record.updater = message.get('updater')
+            record.update_time = now_time
+            record.save()
+        transaction.commit()
+    except Exception as e:
+        LOG.error('Sent error, message is %s' % str(e))
+        transaction.rollback()
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        content_type='application/json;charset-utf-8',
+                        date={'error': 'Sent error.'})
+    return Response(status=status.HTTP_200_OK)

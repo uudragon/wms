@@ -95,7 +95,7 @@ class ShipmentSerializer(serializers.ModelSerializer):
 
 class ShipmentDetailsSerializer(serializers.ModelSerializer):
 
-    goods_name = serializers.CharField(max_length=255, read_only=True)
+    name = serializers.CharField(max_length=255, read_only=True)
     
     class Meta:
         model = ShipmentDetails

@@ -3,6 +3,10 @@
 - [按出库单号查询出库单接口](#21-url)
 - [修改出库单接口](#31-url)
 - [批量查询出库单接口](#41-url)
+- [出库复核接口](#51-url)
+- [出库备货锁定接口](#61-url)
+- [出库拣货完成接口](#71-url)
+- [发货接口](#81-url)
 
 ----
 #####1.订单拆分接口
@@ -63,12 +67,6 @@ customer_tel|String|Y|客户电话
 amount|decimal|Y|付款金额
 shipped_qty|int|Y|发货数量
 has_invoice|int|Y|是否有发票。0：无；1：有
-express_code|String|O|快递公司编号
-express_orders_no|String|O|快递单号
-express_name|String|O|快递公司名称
-express_cost|decimal|O|快递费用
-courier|String|O|快递员
-courier_tel|String|O|快递员电话
 sent_date|String|O|发货时间
 create_time|String|Y|创建时间
 creator|String|Y|创建人
@@ -88,6 +86,7 @@ status|int|Y|发货单状态。-1：无效；0：待审核；1：待发货；2�
 	    'amount':110.11,
 	    'shipped_qty':10,
 	    'has_invoice':0,
+	    'sent_date':'2015-01-01',
 	    'create_time':'2015-01-01T00:00:00',
 	    'creator':'admin',
 	    'update_time':'2015-01-01T00:00:00',
@@ -164,7 +163,9 @@ details|array|Y|发货明细
 名称|类型|是否必填|说明
 ---|---|---|---
 shipment_no|String|Y|出库单号
-goods_code|String|Y|商品编号
+code|String|Y|编号
+name|String|Y|名称
+is_product|int|Y|是否产品。0：否；1：是
 is_gift|int|Y|是否赠品。0：否；1：是
 qty|int|Y|数量
 status|int|Y|状态。0：未确认；1：已确认
@@ -196,7 +197,9 @@ status|int|Y|状态。0：未确认；1：已确认
 	    'status':0,
 	    'details':[{
 	        'shipment_no':'shipment001',
-	        'goods_code':'goods001',
+	        'code':'goods001',
+	        'name':'商品1'
+	        'is_product':1,
 	        'is_gift':0,
 	        'qty':10,
 	        status:0
@@ -239,12 +242,6 @@ customer_tel|String|Y|客户电话
 amount|decimal|Y|付款金额
 shipped_qty|int|Y|发货数量
 has_invoice|int|Y|是否有发票。0：无；1：有
-express_code|String|Y|快递公司编号
-express_orders_no|String|Y|快递单号
-express_name|String|Y|快递公司名称
-express_cost|decimal|Y|快递费用
-courier|String|Y|快递员
-courier_tel|String|Y|快递员电话
 sent_date|String|Y|发货时间
 create_time|String|Y|创建时间
 creator|String|Y|创建人
@@ -257,7 +254,8 @@ Details
 名称|类型|是否必填|说明
 ---|---|---|---
 shipment_no|String|Y|出库单号
-goods_code|String|Y|商品编号
+code|String|Y|编号
+is_product|int|Y|是否是产品。0：否；1：是
 is_gift|int|Y|是否赠品。0：否；1：是
 qty|int|Y|数量
 status|int|Y|状态。0：未确认；1：已确认
@@ -275,12 +273,6 @@ status|int|Y|状态。0：未确认；1：已确认
 	    'amount':110.11,
 	    'shipped_qty':10,
 	    'has_invoice':0,
-	    'express_code':'express0001',
-        'express_orders_no':'010101010',
-        'express_name':'顺丰',
-        'express_cost':22:00,
-        'courier':'aaaa',
-        'courier_tel':18700000000,
         'sent_date':'2015-01-01',
 	    'create_time':'2015-01-01T00:00:00',
 	    'creator':'admin',
@@ -289,7 +281,8 @@ status|int|Y|状态。0：未确认；1：已确认
 	    'status':0,
 	    'details':[{
 	        'shipment_no':'shipment001',
-	        'goods_code':'goods001',
+	        'code':'goods001',
+	        'is_product':1,
 	        'is_gift':0,
 	        'qty':10,
 	        status:0
@@ -405,6 +398,265 @@ status|int|Y|发货单状态。-1：无效；0：待审核；1：待发货；2�
 	a．	HTTP_STATUS_CODE:400 Bad request；
 	b．	HTTP_STATUS_CODE:500 Server Error
 	
+异常报文：
+
+名称 | 类型 | 说明
+------------ | ------------- | ------------
+error| String  | 错误信息
+
+样例报文：
+
+	{‘error’:’Warehouse query error.’}
+	
+----
+#####5.出库复核接口
+该接口用于客服人员对出库单的复核检查确认，经过改操作后，出库单的状态将由未审核（0）-->待发货（1）
+######5.1 url
+	method: POST
+	wms/outbound/shipment/${shipment_no}/check/
+	注意：结尾的’/’不能省略，${shipment_no}为出库单号
+######5.2 header
+	Content_Type:application/json;charset=utf-8
+	Accept:application/json
+######5.3 请求参数
+名称|类型|是否必填|说明
+---|---|---|---
+updater|String|Y|需改人
+details|array|Y|发货明细
+
+Details
+名称|类型|是否必填|说明
+---|---|---|---
+shipment_no|String|Y|出库单号
+code|String|Y|编号
+is_product|int|Y|是否是产品。0：否；1：是
+is_gift|int|Y|是否赠品。0：否；1：是
+qty|int|Y|数量
+status|int|Y|状态。0：未确认；1：已确认
+
+样例报文：
+	{
+	    'updater':'admin',
+	    'details':[{
+	        'shipment_no':'shipment001',
+	        'code':'goods001',
+	        'is_product':1,
+	        'is_gift':0,
+	        'qty':10,
+	        status:0
+	    }]
+	}
+
+######5.4 响应报文
+成功响应：
+
+	HTTP_STATUS_CODE:200
+
+异常响应：
+
+	a．	HTTP_STATUS_CODE:400 Bad request；
+	b．	HTTP_STATUS_CODE:500 Server Error
+
+异常报文：
+
+名称 | 类型 | 说明
+------------ | ------------- | ------------
+error| String  | 错误信息
+
+样例报文：
+
+	{‘error’:’Warehouse query error.’}
+
+
+----
+#####6.出库备货接口
+该接口用于仓库操作员按照发货单进行拣货，此接口中，出库单的状态先由待发货（1）-->备货中（2），用以锁定状态。并返回当前发货单号对应的发货单信息。
+######6.1 url
+	method: POST
+	wms/outbound/shipment/${shipment_no}/prepared/
+	注意：结尾的’/’不能省略，${shipment_no}为出库单号
+######6.2 header
+	Content_Type:application/json;charset=utf-8
+	Accept:application/json
+######6.3 请求参数
+名称|类型|是否必填|说明
+---|---|---|---
+updater|String|Y|需改人
+
+样例报文：
+	{
+	    'updater':'admin'
+	}
+
+######6.4 响应报文
+成功响应：
+
+	HTTP_STATUS_CODE:200
+	
+响应报文说明：
+
+名称|类型|是否必填|说明
+---|---|---|---
+orders_no|String|Y|订单号
+shipment_no|String|Y|发货单号
+customer_code|String|Y|客户编号
+customer_name|String|Y|客户姓名
+address|String|Y|客户地址
+customer_tel|String|Y|客户电话
+amount|decimal|Y|付款金额
+shipped_qty|int|Y|发货数量
+has_invoice|int|Y|是否有发票。0：无；1：有
+sent_date|String|Y|发货时间
+create_time|String|Y|创建时间
+creator|String|Y|创建人
+update_time|String|Y|修改时间
+updater|String|Y|需改人
+status|int|Y|发货单状态。-1：无效；0：待审核；1：待发货；2：备货中；3：发货中；4：已发货
+details|array|Y|发货明细
+
+`Details`
+
+名称|类型|是否必填|说明
+---|---|---|---
+shipment_no|String|Y|出库单号
+code|String|Y|编号
+name|String|Y|名称
+is_product|int|Y|是否产品。0：否；1：是
+is_gift|int|Y|是否赠品。0：否；1：是
+qty|int|Y|数量
+status|int|Y|状态。0：未确认；1：已确认
+
+
+样例报文：
+
+	{
+	    'orders_no':'00010101',
+	    'shipment_no':'shipment0001',
+	    'customer_code':'user001',
+	    'customer_name':'user1',
+	    'address':'北京天安门',
+	    'customer_tel':'18600000000',
+	    'amount':110.11,
+	    'shipped_qty':10,
+	    'has_invoice':0,
+        'sent_date':'2015-01-01',
+	    'create_time':'2015-01-01T00:00:00',
+	    'creator':'admin',
+	    'update_time':'2015-01-01T00:00:00',
+	    'updater':'admin',
+	    'status':0,
+	    'details':[{
+	        'shipment_no':'shipment001',
+	        'code':'goods001',
+	        'name':'商品1'
+	        'is_product':1,
+	        'is_gift':0,
+	        'qty':10,
+	        status:0
+	    }]
+	}
+
+
+异常响应：
+
+	a．	HTTP_STATUS_CODE:400 Bad request；
+	b．	HTTP_STATUS_CODE:500 Server Error
+
+异常报文：
+
+名称 | 类型 | 说明
+------------ | ------------- | ------------
+error| String  | 错误信息
+
+样例报文：
+
+	{‘error’:’Warehouse query error.’}
+
+
+----
+#####7.出库拣货完成接口
+该接口用于仓库操作员按照拣货后调用此接口用于确认拣货完成。调用此接口后出库单的状态先由备货中（2）-->发货中（3），
+并且将出库商品记录入“商品出入库表”（状态为“预占”状态0，表示即将出库但尚未出库）并对扣除库存。
+######7.1 url
+	method: POST
+	wms/outbound/shipment/${shipment_no}/picking/
+	注意：结尾的’/’不能省略，${shipment_no}为出库单号
+######7.2 header
+	Content_Type:application/json;charset=utf-8
+	Accept:application/json
+######7.3 请求参数
+名称|类型|是否必填|说明
+---|---|---|---
+updater|String|Y|需改人
+
+样例报文：
+	{
+	    'updater':'admin'
+	}
+
+######7.4 响应报文
+成功响应：
+
+	HTTP_STATUS_CODE:200
+
+异常响应：
+
+	a．	HTTP_STATUS_CODE:400 Bad request；
+	b．	HTTP_STATUS_CODE:500 Server Error
+
+异常报文：
+
+名称 | 类型 | 说明
+------------ | ------------- | ------------
+error| String  | 错误信息
+
+样例报文：
+
+	{‘error’:’Warehouse query error.’}
+
+
+----
+#####8.发货接口
+该接口用于仓库操作员尽心发货操作，此接口需要操作员提供快递单与快递员相关信息，修改出入库对应记录状态（改为“已完成（1）”）。调用此接口后出库单的状态先由发货中（3）-->已发货（4），
+######8.1 url
+	method: POST
+	wms/outbound/shipment/${shipment_no}/picking/
+	注意：结尾的’/’不能省略，${shipment_no}为出库单号
+######8.2 header
+	Content_Type:application/json;charset=utf-8
+	Accept:application/json
+######8.3 请求参数
+名称|类型|是否必填|说明
+---|---|---|---
+express_code|String|Y|快递公司编号
+express_orders_no|String|Y|快递单号
+express_name|String|Y|快递公司名称
+express_cost|decimal|Y|快递费用
+courier|String|Y|快递员
+courier_tel|String|Y|快递员电话
+updater|String|Y|需改人
+
+样例报文：
+	{
+		'express_code':'express0001',
+        'express_orders_no':'010101010',
+        'express_name':'顺丰',
+        'express_cost':22:00,
+        'courier':'aaaa',
+        'courier_tel':18700000000,
+	    'updater':'admin'
+	}
+
+######8.4 响应报文
+成功响应：
+
+	HTTP_STATUS_CODE:200
+
+异常响应：
+
+	a．	HTTP_STATUS_CODE:400 Bad request；
+	b．	HTTP_STATUS_CODE:500 Server Error
+
 异常报文：
 
 名称 | 类型 | 说明
