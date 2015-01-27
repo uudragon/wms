@@ -201,7 +201,6 @@ def query_shipment(request, shipment_no):
 
 
 @api_view(['POST'])
-@transaction.commit_manually
 def split(request):
     message = request.DATA
     
@@ -304,10 +303,8 @@ def split(request):
             in_one_list = products_dict.values()
             products_dict.clear()
         shipments = assemble_shipments(in_one_list, products_dict, message)
-        transaction.commit()
     except Exception as e:
         LOG.error('Orders split error.\n [ERROR]:%s' % str(e))
-        transaction.rollback()
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         content_type='application/json;charset-utf-8',
                         date={'error': 'Orders split error.'})
@@ -317,105 +314,111 @@ def split(request):
 @transaction.commit_manually
 def assemble_shipments(in_one_list=[], products_dict={}, message={}):
     in_one_dict = dict()
-    for item in in_one_list:
-        if item.product_code in in_one_dict:
-            in_one_dict.get(item.goods_code).qty += item.qty
-        else:
-            in_one_dict[item.goods_code] = item
-    LOG.debug('Current first shipment is %s' % in_one_dict)
-    shipment_no = uuid.uuid4()
-    now_time = datetime.now()
-    total_qty = 0
     shipments = []
-    if len(in_one_list) == 0:
-        for product_code, product in in_one_dict.items():
-            rid = '%s%s' % (shipment_no, product_code)
-            detail = ShipmentDetails(
-                id=rid,
-                shipment_no=shipment_no,
-                product_code=product_code,
-                qty=product.qty,
-                is_product=1,
-                is_gift=0,
-                create_time=now_time,
-                creator=message.get('creator'),
-                update_time=now_time,
-                updater=message.get('updater'),
-                status=0
-            )
-            total_qty += product.qty
-            detail.save()
-        shipment = Shipment(
-            shipment_no=shipment_no,
-            orders_no=message.get('orders_no'),
-            customer_no=message.get('customer_code'),
-            customer_name=message.get('customer_name'),
-            address=message.get('address'),
-            customer_tel=message.get('customer_tel'),
-            has_invoice=int(message.get('has_invoice')),
-            amount=message.get('amount'),
-            shipped_qty=total_qty,
-            express_code='',
-            express_orders_no='',
-            express_name='',
-            express_cost=0.00,
-            courier='',
-            courier_tel='',
-            create_time=now_time,
-            creator=message.get('creator'),
-            update_time=now_time,
-            updater=message.get('updater'),
-            status=0
-        )
-        shipment.save()
-        shipment_seria = ShipmentSerializer(shipment).data
-        shipments.append(shipment_seria)
-    for level, package_detail in products_dict.items():
-        LOG.debug('Current level is %s' % level)
+    try:
+        for item in in_one_list:
+            if item.product_code in in_one_dict:
+                in_one_dict.get(item.goods_code).qty += item.qty
+            else:
+                in_one_dict[item.goods_code] = item
+        LOG.debug('Current first shipment is %s' % in_one_dict)
         shipment_no = uuid.uuid4()
+        now_time = datetime.now()
         total_qty = 0
-        for product_code, product in package_detail.items():
-            rid = '%s%s' % (shipment_no, product_code)
-            detail = ShipmentDetails(
-                id=rid,
+        if len(in_one_list) == 0:
+            for product_code, product in in_one_dict.items():
+                rid = '%s%s' % (shipment_no, product_code)
+                detail = ShipmentDetails(
+                    id=rid,
+                    shipment_no=shipment_no,
+                    product_code=product_code,
+                    qty=product.qty,
+                    is_product=1,
+                    is_gift=0,
+                    create_time=now_time,
+                    creator=message.get('creator'),
+                    update_time=now_time,
+                    updater=message.get('updater'),
+                    status=0
+                )
+                total_qty += product.qty
+                detail.save()
+            shipment = Shipment(
                 shipment_no=shipment_no,
-                product_code=product_code,
-                qty=product.qty,
-                is_product=1,
-                is_gift=0,
+                orders_no=message.get('orders_no'),
+                customer_no=message.get('customer_code'),
+                customer_name=message.get('customer_name'),
+                address=message.get('address'),
+                customer_tel=message.get('customer_tel'),
+                has_invoice=int(message.get('has_invoice')),
+                amount=message.get('amount'),
+                shipped_qty=total_qty,
+                express_code='',
+                express_orders_no='',
+                express_name='',
+                express_cost=0.00,
+                courier='',
+                courier_tel='',
                 create_time=now_time,
                 creator=message.get('creator'),
                 update_time=now_time,
                 updater=message.get('updater'),
                 status=0
             )
-            total_qty += product.qty
-            detail.save()
-        shipment = Shipment(
-            shipment_no=shipment_no,
-            orders_no=message.get('orders_no'),
-            customer_no=message.get('customer_code'),
-            customer_name=message.get('customer_name'),
-            address=message.get('address'),
-            customer_tel=message.get('customer_tel'),
-            has_invoice=int(message.get('has_invoice')),
-            amount=message.get('amount'),
-            shipped_qty=total_qty,
-            express_code='',
-            express_orders_no='',
-            express_name='',
-            express_cost=0.00,
-            courier='',
-            courier_tel='',
-            create_time=now_time,
-            creator=message.get('creator'),
-            update_time=now_time,
-            updater=message.get('updater'),
-            status=0
-        )
-        shipment.save()
-        shipment_seria = ShipmentSerializer(shipment).data
-        shipments.append(shipment_seria)
+            shipment.save()
+            shipment_seria = ShipmentSerializer(shipment).data
+            shipments.append(shipment_seria)
+        for level, package_detail in products_dict.items():
+            LOG.debug('Current level is %s' % level)
+            shipment_no = uuid.uuid4()
+            total_qty = 0
+            for product_code, product in package_detail.items():
+                rid = '%s%s' % (shipment_no, product_code)
+                detail = ShipmentDetails(
+                    id=rid,
+                    shipment_no=shipment_no,
+                    product_code=product_code,
+                    qty=product.qty,
+                    is_product=1,
+                    is_gift=0,
+                    create_time=now_time,
+                    creator=message.get('creator'),
+                    update_time=now_time,
+                    updater=message.get('updater'),
+                    status=0
+                )
+                total_qty += product.qty
+                detail.save()
+            shipment = Shipment(
+                shipment_no=shipment_no,
+                orders_no=message.get('orders_no'),
+                customer_no=message.get('customer_code'),
+                customer_name=message.get('customer_name'),
+                address=message.get('address'),
+                customer_tel=message.get('customer_tel'),
+                has_invoice=int(message.get('has_invoice')),
+                amount=message.get('amount'),
+                shipped_qty=total_qty,
+                express_code='',
+                express_orders_no='',
+                express_name='',
+                express_cost=0.00,
+                courier='',
+                courier_tel='',
+                create_time=now_time,
+                creator=message.get('creator'),
+                update_time=now_time,
+                updater=message.get('updater'),
+                status=0
+            )
+            shipment.save()
+            shipment_seria = ShipmentSerializer(shipment).data
+            shipments.append(shipment_seria)
+        transaction.commit()
+    except Exception as e:
+        LOG.error('Orders split error.\n [ERROR]:%s' % str(e))
+        transaction.rollback()
+        raise e
     return shipments
 
 
