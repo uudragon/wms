@@ -421,6 +421,7 @@ error| String  | 错误信息
 ######5.3 请求参数
 名称|类型|是否必填|说明
 ---|---|---|---
+warehouse|String|Y|库房编号
 updater|String|Y|需改人
 details|array|Y|发货明细
 
@@ -436,6 +437,7 @@ status|int|Y|状态。0：未确认；1：已确认
 
 样例报文：
 	{
+		'warehouse':'w00001',
 	    'updater':'admin',
 	    'details':[{
 	        'shipment_no':'shipment001',

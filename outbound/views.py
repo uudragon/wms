@@ -107,6 +107,7 @@ def check(request):
                     update_time=now_time
                 )
                 shipment_detail.save()
+            shipment.warehouse = message.get('warehouse')
             shipment.updater = message.get('updater')
             shipment.update_time = now_time
             shipment.status = 1
