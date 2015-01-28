@@ -326,7 +326,6 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
     in_one_dict = dict()
     shipments = []
     strptime = time.strptime(message.get('effective_date'), '%Y-%m-%d')
-    strftime = time.strftime('%Y-%m-%d', strptime)
     try:
         for item in in_one_list:
             if item.product_code in in_one_dict:
@@ -371,7 +370,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
                 express_cost=0.00,
                 courier='',
                 courier_tel='',
-                sent_date=strftime,
+                sent_date=time.strftime('%Y-%m-%d', strptime),
                 create_time=now_time,
                 creator=message.get('creator'),
                 update_time=now_time,
@@ -381,7 +380,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
             shipment.save()
             shipment_seria = ShipmentSerializer(shipment).data
             shipments.append(shipment_seria)
-            strftime = strftime + dtime.timedelta(months=1)
+            strptime.tm_mon += 1
         for level, package_detail in products_dict.items():
             LOG.debug('Current level is %s' % level)
             shipment_no = uuid.uuid4()
@@ -420,7 +419,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
                 express_cost=0.00,
                 courier='',
                 courier_tel='',
-                sent_date=strftime,
+                sent_date=time.strftime('%Y-%m-%d', strptime),
                 create_time=now_time,
                 creator=message.get('creator'),
                 update_time=now_time,
@@ -430,7 +429,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
             shipment.save()
             shipment_seria = ShipmentSerializer(shipment).data
             shipments.append(shipment_seria)
-            strftime = strftime + dtime.timedelta(months=1)
+            strptime.tm_mon += 1
         transaction.commit()
     except Exception as e:
         LOG.error('Orders split error.\n [ERROR]:%s' % str(e))
