@@ -1,5 +1,6 @@
 # Create your views here.
 from datetime import datetime
+import datetime as dtime
 import logging
 import uuid
 from django.core.paginator import Paginator
@@ -311,7 +312,7 @@ def split(request):
             LOG.info('Effective_month is 8')
             in_one_list = products_dict.values()
             products_dict.clear()
-        shipments = assemble_shipments(in_one_list, products_dict, message, strptime)
+        shipments = assemble_shipments(in_one_list, products_dict, message)
     except Exception as e:
         LOG.error('Orders split error.\n [ERROR]:%s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -321,9 +322,10 @@ def split(request):
 
 
 @transaction.commit_manually
-def assemble_shipments(in_one_list=[], products_dict={}, message={}, strptime=None):
+def assemble_shipments(in_one_list=[], products_dict={}, message={}):
     in_one_dict = dict()
     shipments = []
+    strftime = time.strftime('%Y-%m-%d', message.get('effective_date'))
     try:
         for item in in_one_list:
             if item.product_code in in_one_dict:
@@ -368,7 +370,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}, strptime=No
                 express_cost=0.00,
                 courier='',
                 courier_tel='',
-                sent_date=time.mktime(strptime),
+                sent_date=strftime,
                 create_time=now_time,
                 creator=message.get('creator'),
                 update_time=now_time,
@@ -378,7 +380,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}, strptime=No
             shipment.save()
             shipment_seria = ShipmentSerializer(shipment).data
             shipments.append(shipment_seria)
-            strptime.tm_mon += 1
+            strftime = strftime + dtime.timedelta(months=1)
         for level, package_detail in products_dict.items():
             LOG.debug('Current level is %s' % level)
             shipment_no = uuid.uuid4()
@@ -417,7 +419,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}, strptime=No
                 express_cost=0.00,
                 courier='',
                 courier_tel='',
-                sent_date=time.mktime(strptime),
+                sent_date=strftime,
                 create_time=now_time,
                 creator=message.get('creator'),
                 update_time=now_time,
@@ -427,7 +429,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}, strptime=No
             shipment.save()
             shipment_seria = ShipmentSerializer(shipment).data
             shipments.append(shipment_seria)
-            strptime.tm_mon += 1
+            strftime = strftime + dtime.timedelta(months=1)
         transaction.commit()
     except Exception as e:
         LOG.error('Orders split error.\n [ERROR]:%s' % str(e))
