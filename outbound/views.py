@@ -44,6 +44,7 @@ def save_shipment(request):
                 address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
                 has_invoice=int(message.get('has_invoice')),
+                sent_date=datetime.strptime(message.get('sent_date'), '%Y-%m-%d'),
                 amount=message.get('amount'),
                 create_time=now_time,
                 creator=message.get('creator'),
