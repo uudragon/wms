@@ -381,7 +381,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
             shipment.save()
             shipment_seria = ShipmentSerializer(shipment).data
             shipments.append(shipment_seria)
-            strptime = strptime + dtime.timedelta(days=monthrange(strptime.year, strptime.month)[1])
+            strptime = strptime + dtime.timedelta(days=monthrange(strptime.year, strptime.month)[1]).
         for level, package_detail in products_dict.items():
             LOG.debug('Current level is %s' % level)
             shipment_no = uuid.uuid4()

@@ -191,7 +191,7 @@ class Shipment(models.Model):
     express_name = models.CharField(db_column='EXPRESS_NAME', null=True, max_length=255)
     express_cost = models.DecimalField(db_column='EXPRESS_COST', null=True, max_digits=20,
                                        decimal_places=2, default=0.00)
-    sent_date = models.CharField(db_column='SENT_DATE', null=True, max_length=10)
+    sent_date = models.DateField(db_column='SENT_DATE', null=True)
     courier = models.CharField(db_column='COURIER', null=True, max_length=100)
     courier_tel = models.CharField(db_column='COURIER_TEL', null=True, max_length=32)
     create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)
