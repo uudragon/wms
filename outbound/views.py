@@ -75,7 +75,7 @@ def save_shipment(request):
         transaction.rollback()
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Save shipment information error'},
-                        content_type='application/json;charset-utf-8')
+                        content_type='application/json;charset=utf-8')
     return Response(status=status.HTTP_200_OK)
 
 
@@ -118,7 +118,7 @@ def check(request):
         transaction.rollback()
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Check error'},
-                        content_type='application/json;charset-utf-8')
+                        content_type='application/json;charset=utf-8')
     return Response(status=status.HTTP_200_OK)
 
 
@@ -162,8 +162,8 @@ def query_shipments(request):
         LOG.error('Query shipment information error. [ERROR] %s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Query shipment information error'},
-                        content_type='application/json;charset-utf-8')
-    return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset-utf-8')
+                        content_type='application/json;charset=utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset=utf-8')
 
 
 @api_view(['GET'])
@@ -174,7 +174,7 @@ def query_shipment(request, shipment_no):
 
     if shipment_no is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'shipment_no\'] can not be none.'})
 
     shipment = Shipment.objects.get(shipment_no=shipment_no)
@@ -197,7 +197,7 @@ def query_shipment(request, shipment_no):
             seria.name = goods.goods_name
         details_seria.append(seria.data)
     shipment_seria['details'] = details_seria
-    return Response(status=status.HTTP_200_OK, data=shipment_seria, content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=shipment_seria, content_type='application/json;charset=utf-8')
 
 
 @api_view(['POST'])
@@ -208,48 +208,48 @@ def split(request):
 
     if message.get('orders_no') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'orders_code\'] can not be none.'})
     if message.get('status') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'status\'] can not be none.'})
     if message.get('status') != 5:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'The value of Attribute[\'status\'] is error, expect 5 but actual %s'
                                        % message.get('status')})
     if message.get('customer_code') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'customer_code\'] can not be none.'})
     if message.get('customer_name') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'customer_name\'] can not be none.'})
     if message.get('effective_date') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'effective_date\'] can not be none.'})
     if message.get('address') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'address\'] can not be none.'})
     if message.get('customer_tel') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'customer_tel\'] can not be none.'})
     if message.get('package_code') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'package_code\'] can not be none.'})
     if message.get('creator') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'creator\'] can not be none.'})
     if message.get('updater') is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'updater\'] can not be none.'})
     try:
         package_details = ProductPackageDetails.objects.extra(
@@ -316,9 +316,9 @@ def split(request):
     except Exception as e:
         LOG.error('Orders split error.\n [ERROR]:%s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         date={'error': 'Orders split error.'})
-    return Response(status=status.HTTP_200_OK, data=shipments, content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=shipments, content_type='application/json;charset=utf-8')
 
 
 @transaction.commit_manually
@@ -469,9 +469,9 @@ def prepared(request, shipment_no):
         LOG.error('Shipment prepared error, message is %s' % str(e))
         transaction.rollback()
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         date={'error': 'Shipment prepared error.'})
-    return Response(status=status.HTTP_200_OK, data=shipment_seria, content_type='application/json;charset-utf-8')
+    return Response(status=status.HTTP_200_OK, data=shipment_seria, content_type='application/json;charset=utf-8')
 
 
 @api_view(['POST'])
@@ -538,7 +538,7 @@ def picking(request, shipment_no):
         LOG.error('Picking error, message is %s' % str(e))
         transaction.rollback()
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         date={'error': 'Picking error.'})
     return Response(status=status.HTTP_200_OK)
 
@@ -575,6 +575,6 @@ def sent(request, shipment_no):
         LOG.error('Sent error, message is %s' % str(e))
         transaction.rollback()
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        content_type='application/json;charset-utf-8',
+                        content_type='application/json;charset=utf-8',
                         date={'error': 'Sent error.'})
     return Response(status=status.HTTP_200_OK)
