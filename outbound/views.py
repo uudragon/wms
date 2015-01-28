@@ -388,7 +388,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
                 detail = ShipmentDetails(
                     id=rid,
                     shipment_no=shipment_no,
-                    product_code=product_code,
+                    code=product_code,
                     qty=product.qty,
                     is_product=1,
                     is_gift=0,
