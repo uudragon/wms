@@ -269,7 +269,6 @@ def split(request):
                 entry = dict()
                 entry[package_detail.product_code] = package_detail
                 products_dict[package_detail.product_level] = entry
-                LOG.debug('>>>>>>>>>>>1')
         LOG.debug('Current count of the products_dict is %s' % len(products_dict))
         strptime = time.strptime(message.get('effective_date'), '%Y-%m-%d')
         effective_month = strptime.tm_mon
@@ -312,7 +311,7 @@ def split(request):
             LOG.info('Effective_month is 8')
             in_one_list = products_dict.values()
             products_dict.clear()
-        shipments = assemble_shipments(in_one_list, products_dict, message)
+        shipments = assemble_shipments(in_one_list, products_dict, message, strptime)
     except Exception as e:
         LOG.error('Orders split error.\n [ERROR]:%s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -322,7 +321,7 @@ def split(request):
 
 
 @transaction.commit_manually
-def assemble_shipments(in_one_list=[], products_dict={}, message={}):
+def assemble_shipments(in_one_list=[], products_dict={}, message={}, strptime=None):
     in_one_dict = dict()
     shipments = []
     try:
@@ -335,7 +334,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
         shipment_no = uuid.uuid4()
         now_time = datetime.now()
         total_qty = 0
-        if len(in_one_list) == 0:
+        if len(in_one_list) != 0:
             for product_code, product in in_one_dict.items():
                 rid = '%s%s' % (shipment_no, product_code)
                 detail = ShipmentDetails(
@@ -369,6 +368,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
                 express_cost=0.00,
                 courier='',
                 courier_tel='',
+                sent_date=time.mktime(strptime),
                 create_time=now_time,
                 creator=message.get('creator'),
                 update_time=now_time,
@@ -378,6 +378,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
             shipment.save()
             shipment_seria = ShipmentSerializer(shipment).data
             shipments.append(shipment_seria)
+            strptime.tm_mon += 1
         for level, package_detail in products_dict.items():
             LOG.debug('Current level is %s' % level)
             shipment_no = uuid.uuid4()
@@ -416,6 +417,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
                 express_cost=0.00,
                 courier='',
                 courier_tel='',
+                sent_date=time.mktime(strptime),
                 create_time=now_time,
                 creator=message.get('creator'),
                 update_time=now_time,
@@ -425,6 +427,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
             shipment.save()
             shipment_seria = ShipmentSerializer(shipment).data
             shipments.append(shipment_seria)
+            strptime.tm_mon += 1
         transaction.commit()
     except Exception as e:
         LOG.error('Orders split error.\n [ERROR]:%s' % str(e))
