@@ -275,45 +275,41 @@ def split(request):
         LOG.debug('Current count of the products_dict is %s' % len(products_dict))
         strptime = time.strptime(message.get('effective_date'), '%Y-%m-%d')
         effective_month = strptime.tm_mon
+        in_one_list = []
+        num = 0
         if effective_month in (9, 10, 11):
             LOG.info('Effective_month are 9, 10, 11')
             in_one_list = []
         elif effective_month == 12:
             LOG.info('Effective_month is 12')
-            in_one_list = [products_dict.pop(1), products_dict.pop(2)]
+            num = 2
         elif effective_month == 1:
-            LOG.info('Effective_month is 1')
-            in_one_list = [products_dict.pop(1), products_dict.pop(2), products_dict.pop(3)]
+            num = 3
         elif effective_month == 2:
-            LOG.info('Effective_month is 2')
-            in_one_list = [products_dict.pop(1), products_dict.pop(2), products_dict.pop(3), products_dict.pop(4)]
+            num = 4
         elif effective_month == 3:
             LOG.info('Effective_month is 3')
-            in_one_list = [products_dict.pop(1), products_dict.pop(2), products_dict.pop(3), 
-                     products_dict.pop(4), products_dict.pop(5)]
+            num = 5
         elif effective_month == 4:
             LOG.info('Effective_month is 4')
-            in_one_list = [products_dict.pop(1), products_dict.pop(2), products_dict.pop(3), 
-                     products_dict.pop(4), products_dict.pop(5), products_dict.pop(6)]
+            num = 6
         elif effective_month == 5:
             LOG.info('Effective_month is 5')
-            in_one_list = [products_dict.pop(1), products_dict.pop(2), products_dict.pop(3),
-                     products_dict.pop(4), products_dict.pop(5), products_dict.pop(6), 
-                     products_dict.pop(7)]
+            num = 7
         elif effective_month == 6:
             LOG.info('Effective_month is 6')
-            in_one_list = [products_dict.pop(1), products_dict.pop(2), products_dict.pop(3),
-                     products_dict.pop(4), products_dict.pop(5), products_dict.pop(6),
-                     products_dict.pop(7), products_dict.pop(8)]
+            num = 8
         elif effective_month == 7:
             LOG.info('Effective_month is 7')
-            in_one_list = [products_dict.pop(1), products_dict.pop(2), products_dict.pop(3),
-                     products_dict.pop(4), products_dict.pop(5), products_dict.pop(6),
-                     products_dict.pop(7), products_dict.pop(8), products_dict.pop(9)]
+            num = 9
         else:
             LOG.info('Effective_month is 8')
             in_one_list = products_dict.values()
             products_dict.clear()
+        for i in range(num):
+            index = i + 1
+            if index in products_dict:
+                in_one_list.append(products_dict.pop(index))
         shipments = assemble_shipments(in_one_list, products_dict, message)
     except Exception as e:
         LOG.error('Orders split error.\n [ERROR]:%s' % str(e))
