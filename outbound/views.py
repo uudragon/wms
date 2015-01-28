@@ -383,6 +383,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
             shipment_no = uuid.uuid4()
             total_qty = 0
             for product_code, product in package_detail.items():
+                LOG.debug('Current product code is %s' % product_code)
                 rid = '%s%s' % (shipment_no, product_code)
                 detail = ShipmentDetails(
                     id=rid,
