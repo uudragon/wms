@@ -325,7 +325,8 @@ def split(request):
 def assemble_shipments(in_one_list=[], products_dict={}, message={}):
     in_one_dict = dict()
     shipments = []
-    strftime = time.strftime('%Y-%m-%d', message.get('effective_date'))
+    strptime = time.strptime(message.get('effective_date'), '%Y-%m-%d')
+    strftime = time.strftime('%Y-%m-%d', strptime)
     try:
         for item in in_one_list:
             if item.product_code in in_one_dict:
