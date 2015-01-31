@@ -678,7 +678,7 @@ error| String  | 错误信息
 按给定的出库单号查询对应的出库单信息
 ######9.1 url
 	method: GET
-	wms/outbound/shipment/${orders_no}/
+	wms/outbound/shipment/orders${orders_no}/
 	注意：结尾的’/’不能省略, ${orders_no}为出库单号
 ######9.2 header
 	Content_Type:application/json;charset=utf-8
