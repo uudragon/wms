@@ -203,6 +203,27 @@ def query_shipment(request, shipment_no):
     return Response(status=status.HTTP_200_OK, data=shipment_seria, content_type='application/json;charset=utf-8')
 
 
+@api_view(['GET'])
+def query_by_ordersno(request, orders_no):
+    orders_no = orders_no
+
+    LOG.info('Current received orders_no is %s' % orders_no)
+
+    if orders_no is None:
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'Attribute[\'orders_no\'] can not be none.'})
+
+    shipments = Shipment.objects.filter(orders_no=orders_no)
+    LOG.debut('Current count of shipments is %s' % len(shipments))
+    
+    shipments_seria = []
+    for shipment in shipments:
+        seria = ShipmentSerializer(shipment)
+        shipments_seria.append(seria.data)
+    return Response(status=status.HTTP_200_OK, data=shipments_seria, content_type='application/json;charset=utf-8')
+
+
 @api_view(['POST'])
 def split(request):
     message = request.DATA
