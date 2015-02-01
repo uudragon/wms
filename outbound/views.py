@@ -118,7 +118,7 @@ def check(request):
             shipment.save()
             transaction.commit()
     except Exception as e:
-        LOG.error('Check error. [ERROR] %s' % str(e))
+        LOG.error('Check error. message is %s' % str(e))
         transaction.rollback()
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         data={'error': 'Check error'},

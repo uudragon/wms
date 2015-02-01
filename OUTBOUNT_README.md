@@ -427,6 +427,7 @@ error| String  | 错误信息
 shipment_no|String|Y|发货单号
 warehouse|String|Y|库房编号
 updater|String|Y|需改人
+sent_date|String|Y|发货时间，yyyy-mm-dd
 details|array|Y|发货明细
 
 Details
