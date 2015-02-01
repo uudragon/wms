@@ -219,14 +219,19 @@ def query_by_ordersno(request, orders_no):
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'orders_no\'] can not be none.'})
-
-    shipments = Shipment.objects.filter(orders_no=orders_no)
-    LOG.debut('Current count of shipments is %s' % len(shipments))
-    
     shipments_seria = []
-    for shipment in shipments:
-        seria = ShipmentSerializer(shipment)
-        shipments_seria.append(seria.data)
+    try:
+        shipments = Shipment.objects.filter(orders_no=orders_no)
+        LOG.debut('Current count of shipments is %s' % len(shipments))
+        
+        for shipment in shipments:
+            seria = ShipmentSerializer(shipment)
+            shipments_seria.append(seria.data)
+    except Exception as e:
+        LOG.error('Query shipment by orders_no error. [ERROR] %s' % str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={'error': 'Query shipment by orders_no error.'},
+                        content_type='application/json;charset=utf-8')
     return Response(status=status.HTTP_200_OK, data=shipments_seria, content_type='application/json;charset=utf-8')
 
 
@@ -237,47 +242,59 @@ def split(request):
     LOG.info('Current received message is %s' % message)
 
     if message.get('orders_no') is None:
+        LOG.error('Attribute[\'orders_no\'] can not be none.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset=utf-8',
-                        data={'error': 'Attribute[\'orders_code\'] can not be none.'})
+                        data={'error': 'Attribute[\'orders_no\'] can not be none.'})
     if message.get('status') is None:
+        LOG.error('Attribute[\'status\'] can not be none.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'status\'] can not be none.'})
     if message.get('status') != 5:
+        LOG.error('The value of Attribute[\'status\'] is error, expect 5 but actual %s'
+                  % message.get('status'))
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset=utf-8',
                         data={'error': 'The value of Attribute[\'status\'] is error, expect 5 but actual %s'
                                        % message.get('status')})
     if message.get('customer_code') is None:
+        LOG.error('Attribute[\'customer_code\'] can not be none.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'customer_code\'] can not be none.'})
     if message.get('customer_name') is None:
+        LOG.error('Attribute[\'customer_name\'] can not be none.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'customer_name\'] can not be none.'})
     if message.get('effective_date') is None:
+        LOG.error('Attribute[\'effective_date\'] can not be none.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'effective_date\'] can not be none.'})
     if message.get('address') is None:
+        LOG.error('Attribute[\'address\'] can not be none.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'address\'] can not be none.'})
     if message.get('customer_tel') is None:
+        LOG.error('Attribute[\'customer_tel\'] can not be none.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'customer_tel\'] can not be none.'})
     if message.get('package_code') is None:
+        LOG.error('Attribute[\'package_code\'] can not be none.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'package_code\'] can not be none.'})
     if message.get('creator') is None:
+        LOG.error('Attribute[\'creator\'] can not be none.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'creator\'] can not be none.'})
     if message.get('updater') is None:
+        LOG.error('Attribute[\'updater\'] can not be none.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'updater\'] can not be none.'})
@@ -603,6 +620,50 @@ def sent(request, shipment_no):
         transaction.commit()
     except Exception as e:
         LOG.error('Sent error, message is %s' % str(e))
+        transaction.rollback()
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        content_type='application/json;charset=utf-8',
+                        date={'error': 'Sent error.'})
+    return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@transaction.commit_manually
+def set_orders_amount(request):
+    message = request.DATA
+    
+    LOG.info('Current received message is %s' % message)
+    
+    if message.get('orders_no') is None:
+        LOG.error('Attribute[\'orders_no\'] can not be none.')
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'Attribute[\'orders_no\'] can not be none.'})
+
+    if message.get('amount') is None or message.get('amount') == 0.00:
+        LOG.error('The value of Attribute[\'amount\'] is invalid.')
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'The value of Attribute[\'amount\'] is invalid.'})
+
+    if message.get('updater') is None:
+        LOG.error('The value of Attribute[\'updater\'] is invalid.')
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'The value of Attribute[\'updater\'] is invalid.'})
+    
+    try:
+        first_shipment = Shipment.objects.select_for_update().filter(
+            orders_no=message.get('orders_no')).order_by('sent_date').first()
+        LOG.info("The first shipment of orders [%s] will be sent at %s" 
+                 % (message.get('orders_no'), first_shipment.sent_date))
+        first_shipment.amount = message.get('amount')
+        first_shipment.updater = message.get('amount')
+        first_shipment.update_time = datetime.now()
+        first_shipment.save()
+        transaction.commit()
+    except Exception as e:
+        LOG.error('Amount setting error. [ERROR] is %s' % str(e))
         transaction.rollback()
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         content_type='application/json;charset=utf-8',
