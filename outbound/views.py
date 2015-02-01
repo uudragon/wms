@@ -179,27 +179,33 @@ def query_shipment(request, shipment_no):
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'shipment_no\'] can not be none.'})
-
-    shipment = Shipment.objects.get(shipment_no=shipment_no)
-    shipment_seria = ShipmentSerializer(shipment).data
-    LOG.debut('Current shipment serialized is %s' % shipment_seria)
-    # shipment_details = ShipmentDetails.objects.extra(
-    #     select={'goods_name': 't_goods.goods_name'},
-    #     tables=['t_shipment_details', 't_goods'],
-    #     where=['t_shipment_details.goods_code=t_goods.goods_code']
-    # ).filter(shipment_no=shipment_no)
-    shipment_details = ShipmentDetails.objects.filter(shipment_no=shipment_no)
-    details_seria = []
-    for detail in shipment_details:
-        seria = ShipmentDetailsSerializer(detail)
-        if detail.is_product:
-            product = Product.objects.filter(product_code=detail.code).first()
-            seria.name = product.product_name
-        elif detail.is_gift:
-            goods = Goods.objects.filter(goods_code=detail.code).first()
-            seria.name = goods.goods_name
-        details_seria.append(seria.data)
-    shipment_seria['details'] = details_seria
+    
+    try:
+        shipment = Shipment.objects.get(shipment_no=shipment_no)
+        shipment_seria = ShipmentSerializer(shipment).data
+        LOG.debut('Current shipment serialized is %s' % shipment_seria)
+        # shipment_details = ShipmentDetails.objects.extra(
+        #     select={'goods_name': 't_goods.goods_name'},
+        #     tables=['t_shipment_details', 't_goods'],
+        #     where=['t_shipment_details.goods_code=t_goods.goods_code']
+        # ).filter(shipment_no=shipment_no)
+        shipment_details = ShipmentDetails.objects.filter(shipment_no=shipment_no)
+        details_seria = []
+        for detail in shipment_details:
+            seria = ShipmentDetailsSerializer(detail)
+            if detail.is_product:
+                product = Product.objects.filter(product_code=detail.code).first()
+                seria.name = product.product_name
+            elif detail.is_gift:
+                goods = Goods.objects.filter(goods_code=detail.code).first()
+                seria.name = goods.goods_name
+            details_seria.append(seria.data)
+        shipment_seria['details'] = details_seria
+    except Exception as e:
+        LOG.error('Query shipment information error. [ERROR] %s' % str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={'error': 'Query shipment information error'},
+                        content_type='application/json;charset=utf-8')
     return Response(status=status.HTTP_200_OK, data=shipment_seria, content_type='application/json;charset=utf-8')
 
 
