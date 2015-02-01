@@ -192,14 +192,14 @@ def query_shipment(request, shipment_no):
         shipment_details = ShipmentDetails.objects.filter(shipment_no=shipment_no)
         details_seria = []
         for detail in shipment_details:
-            seria = ShipmentDetailsSerializer(detail)
+            seria = ShipmentDetailsSerializer(detail).data
             if detail.is_product:
                 product = Product.objects.filter(product_code=detail.code).first()
-                seria.name = product.product_name
+                seria['name'] = product.product_name
             elif detail.is_gift:
                 goods = Goods.objects.filter(goods_code=detail.code).first()
-                seria.name = goods.goods_name
-            details_seria.append(seria.data)
+                seria['name'] = goods.goods_name
+            details_seria.append(seria)
         shipment_seria['details'] = details_seria
     except Exception as e:
         LOG.error('Query shipment information error. [ERROR] %s' % str(e))
