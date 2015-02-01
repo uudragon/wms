@@ -97,8 +97,8 @@ def check(request):
             rece_details = message.get('details')
             for rece_detail in rece_details:
                 shipment_detail = ShipmentDetails(
-                    id='%s%s' % (rece_detail.get('shipment_no'), rece_detail.get('goods_code')),
-                    shipment_no=rece_detail.get('shipment_no'),
+                    id='%s%s' % (message.get('shipment_no'), rece_detail.get('goods_code')),
+                    shipment_no=message.get('shipment_no'),
                     code=rece_detail.get('code'),
                     is_product=rece_detail.get('is_product'),
                     is_gift=rece_detail.get('is_gift'),
@@ -111,6 +111,7 @@ def check(request):
                 )
                 shipment_detail.save()
             shipment.warehouse = message.get('warehouse')
+            shipment.sent_date = datetime.strptime(message.get('sent_date'), '%Y-%m-%d')
             shipment.updater = message.get('updater')
             shipment.update_time = now_time
             shipment.status = 1
