@@ -482,16 +482,14 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
 
 @api_view(['POST'])
 @transaction.commit_manually
-def prepared(request, shipment_no):
-    LOG.info('Current prepared shipment is %s' % shipment_no)
-    
+def prepared(request):
     message = request.DATA
 
     LOG.info('Current received message is %s' % message)
     
     shipment_seria = None
     try:
-        shipment = Shipment.objects.filter(status=1).filter(shipment_no=shipment_no)
+        shipment = Shipment.objects.filter(status=1).filter(shipment_no=message.get('shipment_no'))
         if shipment is not None:
             shipment.status = 2
             shipment.updater = message.get('updater')
@@ -500,7 +498,7 @@ def prepared(request, shipment_no):
             shipment.save()
             transaction.commit()
             shipment_seria = ShipmentSerializer(shipment).data
-            details = ShipmentDetails.objects.filter(shipment_no=shipment_no)
+            details = ShipmentDetails.objects.filter(shipment_no=message.get('shipment_no'))
             details_seria = []
             for detail in details:
                 seria = ShipmentDetailsSerializer(detail)
@@ -523,16 +521,14 @@ def prepared(request, shipment_no):
 
 @api_view(['POST'])
 @transaction.commit_manually
-def picking(request, shipment_no):
-    LOG.info('Current prepared shipment is %s' % shipment_no)
-
+def picking(request):
     message = request.DATA
 
     LOG.info('Current received message is %s' % message)
     
     try:
-        shipment = Shipment.objects.filter(shipment_no=shipment_no).first()
-        shipment_details = ShipmentDetails.objects.filter(shipment_no=shipment_no)
+        shipment = Shipment.objects.filter(shipment_no=message.get('shipment_no')).first()
+        shipment_details = ShipmentDetails.objects.filter(shipment_no=message.get('shipment_no'))
         out_goods = dict()
         for item in shipment_details:
             if item.is_gift:
@@ -570,7 +566,7 @@ def picking(request, shipment_no):
             storage_record = StorageRecords(
                 goods_code=goods_code,
                 goods_qty=qty,
-                code=shipment_no,
+                code=message.get('shipment_no'),
                 warehouse=shipment.warehouse,
                 type=STORAGE_RECORD_TYPE_OUTPUT,
                 create_time=now_time,
@@ -592,15 +588,13 @@ def picking(request, shipment_no):
 
 @api_view(['POST'])
 @transaction.commit_manually
-def sent(request, shipment_no):
-    LOG.info('Current prepared shipment is %s' % shipment_no)
-
+def sent(request):
     message = request.DATA
 
     LOG.info('Current received message is %s' % message)
     try:
         now_time = datetime.now()
-        shipment = Shipment.objects.filter(shipment_no=shipment_no).first()
+        shipment = Shipment.objects.filter(shipment_no=message.get('shipment_no')).first()
         shipment.express_code = message.get('express_code')
         shipment.express_orders_no = message.get('express_orders_no')
         shipment.express_name = message.get('express_name')
@@ -611,7 +605,7 @@ def sent(request, shipment_no):
         shipment.updater = message.get('updater')
         shipment.update_time = now_time
         shipment.save()
-        records = StorageRecords.objects.filter(code=shipment_no)
+        records = StorageRecords.objects.filter(code=message.get('shipment_no'))
         for record in records:
             record.status = 1
             record.updater = message.get('updater')
