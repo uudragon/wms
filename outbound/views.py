@@ -56,13 +56,13 @@ def save_shipment(request):
         total_qty = 0
         for rece_detail in rece_details:
             shipment_detail = ShipmentDetails(
-                id='%s%s' % (rece_detail.get('shipment_no'), rece_detail.get('goods_code')),
-                shipment_no=rece_detail.get('shipment_no'),
+                id='%s%s' % (message.get('shipment_no'), rece_detail.get('code')),
+                shipment_no=message.get('shipment_no'),
                 code=rece_detail.get('code'),
                 is_product=rece_detail.get('is_product'),
                 is_gift=rece_detail.get('is_gift'),
                 qty=rece_detail.get('qty'),
-                status=rece_detail.get('status'),
+                status=0,
                 creator=message.get('updater'),
                 updater=message.get('updater'),
                 create_time=now_time,
@@ -97,7 +97,7 @@ def check(request):
             rece_details = message.get('details')
             for rece_detail in rece_details:
                 shipment_detail = ShipmentDetails(
-                    id='%s%s' % (message.get('shipment_no'), rece_detail.get('goods_code')),
+                    id='%s%s' % (message.get('shipment_no'), rece_detail.get('code')),
                     shipment_no=message.get('shipment_no'),
                     code=rece_detail.get('code'),
                     is_product=rece_detail.get('is_product'),
