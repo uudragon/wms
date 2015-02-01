@@ -416,14 +416,15 @@ error| String  | 错误信息
 该接口用于客服人员对出库单的复核检查确认，经过改操作后，出库单的状态将由未审核（0）-->待发货（1）
 ######5.1 url
 	method: POST
-	wms/outbound/shipment/${shipment_no}/check/
-	注意：结尾的’/’不能省略，${shipment_no}为出库单号
+	wms/outbound/shipment/check/
+	注意：结尾的’/’不能省略
 ######5.2 header
 	Content_Type:application/json;charset=utf-8
 	Accept:application/json
 ######5.3 请求参数
 名称|类型|是否必填|说明
 ---|---|---|---
+shipment_no|String|Y|发货单号
 warehouse|String|Y|库房编号
 updater|String|Y|需改人
 details|array|Y|发货明细
@@ -443,6 +444,7 @@ status|int|Y|状态。0：未确认；1：已确认
 	{
 		'warehouse':'w00001',
 	    'updater':'admin',
+	    'shipment_no':'S000001',
 	    'details':[{
 	        'shipment_no':'shipment001',
 	        'code':'goods001',
@@ -479,18 +481,20 @@ error| String  | 错误信息
 该接口用于仓库操作员按照发货单进行拣货，此接口中，出库单的状态先由待发货（1）-->备货中（2），用以锁定状态。并返回当前发货单号对应的发货单信息。
 ######6.1 url
 	method: POST
-	wms/outbound/shipment/${shipment_no}/prepared/
-	注意：结尾的’/’不能省略，${shipment_no}为出库单号
+	wms/outbound/shipment/prepared/
+	注意：结尾的’/’不能省略
 ######6.2 header
 	Content_Type:application/json;charset=utf-8
 	Accept:application/json
 ######6.3 请求参数
 名称|类型|是否必填|说明
 ---|---|---|---
+shipment_no|String|Y|发货单号
 updater|String|Y|需改人
 
 样例报文：
 	{
+	    'shipment_no':'S00001',
 	    'updater':'admin'
 	}
 
@@ -585,18 +589,20 @@ error| String  | 错误信息
 并且将出库商品记录入“商品出入库表”（状态为“预占”状态0，表示即将出库但尚未出库）并对扣除库存。
 ######7.1 url
 	method: POST
-	wms/outbound/shipment/${shipment_no}/picking/
-	注意：结尾的’/’不能省略，${shipment_no}为出库单号
+	wms/outbound/shipment/picking/
+	注意：结尾的’/’不能省略
 ######7.2 header
 	Content_Type:application/json;charset=utf-8
 	Accept:application/json
 ######7.3 请求参数
 名称|类型|是否必填|说明
 ---|---|---|---
+shipment_no|String|Y|发货单号
 updater|String|Y|需改人
 
 样例报文：
 	{
+		'shipment_no':'S00001',
 	    'updater':'admin'
 	}
 
@@ -623,17 +629,18 @@ error| String  | 错误信息
 
 ----
 #####8.发货接口
-该接口用于仓库操作员尽心发货操作，此接口需要操作员提供快递单与快递员相关信息，修改出入库对应记录状态（改为“已完成（1）”）。调用此接口后出库单的状态先由发货中（3）-->已发货（4），
+该接口用于仓库操作员进行发货操作，此接口需要操作员提供快递单与快递员相关信息，修改出入库对应记录状态（改为“已完成（1）”）。调用此接口后出库单的状态先由发货中（3）-->已发货（4），
 ######8.1 url
 	method: POST
-	wms/outbound/shipment/${shipment_no}/picking/
-	注意：结尾的’/’不能省略，${shipment_no}为出库单号
+	wms/outbound/shipment/sent/
+	注意：结尾的’/’不能省略
 ######8.2 header
 	Content_Type:application/json;charset=utf-8
 	Accept:application/json
 ######8.3 请求参数
 名称|类型|是否必填|说明
 ---|---|---|---
+shipment_no|String|Y|发货单号
 express_code|String|Y|快递公司编号
 express_orders_no|String|Y|快递单号
 express_name|String|Y|快递公司名称
@@ -644,6 +651,7 @@ updater|String|Y|需改人
 
 样例报文：
 	{
+		'shipment_no':'S00001',
 		'express_code':'express0001',
         'express_orders_no':'010101010',
         'express_name':'顺丰',
