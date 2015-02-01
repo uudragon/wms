@@ -15,5 +15,4 @@ urlpatterns = patterns(
     url(r'^shipment/(.+)/picking/$', 'picking'),
     url(r'^shipment/(.+)/sent/$', 'sent'),
     url(r'^shipments/orders(.+)/$', 'query_by_ordersno'),
-    url(r'^shipment/amount_setting/$', 'set_orders_amount'),
 )
