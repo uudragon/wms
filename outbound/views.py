@@ -103,7 +103,7 @@ def check(request):
                     is_product=rece_detail.get('is_product'),
                     is_gift=rece_detail.get('is_gift'),
                     qty=rece_detail.get('qty'),
-                    status=rece_detail.get('status'),
+                    status=0,
                     creator=message.get('updater'),
                     updater=message.get('updater'),
                     create_time=now_time,
