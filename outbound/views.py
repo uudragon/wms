@@ -179,11 +179,11 @@ def query_shipment(request, shipment_no):
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'shipment_no\'] can not be none.'})
-    
+
     try:
         shipment = Shipment.objects.get(shipment_no=shipment_no)
         shipment_seria = ShipmentSerializer(shipment).data
-        LOG.debut('Current shipment serialized is %s' % shipment_seria)
+        LOG.debug('Current shipment serialized is %s' % shipment_seria)
         # shipment_details = ShipmentDetails.objects.extra(
         #     select={'goods_name': 't_goods.goods_name'},
         #     tables=['t_shipment_details', 't_goods'],
