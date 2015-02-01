@@ -222,7 +222,7 @@ def query_by_ordersno(request, orders_no):
     shipments_seria = []
     try:
         shipments = Shipment.objects.filter(orders_no=orders_no)
-        LOG.debut('Current count of shipments is %s' % len(shipments))
+        LOG.debug('Current count of shipments is %s' % len(shipments))
         
         for shipment in shipments:
             seria = ShipmentSerializer(shipment)
