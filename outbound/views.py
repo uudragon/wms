@@ -371,7 +371,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
     strptime = datetime.strptime(message.get('effective_date'), '%Y-%m-%d')
     try:
         for item in in_one_list:
-            if item.product_code in in_one_dict:
+            if item.get('product_code') in in_one_dict:
                 in_one_dict.get(item.goods_code).qty += item.qty
             else:
                 in_one_dict[item.goods_code] = item
