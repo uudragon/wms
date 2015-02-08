@@ -354,7 +354,9 @@ def split(request):
         for i in range(num):
             index = i + 1
             if index in products_dict:
-                in_one_list.append(products_dict.pop(index))
+                item = products_dict.pop(index)
+                LOG.debug('Current item is %s' % item)
+                in_one_list.append(item)
         shipments = assemble_shipments(in_one_list, products_dict, message)
     except Exception as e:
         LOG.error('Orders split error.\n [ERROR]:%s' % str(e))
@@ -372,10 +374,11 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
     try:
         for item in in_one_list:
             LOG.debug('Item is %s' % item)
+            LOG.debug('Current in_one_dict is %s' % in_one_dict)
             if item.get('product_code') in in_one_dict:
                 tmp = in_one_dict.get(item.get('product_code'))
                 LOG.debug('%s is value of %s' % (tmp, item.get('prodcut_code')))
-                tmp.qty += item.get['qty']
+                tmp.get['qty'] += item.get['qty']
             else:
                 in_one_dict[item.get('product_code')] = item
             LOG.debug('Current first shipment is %s' % in_one_dict)
