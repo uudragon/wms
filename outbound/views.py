@@ -375,12 +375,12 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
         for item in in_one_list:
             LOG.debug('Item is %s' % item)
             LOG.debug('Current in_one_dict is %s' % in_one_dict)
-            if item.get('product_code') in in_one_dict:
-                tmp = in_one_dict.get(item.get('product_code'))
-                LOG.debug('%s is value of %s' % (tmp, item.get('prodcut_code')))
-                tmp.get['qty'] += item.get['qty']
-            else:
-                in_one_dict[item.get('product_code')] = item
+            for product_code, package_detail in item:
+                if product_code in in_one_dict:
+                    LOG.debug('The package_detail of %s is %s' % (product_code, package_detail))
+                    in_one_dict.get['product_code'].qty += package_detail.qty
+                else:
+                    in_one_dict[product_code] = package_detail
             LOG.debug('Current first shipment is %s' % in_one_dict)
         LOG.debug('Current first shipment is %s' % in_one_dict)
         shipment_no = uuid.uuid4()
