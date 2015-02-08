@@ -375,7 +375,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
         for item in in_one_list:
             LOG.debug('Item is %s' % item)
             LOG.debug('Current in_one_dict is %s' % in_one_dict)
-            for product_code, package_detail in item:
+            for product_code, package_detail in item.items():
                 if product_code in in_one_dict:
                     LOG.debug('The package_detail of %s is %s' % (product_code, package_detail))
                     in_one_dict.get['product_code'].qty += package_detail.qty
