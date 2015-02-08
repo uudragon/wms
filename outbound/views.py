@@ -377,7 +377,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
                 LOG.debug('%s is value of %s' % (tmp, item.get('prodcut_code')))
                 tmp.qty += item.get['qty']
             else:
-                in_one_dict[item.get('goods_code')] = item
+                in_one_dict[item.get('product_code')] = item
             LOG.debug('Current first shipment is %s' % in_one_dict)
         LOG.debug('Current first shipment is %s' % in_one_dict)
         shipment_no = uuid.uuid4()
