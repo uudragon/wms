@@ -381,12 +381,12 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
                     in_one_dict.get['product_code'].qty += package_detail.qty
                 else:
                     in_one_dict[product_code] = package_detail
-            LOG.debug('Current first shipment is %s' % in_one_dict)
         LOG.debug('Current first shipment is %s' % in_one_dict)
         shipment_no = uuid.uuid4()
         now_time = datetime.now()
         total_qty = 0
         if len(in_one_list) != 0:
+            LOG.debug('----------->Create one shipment')
             for product_code, product in in_one_dict.items():
                 rid = '%s%s' % (shipment_no, product_code)
                 detail = ShipmentDetails(
@@ -431,6 +431,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
             shipment_seria = ShipmentSerializer(shipment).data
             shipments.append(shipment_seria)
             strptime = strptime + dtime.timedelta(days=monthrange(strptime.year, strptime.month)[1])
+        LOG.debug('-------------> Create another shipments.')
         for level, package_detail in products_dict.items():
             LOG.debug('Current level is %s' % level)
             shipment_no = uuid.uuid4()
