@@ -389,6 +389,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
             LOG.debug('----------->Create one shipment')
             for product_code, product in in_one_dict.items():
                 rid = '%s%s' % (shipment_no, product_code)
+                LOG.debug('New Shipment id is %s' % rid)
                 detail = ShipmentDetails(
                     id=rid,
                     shipment_no=shipment_no,
