@@ -372,7 +372,9 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
     try:
         for item in in_one_list:
             if item.get('product_code') in in_one_dict:
-                in_one_dict.get(item.get('goods_code')).qty += item.get['qty']
+                tmp = in_one_dict.get(item.get('goods_code'))
+                LOG.debug('%s is value of %s' % (tmp, item.get('goods_code')))
+                tmp.qty += item.get['qty']
             else:
                 in_one_dict[item.get('goods_code')] = item
         LOG.debug('Current first shipment is %s' % in_one_dict)
