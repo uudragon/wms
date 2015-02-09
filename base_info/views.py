@@ -409,6 +409,24 @@ def query_warehouse_list(request):
     return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset=utf-8')
 
 
+@api_view(['GET'])
+def query_packages_all(request):
+    resp_array = []
+    try:
+        query_list = ProductPackage.objects.all()
+
+        for item in query_list:
+            package_seria = ProductPackageSerializer(item)
+            seria_data = package_seria.data
+            resp_array.append(seria_data)
+    except Exception as e:
+        LOG.error('Query package information error. [ERROR] %s' % str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    data={'error': 'Query package information error'},
+                    content_type='application/json;charset=utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_array, content_type='application/json;charset=utf-8')
+
+
 @api_view(['POST'])
 def query_packages(request):
     message = request.DATA

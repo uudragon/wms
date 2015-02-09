@@ -17,4 +17,5 @@ urlpatterns = patterns(
     url(r'^package/save/$', 'save_package'),
     url(r'^package/(.+)/$', 'query_package'),
     url(r'^packages/$', 'query_packages'),
+    url(r'^packages_all/$', 'query_packages_all'),
 )
