@@ -29,7 +29,7 @@ customer_name|String|Y|客户姓名
 effective_date|date|Y|生效日期
 address|String|Y|客户地址
 customer_tel|String|Y|客户电话
-amount|decimal|Y|付款金额
+source|Int|Y|订单来源。1：网站；2：电话；3：代理商代下单。
 has_invoice|int|Y|是否有发票。0：无；1：有
 package_code|String|Y|套餐编号。0：无；1：有
 creator|String|Y|创建人
@@ -43,7 +43,7 @@ updater|String|Y|需改人
 	'effective_date':'2014-12-31',
 	'address':'北京市天安门',
 	'customer_tel':'18600000000',
-	'amount':110.11,
+	'source':2,
 	'has_invoice':0,
 	'package_code':'pack00001',
 	'creator':'admin',

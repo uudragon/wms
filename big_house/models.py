@@ -3,6 +3,21 @@ from django.db import models
 # Create your models here.
 
 
+class GoodsGroup(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)
+    group_code = models.CharField(db_column='GROUP_CODE', null=False, max_length=36, unique=True)
+    group_name = models.CharField(db_column='GROUP_NAME', null=False, max_length=255, unique=True)
+    group_desc = models.CharField(db_column='GROUP_DESC', null=True, max_length=255)
+    create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)
+    creator = models.CharField(db_column='CREATOR', null=False, max_length=50)
+    update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True)
+    updater = models.CharField(db_column='UPDATER', null=False, max_length=50)
+    yn = models.SmallIntegerField(db_column='YN', max_length=4, default=0)
+    
+    class Meta:
+        db_table = 'T_GOODS_GROUP'
+
+
 class ProductPackage(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
     package_code = models.CharField(db_column='PACKAGE_CODE', null=False, max_length=36, unique=True)
@@ -156,6 +171,7 @@ class Goods(models.Model):
     goods_type = models.IntegerField(db_column='GOODS_TYPE', max_length=4, null=False, default=1)
     goods_code = models.CharField(db_column='GOODS_CODE', max_length=36, null=False)
     goods_name = models.CharField(db_column='GOODS_NAME', max_length=200, null=False)
+    goods_group = models.CharField(db_column='GOODS_GROUP', max_length=36, null=False)
     goods_price = models.DecimalField(db_column='GOODS_PRICE', max_digits=10, decimal_places=2)
     goods_bulk = models.DecimalField(db_column='GOODS_BULK', max_digits=20, decimal_places=2, default=0.00)
     goods_weight = models.DecimalField(db_column='GOODS_WEIGHT', max_digits=20, decimal_places=2, default=0.00)

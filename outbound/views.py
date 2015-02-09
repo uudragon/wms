@@ -357,7 +357,7 @@ def split(request):
                 item = products_dict.pop(index)
                 LOG.debug('Current item is %s' % item)
                 in_one_list.append(item)
-        shipments = assemble_shipments(in_one_list, products_dict, message)
+        shipments = assemble_shipments(in_one_list, products_dict, message, source=message.get('source'))
     except Exception as e:
         LOG.error('Orders split error.\n [ERROR]:%s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -367,10 +367,14 @@ def split(request):
 
 
 @transaction.commit_manually
-def assemble_shipments(in_one_list=[], products_dict={}, message={}):
+def assemble_shipments(in_one_list=[], products_dict={}, message={}, source=2):
     in_one_dict = dict()
     shipments = []
     strptime = datetime.strptime(message.get('effective_date'), '%Y-%m-%d')
+    if source != 3:
+        strptime = strptime + dtime.timedelta(days=2)
+    else:
+        strptime = strptime + dtime.timedelta(days=monthrange(strptime.year, strptime.month)[1])
     try:
         for item in in_one_list:
             LOG.debug('Item is %s' % item)
@@ -413,7 +417,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
                 address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
                 has_invoice=int(message.get('has_invoice')),
-                amount=message.get('amount'),
+                amount=0.0,
                 shipped_qty=total_qty,
                 express_code='',
                 express_orders_no='',
@@ -463,7 +467,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}):
                 address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
                 has_invoice=int(message.get('has_invoice')),
-                amount=message.get('amount'),
+                amount=0.0,
                 shipped_qty=total_qty,
                 express_code='',
                 express_orders_no='',

@@ -7,9 +7,10 @@ from django.db import transaction
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from big_house.models import Goods, Product, ProductDetails, Warehouse, ProductPackage, ProductPackageDetails
+from big_house.models import Goods, Product, ProductDetails, Warehouse, ProductPackage, ProductPackageDetails, \
+    GoodsGroup
 from big_house.serializers import GoodsSerializer, ProductDetailsSerializer, ProductSerializer, WarehouseSerializer, \
-    ProductPackageDetailsSerializer, ProductPackageSerializer
+    ProductPackageDetailsSerializer, ProductPackageSerializer, GoodsGroupSerializer
 from commons.exceptions import ValueIsNoneException
 from uudragon_wms.local.settings import DEFAULT_PAGE_SIZE, YN_YES
 
@@ -54,6 +55,7 @@ def define_goods(request):
                 goods_type=message.get('goods_type'),
                 goods_name=message.get('goods_name'),
                 goods_price=message.get('goods_price'),
+                goods_group=message.get('goods_group'),
                 goods_unit=message.get('goods_unit'),
                 barcode=message.get('barcode'),
                 isbn=message.get('isbn'),
@@ -70,6 +72,7 @@ def define_goods(request):
             goods.goods_type = message.get('goods_type')
             goods.goods_name = message.get('goods_name')
             goods.goods_price = message.get('goods_price')
+            goods.goods_group = message.get('goods_group')
             goods.goods_unit = message.get('goods_unit')
             goods.barcode = message.get('barcode')
             goods.isbn = message.get('isbn')
@@ -543,3 +546,125 @@ def save_package(request):
                         date={'error': 'Package Information saved error.'})
 
     return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@transaction.commit_manually
+def goods_group_save(request):
+    message = request.DATA
+
+    LOG.debug('Current received message is %s' % message)
+
+    if message.get('group_name') is None:
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'Attribute[\'group_name\'] can not be none.'})
+    if message.get('group_code') is None:
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'Attribute[\'group_code\'] can not be none.'})
+    if message.get('creator') is None:
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'Attribute[\'creator\'] can not be none.'})
+    if message.get('updater') is None:
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'Attribute[\'updater\'] can not be none.'})
+
+    try:
+        group = GoodsGroup.objects.select_for_update().filter(group_code=message.get('group_code')).first()
+        nowTime = datetime.now()
+        if group is None:
+            group = GoodsGroup(
+                group_code=message.get('group_code'),
+                group_name=message.get('group_name'),
+                group_desc=message.get('group_desc'),
+                yn=message.get('yn'),
+                create_time=nowTime,
+                update_time=nowTime,
+                creator=message.get('creator'),
+                updater=message.get('updater'),
+            )
+        else:
+            group.group_name = message.get('group_name')
+            group.group_desc = message.get('group_desc')
+            group.yn = message.get('yn')
+            group.update_time = nowTime
+            group.updater = message.get('updater')
+        group.save()
+        transaction.commit()
+    except Exception as e:
+        LOG.error('GoodsGroup Information saved error.\n [ERROR]:%s' % str(e))
+        transaction.rollback()
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        content_type='application/json;charset=utf-8',
+                        date={'error': 'GoodsGroup Information saved error.'})
+
+    return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+def query_goods_group(request, group_code):
+    code = group_code
+
+    LOG.debug('Current received group_code is %s' % code)
+
+    try:
+        group = GoodsGroup.objects.filter(group_code=code).first()
+        LOG.debug('Query goods information is %s' % group)
+        groupSeria = GoodsGroupSerializer(group)
+        message = groupSeria.data
+    except Exception as e:
+        LOG.error('Query goods group information error. [ERROR] %s' % str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={'error': 'Query goods group [%s] information error' % code},
+                        content_type='application/json;charset=utf-8')
+    return Response(status=status.HTTP_200_OK, data=message, content_type='application/json;charset=utf-8')
+
+
+@api_view(['POST'])
+def query_goods_group_list(request):
+    message = request.DATA
+
+    LOG.debug('Current received message is %s' % message)
+
+    pageSize = message.pop('pageSize')
+    if pageSize is None or pageSize == 0:
+        pageSize = DEFAULT_PAGE_SIZE
+    pageNo = message.pop('pageNo')
+    if pageNo is None or pageNo == 0:
+        pageNo = 1
+
+    resp_message = dict()
+    try:
+        for key in message.iterkeys():
+            key += '__contains'
+            LOG.debug('Condition of query is %s' % message)
+        query_list = GoodsGroup.objects.filter(**message)
+        paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
+        total_page_count = paginator.num_pages
+        if pageNo > total_page_count:
+            pageNo = total_page_count
+        elif pageNo < 1:
+            pageNo = 1
+        cur_page = paginator.page(pageNo)
+        page_records = cur_page.object_list
+        resp_array = []
+        for item in page_records:
+            group_seria = GoodsGroupSerializer(item)
+            seria_data = group_seria.data
+            resp_array.append(seria_data)
+        resp_message['records'] = resp_array
+        resp_message['recordsCount'] = paginator.count
+        resp_message['pageSize'] = pageSize
+        resp_message['pageNumber'] = total_page_count
+        resp_message['pageNo'] = pageNo
+        LOG.info('Current response message is %s' % resp_message)
+        #resp_data = renderer.render(resp_message)
+    except Exception as e:
+        LOG.error('Query goods groups information error. [ERROR] %s' % str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={'error': 'Query goods groups information error'},
+                        content_type='application/json;charset=utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset=utf-8')
