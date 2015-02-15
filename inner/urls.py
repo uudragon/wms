@@ -9,5 +9,5 @@ urlpatterns = patterns(
     url(r'^(.+)/goods/$', 'query_goods'),
     url(r'^(.+)/products/$', 'query_products'),
     url(r'^(.+)/picking/$', 'picking'),
-    url(r'^(.+)/picking_statistic', 'picking_statistic'),
+    url(r'^(.+)/picking_statistic/$', 'picking_statistic'),
 )
