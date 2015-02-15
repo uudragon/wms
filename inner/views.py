@@ -82,7 +82,7 @@ def picking(request, warehouse_code):
                         data={'error': 'Attribute[\'product_code\'] can not be none.'})
     try:
         product_detail = ProductDetails.objects.filter(product_code=product_code)
-        resp_message = {'picking_qty':0}
+        resp_message = {'picking_qty': 0}
         if product_detail is not None and len(product_detail) > 0:
             goods_dict = dict()
             goods_codes = []
@@ -103,9 +103,14 @@ def picking(request, warehouse_code):
                     qtys.append(0)
             
             LOG.debug('Current picking qty list is %s' % qtys)
-            
+
             if len(qtys) > 1:
                 picking_qty = min(*qtys)
+            elif len(qtys) == 0:
+                picking_qty = 0
+            else:
+                picking_qty = qtys[0]
+
             picking_count = message.get('picking_count')
             if picking_count > picking_qty:
                 raise Exception('The picking_count is error, valid is %s, but now is %s' % (picking_qty, picking_count))
