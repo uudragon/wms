@@ -144,7 +144,7 @@ def query_shipments(request):
         for key in message.iterkeys():
             key += '__contains'
             LOG.debug('Condition of query is %s' % message)
-        query_list = Shipment.objects.filter(**message).order_by()
+        query_list = Shipment.objects.filter(**message).order_by('sent_date')
         paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
         total_page_count = paginator.num_pages
         if pageNo > total_page_count:
