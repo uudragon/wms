@@ -57,6 +57,8 @@ def picking(request, warehouse_code):
             else:
                 picking_qty = qtys[0]
                 
+            LOG.debug('Current count of product can be picked is %s' % picking_qty)
+                
             if picking_qty != 0:
                 now_time = datetime.now()
                 for goods in goods_list:
@@ -80,8 +82,8 @@ def picking(request, warehouse_code):
                                         update_time=now_time,
                                         updater=message.get('updater'))
                 product_detail.save()
-                transaction.commit()
-                resp_message['picking_qty'] = picking_qty
+            transaction.commit()
+            resp_message['picking_qty'] = picking_qty
     except Exception as e:
         LOG.error('Picking operation error.\n [ERROR]:%s' % str(e))
         transaction.rollback()
