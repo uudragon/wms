@@ -43,6 +43,16 @@ class ProductPackageDetails(models.Model):
         db_table = 'T_PRODUCT_PACKAGE_DETAILS'
 
 
+class ProductPackageGifts(models.Model):
+    id = models.CharField(db_column='ID', primary_key=True, max_length=72)
+    package_code = models.CharField(db_column='PACKAGE_CODE', null=False, max_length=36)
+    goods_code = models.CharField(db_column='GOODS_CODE', null=False, max_length=36)
+    qty = models.IntegerField(db_column='QTY', null=False, max_length=11, default=1)
+
+    class Meta:
+        db_table = 'T_PRODUCT_PACKAGE_GIFTS'
+
+
 class Product(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
     product_code = models.CharField(db_column='PRODUCT_CODE', null=False, max_length=36, unique=True)
