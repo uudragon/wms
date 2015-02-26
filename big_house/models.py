@@ -264,7 +264,6 @@ class PickingOrders(models.Model):
 class PickingOrdersDetails(models.Model):
     id = models.CharField(db_column='ID', primary_key=True, max_length=72)
     picking_no = models.CharField(db_column='PICKING_NO', null=False, max_length=36)
-    shipment_no = models.CharField(db_column='SHIPMENT_NO', null=False, max_length=36)
     code = models.CharField(db_column='CODE', null=False, max_length=36)
     is_product = models.IntegerField(db_column='IS_PRODUCT', null=False, max_length=4, default=1)
     is_gift = models.IntegerField(db_column='IS_GIFT', null=False, max_length=4, default=0)
