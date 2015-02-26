@@ -781,9 +781,10 @@ def assemble_picking_orders(request):
                 goods = Goods.objects.filter(goods_code=picking_detail.code).first()
                 picking_detail_seria.name = goods.goods_name
             picking_details_srias.append(picking_detail_seria.data)
+        LOG.debug('Total_qty is %s' % picking_qty)
         picking_orders = PickingOrders(
             picking_no=picking_no,
-            picking_qty=total_qty,
+            #picking_qty=total_qty,
             creator=message.get('creator'),
             create_time=now_time,
             updater=message.get('updater'),
