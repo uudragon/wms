@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from big_house.models import Product, ProductDetails, Warehouse, StorageRecords, Receipt, ReceiptDetails, \
     WarehouseGoodsDetails, WarehouseProductDetails, Goods, Shipment, ShipmentDetails, ProductPackage, \
-    ProductPackageDetails, GoodsGroup, ProductPackageGifts
+    ProductPackageDetails, GoodsGroup, ProductPackageGifts, PickingOrders, PickingOrdersDetails
 
 __author__ = 'pluto'
 
@@ -111,3 +111,15 @@ class ShipmentDetailsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ShipmentDetails
+
+
+class PickingOrdersSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = PickingOrders
+
+
+class PickingOrdersDetailsSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = PickingOrdersDetails

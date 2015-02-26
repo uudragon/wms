@@ -10,6 +10,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 import time
+import xlrd
 from big_house.models import ProductDetails, ShipmentDetails, Shipment, ProductPackageDetails, Product, Goods, \
     WarehouseGoodsDetails, WarehouseProductDetails, StorageRecords
 from big_house.serializers import ShipmentDetailsSerializer, ShipmentSerializer
@@ -141,10 +142,8 @@ def query_shipments(request):
 
     resp_message = dict()
     try:
-        for key in message.iterkeys():
-            key += '__contains'
-            LOG.debug('Condition of query is %s' % message)
-        query_list = Shipment.objects.filter(**message).order_by('sent_date')
+        query_month = int(message.get('month')) if message.get('month') is not None else datetime.now().month
+        query_list = Shipment.objects.filter(sent_date__month=query_month).order_by('sent_date')
         paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
         total_page_count = paginator.num_pages
         if pageNo > total_page_count:
@@ -677,3 +676,12 @@ def set_orders_amount(request):
                         content_type='application/json;charset=utf-8',
                         date={'error': 'Sent error.'})
     return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def assemble_picking_orders(request):
+    message = request.DATA
+    
+    LOG.info('Current method is [assemble_pickings], received message is %s' % message)
+    
+    

@@ -245,3 +245,34 @@ class ShipmentDetails(models.Model):
 
     class Meta:
         db_table = 'T_SHIPMENT_DETAILS'
+
+
+class PickingOrders(models.Model):
+    id = models.AutoField(db_column='ID', primary_key=True)
+    picking_no = models.CharField(db_column='PICKING_NO', null=False, unique=True, max_length=36)
+    picking_qty = models.IntegerField(db_column='PICKING_QTY', null=False, default=0),
+    status = models.IntegerField(db_column='STATUS', null=False, default=0)
+    create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)
+    creator = models.CharField(db_column='CREATOR', null=False, max_length=50)
+    update_time = models.DateTimeField(db_column='UPDATE_TIME', null=False, auto_now_add=True)
+    updater = models.CharField(db_column='UPDATER', null=False, max_length=50)
+    
+    class Meta:
+        db_table = 'T_PICKING_ORDERS'
+
+
+class PickingOrdersDetails(models.Model):
+    id = models.CharField(db_column='ID', primary_key=True, max_length=72)
+    picking_no = models.CharField(db_column='PICKING_NO', null=False, max_length=36)
+    shipment_no = models.CharField(db_column='SHIPMENT_NO', null=False, max_length=36)
+    code = models.CharField(db_column='CODE', null=False, max_length=36)
+    is_product = models.IntegerField(db_column='IS_PRODUCT', null=False, max_length=4, default=1)
+    is_gift = models.IntegerField(db_column='IS_GIFT', null=False, max_length=4, default=0)
+    qty = models.IntegerField(db_column='QTY', null=False, default=0)
+    create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)
+    creator = models.CharField(db_column='CREATOR', null=False, max_length=50)
+    update_time = models.DateTimeField(db_column='UPDATE_TIME', null=False, auto_now_add=True)
+    updater = models.CharField(db_column='UPDATER', null=False, max_length=50)
+    
+    class Meta:
+        db_table = 'T_PICKING_ORDERS_DETAILS'
