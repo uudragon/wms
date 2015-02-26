@@ -773,7 +773,7 @@ def assemble_picking_orders(request):
         picking_details_srias = []
         for picking_detail in details_dict.values():
             picking_detail.save()
-            picking_detail_seria = PickingOrdersDetailsSerializer(picking_detail)
+            picking_detail_seria = PickingOrdersDetailsSerializer(picking_detail).data
             if picking_detail.is_product:
                 product = Product.objects.filter(product_code=picking_detail.code).first()
                 picking_detail_seria.name = product.product_name
