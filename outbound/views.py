@@ -773,14 +773,16 @@ def assemble_picking_orders(request):
         picking_details_srias = []
         for picking_detail in details_dict.values():
             picking_detail.save()
-            picking_detail_seria = PickingOrdersDetailsSerializer(picking_detail).data
+            picking_detail_seria = PickingOrdersDetailsSerializer(picking_detail)
             if picking_detail.is_product:
                 product = Product.objects.filter(product_code=picking_detail.code).first()
-                picking_detail_seria.name = product.product_name
+                name = product.product_name
             elif picking_detail.is_gift:
                 goods = Goods.objects.filter(goods_code=picking_detail.code).first()
-                picking_detail_seria.name = goods.goods_name
-            picking_details_srias.append(picking_detail_seria.data)
+                name = goods.goods_name
+            seria_data = picking_detail_seria.data
+            seria_data['name'] = name
+            picking_details_srias.append(seria_data)
         LOG.debug('Total_qty is %s' % total_qty)
         picking_orders = PickingOrders(
             picking_no=picking_no,
