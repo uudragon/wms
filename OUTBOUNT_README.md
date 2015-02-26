@@ -326,11 +326,19 @@ error| String  | 错误信息
 	Content_Type:application/json;charset=utf-8
 	Accept:application/json
 ######4.3 请求参数
-无
+名称|类型|是否必填|说明
+---|---|---|---
+pageSize|Int|Y|每页显示记录数
+pageNo|Int|Y|当前页号
+month|Int|Y|查询月份
 
 样例报文：
 
-暂略
+{
+	'pageSize':8,
+	'pageNo':1,
+	'month':3
+}
 
 ######4.4 响应报文
 成功响应：

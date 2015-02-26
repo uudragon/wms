@@ -534,7 +534,7 @@ def prepared(request):
     return Response(status=status.HTTP_200_OK, data=shipment_seria, content_type='application/json;charset=utf-8')
 
 
-@api_view('GET')
+@api_view(['GET'])
 @transaction.commit_manually
 def picking(request, picking_no):
     LOG.info('Current method [picking], received picking_no is %s' % picking_no)
