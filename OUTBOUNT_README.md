@@ -817,3 +817,91 @@ error| String  | 错误信息
 样例报文：
 
 	{‘error’:’Shipments query error.’}
+
+----
+#####11.生成拣货单
+该接口按给定的发货单号生成拣货单
+######11.1 url
+	method: POST
+	wms/outbound/picking_orders/create/
+	注意：结尾的’/’不能省略
+######11.2 header
+	Content_Type:application/json;charset=utf-8
+	Accept:application/json
+######11.3 请求参数
+
+名称|类型|是否必填|说明
+---|---|---|---
+shipment_nos|Array|Y|订单号数组
+creator|String|Y|创建人
+updater|String|Y|更新人
+
+样例报文：
+
+	{
+		'shipment_nos':['000001','000002'],
+		'creator':'admin',
+		'updater':'admin'
+	}
+
+######11.4 响应报文
+成功响应：
+
+	HTTP_STATUS_CODE:200
+
+名称|类型|是否必填|说明
+---|---|---|---
+picking_no|String|Y|拣货单号
+picking_qty|Int|Y|拣货总数量
+status|Int|Y|拣货单状态
+details|Array|Y|拣货单明细
+creator|String|Y|创建人
+create_time|String|Y|创建时间
+updater|String|更新人
+update_time|String|Y|更新时间
+
+<拣货单明细>
+
+名称|类型|是否必填|说明
+---|---|---|---
+picking_no|String|Y|拣货单号
+code|String|Y|产品/商品编号
+name|String|Y|名称
+is_product|int|Y|是否产品。0：否；1：是
+is_gift|int|Y|是否赠品。0：否；1：是
+qty|int|Y|数量
+
+样例报文：
+
+	{
+	    'picking_no':'00010101',
+	    'picking_qty':10,
+	    'create_time':'2015-01-01T00:00:00',
+	    'creator':'admin',
+	    'update_time':'2015-01-01T00:00:00',
+	    'updater':'admin',
+	    'status':0,
+	    'details':[{
+	        'picking_no':'shipment001',
+	        'code':'goods001',
+	        'name':'商品1'
+	        'is_product':1,
+	        'is_gift':0,
+	        'qty':10
+	    }]
+	}
+
+异常响应：
+
+	a．	HTTP_STATUS_CODE:400 Bad request；
+	b．	HTTP_STATUS_CODE:500 Server Error
+
+异常报文：
+
+名称 | 类型 | 说明
+------------ | ------------- | ------------
+error| String  | 错误信息
+
+样例报文：
+
+	{‘error’:’Shipments query error.’}
