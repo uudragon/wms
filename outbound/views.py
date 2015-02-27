@@ -362,7 +362,7 @@ def split(request):
                 item = products_dict.pop(index)
                 LOG.debug('Current item is %s' % item)
                 in_one_list.append(item)
-        shipments = assemble_shipments(in_one_list, products_dict, message, effective_month)
+        shipments = assemble_shipments(in_one_list, products_dict, message, strptime)
     except Exception as e:
         LOG.error('Orders split error.\n [ERROR]:%s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
