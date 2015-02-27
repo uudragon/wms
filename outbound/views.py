@@ -549,7 +549,7 @@ def picking_completed(request, picking_no):
     
         shipment_nos = []
         for picking_detail in picking_orders_details:
-            shipment_nos.append(picking_detail.id[37:72])
+            shipment_nos.append(picking_detail.id[36:72])
         shipments = Shipment.objects.select_for_update().filter(shipment_no__in=shipment_nos)
         for shipment in shipments:
             shipment_details = ShipmentDetails.objects.filter(shipment_no=shipment.shipment_no)
@@ -635,7 +635,7 @@ def query_shipments_by_picking_no(request, picking_no):
         picking_orders_details = PickingOrdersDetails.objects.filter(picking_no=picking_no)
         shipment_nos = []
         for picking_detail in picking_orders_details:
-            shipment_nos.append(picking_detail.id[37:72])
+            shipment_nos.append(picking_detail.id[36:72])
         shipments = Shipment.objects.filter(shipment_no__in=shipment_nos)
         paginator = Paginator(shipments, pageSize, orphans=0, allow_empty_first_page=True)
         total_page_count = paginator.num_pages
