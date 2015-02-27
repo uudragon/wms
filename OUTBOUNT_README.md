@@ -10,6 +10,8 @@
 - [按订单号查询发货单](#91-url)
 - [按订单号设置应收款金额](#101-url)
 - [生成拣货单](#111-url)
+- [批量查询拣货单](#121-url)
+- [按拣货单号查询拣货明细](#131-url)
 
 ----
 #####1.订单拆分接口
@@ -849,6 +851,169 @@ updater|String|Y|更新人
 成功响应：
 
 	HTTP_STATUS_CODE:200
+
+名称|类型|是否必填|说明
+---|---|---|---
+picking_no|String|Y|拣货单号
+picking_qty|Int|Y|拣货总数量
+status|Int|Y|拣货单状态
+details|Array|Y|拣货单明细
+creator|String|Y|创建人
+create_time|String|Y|创建时间
+updater|String|更新人
+update_time|String|Y|更新时间
+
+<拣货单明细>
+
+名称|类型|是否必填|说明
+---|---|---|---
+picking_no|String|Y|拣货单号
+code|String|Y|产品/商品编号
+name|String|Y|名称
+is_product|int|Y|是否产品。0：否；1：是
+is_gift|int|Y|是否赠品。0：否；1：是
+qty|int|Y|数量
+
+样例报文：
+
+	{
+	    'picking_no':'00010101',
+	    'picking_qty':10,
+	    'create_time':'2015-01-01T00:00:00',
+	    'creator':'admin',
+	    'update_time':'2015-01-01T00:00:00',
+	    'updater':'admin',
+	    'status':0,
+	    'details':[{
+	        'picking_no':'shipment001',
+	        'code':'goods001',
+	        'name':'商品1'
+	        'is_product':1,
+	        'is_gift':0,
+	        'qty':10
+	    }]
+	}
+
+异常响应：
+
+	a．	HTTP_STATUS_CODE:400 Bad request；
+	b．	HTTP_STATUS_CODE:500 Server Error
+
+异常报文：
+
+名称 | 类型 | 说明
+------------ | ------------- | ------------
+error| String  | 错误信息
+
+样例报文：
+
+	{‘error’:’Shipments query error.’}
+
+----
+#####12.批量查询拣货单接口
+该接口用于批量查询拣货单
+######4.1 url
+	method: POST
+	wms/outbound/picking_orders/
+	注意：结尾的’/’不能省略
+######4.2 header
+	Content_Type:application/json;charset=utf-8
+	Accept:application/json
+######4.3 请求参数
+名称|类型|是否必填|说明
+---|---|---|---
+pageSize|Int|Y|每页显示记录数
+pageNo|Int|Y|当前页号
+month|Int|Y|查询月份
+
+样例报文：
+
+{
+	'pageSize':8,
+	'pageNo':1,
+	'month':3
+}
+
+######4.4 响应报文
+成功响应：
+
+	HTTP_STATUS_CODE:200
+
+响应报文说明：
+
+名称|类型|是否必填|说明
+---|---|---|---
+pageSize|Int|Y|每页显示记录数
+pageNo|Int|Y|当前页号
+recordsCount|Int|Y|总记录数
+pageNumber|Int|Y|总页数
+records|Array|N|当前页记录
+
+<Records-Item>
+
+名称|类型|是否必填|说明
+---|---|---|---
+picking_no|String|Y|拣货单号
+picking_qty|Int|Y|拣货总数量
+status|Int|Y|拣货单状态。0：未拣货；1：拣货中；2：拣货完成
+details|Array|Y|拣货单明细
+creator|String|Y|创建人
+create_time|String|Y|创建时间
+updater|String|更新人
+update_time|String|Y|更新时间
+
+样例报文：
+
+	{'pageSize':8,
+	'pageNo':1,
+	'recordsCount':15,
+	'pageNumber':2,
+	'records':[{
+	    'picking_no':'00010101',
+	    'picking_qty':10,
+	    'create_time':'2015-01-01T00:00:00',
+	    'creator':'admin',
+	    'update_time':'2015-01-01T00:00:00',
+	    'updater':'admin',
+	    'status':0
+		}......]
+	}
+异常响应：
+
+	a．	HTTP_STATUS_CODE:400 Bad request；
+	b．	HTTP_STATUS_CODE:500 Server Error
+	
+异常报文：
+
+名称 | 类型 | 说明
+------------ | ------------- | ------------
+error| String  | 错误信息
+
+样例报文：
+
+	{‘error’:’Warehouse query error.’}
+
+----
+#####13.按订单号查询出库单信息
+按给定的订单号查询对应的出库单信息
+######13.1 url
+	method: GET
+	wms/outbound/picking_orders/${picking_no}/
+	注意：结尾的’/’不能省略, ${picking_no}为出库单号
+######13.2 header
+	Content_Type:application/json;charset=utf-8
+	Accept:application/json
+######13.3 请求参数
+
+样例报文：
+无
+
+######9.4 响应报文
+成功响应：
+
+	HTTP_STATUS_CODE:200
+
+响应报文说明：
 
 名称|类型|是否必填|说明
 ---|---|---|---
