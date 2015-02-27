@@ -319,8 +319,12 @@ def split(request):
                 entry[package_detail.product_code] = package_detail
                 products_dict[package_detail.product_level] = entry
         LOG.debug('Current count of the products_dict is %s' % len(products_dict))
-        strptime = time.strptime(message.get('effective_date'), '%Y-%m-%d')
-        effective_month = strptime.tm_mon
+        strptime = datetime.strptime(message.get('effective_date'), '%Y-%m-%d')
+        if message.get('source') != 3:
+            strptime = strptime + dtime.timedelta(days=2)
+        else:
+            strptime = strptime + dtime.timedelta(days=monthrange(strptime.year, strptime.month)[1])
+        effective_month = strptime.month
         in_one_list = []
         num = 0
         if effective_month in (9, 10, 11):
@@ -358,7 +362,7 @@ def split(request):
                 item = products_dict.pop(index)
                 LOG.debug('Current item is %s' % item)
                 in_one_list.append(item)
-        shipments = assemble_shipments(in_one_list, products_dict, message, source=message.get('source'))
+        shipments = assemble_shipments(in_one_list, products_dict, message, effective_month)
     except Exception as e:
         LOG.error('Orders split error.\n [ERROR]:%s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
@@ -368,14 +372,10 @@ def split(request):
 
 
 @transaction.commit_manually
-def assemble_shipments(in_one_list=[], products_dict={}, message={}, source=2):
+def assemble_shipments(in_one_list=[], products_dict={}, message={}, sent_date=None):
     in_one_dict = dict()
     shipments = []
-    strptime = datetime.strptime(message.get('effective_date'), '%Y-%m-%d')
-    if source != 3:
-        strptime = strptime + dtime.timedelta(days=2)
-    else:
-        strptime = strptime + dtime.timedelta(days=monthrange(strptime.year, strptime.month)[1])
+    strptime = sent_date
     try:
         for item in in_one_list:
             LOG.debug('Item is %s' % item)
