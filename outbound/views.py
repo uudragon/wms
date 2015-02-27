@@ -145,7 +145,7 @@ def query_shipments(request):
     now_time = datetime.now()
     try:
         query_month = int(message.get('month')) if message.get('month') is not None else now_time.month
-        query_list = Shipment.objects.filter(sent_date__month=query_month, sent_date__year=now_time.year).order_by('sent_date')
+        query_list = Shipment.objects.filter(sent_date__month=query_month, sent_date__year=now_time.year, status=0).order_by('sent_date')
         paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
         total_page_count = paginator.num_pages
         if pageNo > total_page_count:
