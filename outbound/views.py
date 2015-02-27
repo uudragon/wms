@@ -497,45 +497,6 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}, sent_date=N
 
 @api_view(['POST'])
 @transaction.commit_manually
-def prepared(request):
-    message = request.DATA
-
-    LOG.info('Current received message is %s' % message)
-    
-    shipment_seria = None
-    try:
-        shipment = Shipment.objects.filter(status=1).filter(shipment_no=message.get('shipment_no'))
-        if shipment is not None:
-            shipment.status = 2
-            shipment.updater = message.get('updater')
-            now_time = datetime.now()
-            shipment.update_time = now_time
-            shipment.save()
-            transaction.commit()
-            shipment_seria = ShipmentSerializer(shipment).data
-            details = ShipmentDetails.objects.filter(shipment_no=message.get('shipment_no'))
-            details_seria = []
-            for detail in details:
-                seria = ShipmentDetailsSerializer(detail)
-                if detail.is_product:
-                    product = Product.objects.filter(product_code=detail.code).first()
-                    seria.name = product.product_name
-                elif detail.is_gift:
-                    goods = Goods.objects.filter(goods_code=detail.code).first()
-                    seria.name = goods.goods_name
-                details_seria.append(seria.data)
-            shipment_seria['details'] = details_seria
-    except Exception as e:
-        LOG.error('Shipment prepared error, message is %s' % str(e))
-        transaction.rollback()
-        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-                        content_type='application/json;charset=utf-8',
-                        date={'error': 'Shipment prepared error.'})
-    return Response(status=status.HTTP_200_OK, data=shipment_seria, content_type='application/json;charset=utf-8')
-
-
-@api_view(['POST'])
-@transaction.commit_manually
 def picking(request, picking_no):
     LOG.info('Current method [picking], received picking_no is %s' % picking_no)
 
@@ -647,65 +608,58 @@ def picking_completed(request, picking_no):
                         content_type='application/json;charset=utf-8',
                         date={'error': 'Shipment picking error.'})
     return Response(status=status.HTTP_200_OK)
-    #
-    # try:
-    #     shipment = Shipment.objects.filter(shipment_no=message.get('shipment_no')).first()
-    #     shipment_details = ShipmentDetails.objects.filter(shipment_no=message.get('shipment_no'))
-    #     out_goods = dict()
-    #     for item in shipment_details:
-    #         if item.is_gift:
-    #             goods = WarehouseGoodsDetails.objects.filter(goods_code=item.code).filter(
-    #                 warehouse=shipment.warehouse).first()
-    #             goods.qty -= item.qty
-    #             goods.not_picking_qty -= item.qty
-    #             goods.save()
-    #             if goods.goods_code in out_goods:
-    #                 out_goods[goods.goods_code] += item.qty
-    #             else:
-    #                 out_goods[goods.goods_code] = item.qty
-    #         elif item.is_product:
-    #             product = WarehouseProductDetails.objects.filter(product_code=item.code).filter(
-    #                 warehouse=shipment.warehouse).first()
-    #             product.qty -= item.qty
-    #             product_details = ProductDetails.objects.filter(product_code=product.product_code)
-    #             for detail in product_details:
-    #                 goods = WarehouseGoodsDetails.objects.filter(goods_code=detail.goods_code).filter(
-    #                     warehouse=shipment.warehouse).first()
-    #                 goods.qty -= detail.qty
-    #                 goods.picking_qty -= detail.qty
-    #                 goods.save()
-    #                 if goods.goods_code in out_goods:
-    #                     out_goods[goods.goods_code] += item.qty
-    #                 else:
-    #                     out_goods[goods.goods_code] = item.qty
-    #             product.save()
-    #     LOG.info('Current output goods is %s' % out_goods)
-    #     now_time = datetime.now()
-    #     shipment.status = 3
-    #     shipment.updater = message.get('updater')
-    #     shipment.update_time = now_time
-    #     for goods_code, qty in out_goods.items():
-    #         storage_record = StorageRecords(
-    #             goods_code=goods_code,
-    #             goods_qty=qty,
-    #             code=message.get('shipment_no'),
-    #             warehouse=shipment.warehouse,
-    #             type=STORAGE_RECORD_TYPE_OUTPUT,
-    #             create_time=now_time,
-    #             creator=message.get('updater'),
-    #             update_time=now_time,
-    #             updater=message.get('updater'),
-    #             status=0
-    #         )
-    #         storage_record.save()
-    #     transaction.commit()
-    # except Exception as e:
-    #     LOG.error('Picking error, message is %s' % str(e))
-    #     transaction.rollback()
-    #     return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-    #                     content_type='application/json;charset=utf-8',
-    #                     date={'error': 'Picking error.'})
-    # return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+def query_shipments_by_picking_no(request, picking_no):
+    LOG.info('Current method [picking_completed], received picking_no is %s' % picking_no)
+
+    if picking_no is None:
+        LOG.error('Attribute[\'picking_no\'] can not be none.')
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'Attribute[\'picking_no\'] can not be none.'})
+    message = request.DATA
+
+    LOG.info('Current received message is %s' % message)
+
+    pageSize = message.pop('pageSize')
+    if pageSize is None or pageSize == 0:
+        pageSize = DEFAULT_PAGE_SIZE
+    pageNo = message.pop('pageNo')
+    if pageNo is None or pageNo == 0:
+        pageNo = 1
+
+    resp_message = dict()
+    try:
+        picking_orders_details = PickingOrdersDetails.objects.filter(picking_no=picking_no)
+        shipment_nos = []
+        for picking_detail in picking_orders_details:
+            shipment_nos.append(picking_detail.id[37:72])
+        shipments = Shipment.objects.select_for_update().filter(shipment_no__in=shipment_nos)
+        paginator = Paginator(shipments, pageSize, orphans=0, allow_empty_first_page=True)
+        total_page_count = paginator.num_pages
+        if pageNo > total_page_count:
+            pageNo = total_page_count
+        elif pageNo < 1:
+            pageNo = 1
+        cur_page = paginator.page(pageNo)
+        page_records = cur_page.object_list
+        resp_array = []
+        for item in page_records:
+            record_seria = ShipmentSerializer(item)
+            resp_array.append(record_seria.data)
+        resp_message['records'] = resp_array
+        resp_message['recordsCount'] = paginator.count
+        resp_message['pageSize'] = pageSize
+        resp_message['pageNumber'] = total_page_count
+        resp_message['pageNo'] = pageNo
+    except Exception as e:
+        LOG.error('Query shipment information error. [ERROR] %s' % str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={'error': 'Query shipment information error'},
+                        content_type='application/json;charset=utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset=utf-8')
 
 
 @api_view(['POST'])
