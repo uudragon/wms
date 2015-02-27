@@ -71,7 +71,7 @@ def save_shipment(request):
             )
             shipment_detail.save()
             total_qty += shipment_detail.qty
-        shipment.total_qty = total_qty
+        shipment.shipped_qty = total_qty
         shipment.save()
         transaction.commit()
     except Exception as e:
