@@ -810,7 +810,7 @@ def assemble_picking_orders(request):
     return Response(status=status.HTTP_200_OK, data=picking_orders_seria, content_type='application/json;charset=utf-8')
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 def query_picking_orders_list(request):
     message = request.DATA
     
