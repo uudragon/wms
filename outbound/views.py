@@ -811,6 +811,50 @@ def assemble_picking_orders(request):
 
 
 @api_view(['GET'])
+def query_picking_orders_list(request):
+    message = request.DATA
+    
+    LOG.info('Current method is [query_picking_orders_list], received message is %s' % message)
+
+    pageSize = message.pop('pageSize')
+    if pageSize is None or pageSize == 0:
+        pageSize = DEFAULT_PAGE_SIZE
+    pageNo = message.pop('pageNo')
+    if pageNo is None or pageNo == 0:
+        pageNo = 1
+
+    resp_message = dict()
+
+    now_time = datetime.now()
+    try:
+        query_month = int(message.get('month')) if message.get('month') is not None else now_time.month
+        query_list = PickingOrders.objects.filter(sent_date__month=query_month, sent_date__year=now_time.year, status=0).order_by('sent_date')
+        paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
+        total_page_count = paginator.num_pages
+        if pageNo > total_page_count:
+            pageNo = total_page_count
+        elif pageNo < 1:
+            pageNo = 1
+        cur_page = paginator.page(pageNo)
+        page_records = cur_page.object_list
+        resp_array = []
+        for item in page_records:
+            record_seria = PickingOrdersSerializer(item)
+            resp_array.append(record_seria.data)
+        resp_message['records'] = resp_array
+        resp_message['recordsCount'] = paginator.count
+        resp_message['pageSize'] = pageSize
+        resp_message['pageNumber'] = total_page_count
+        resp_message['pageNo'] = pageNo
+    except Exception as e:
+        LOG.error('Query picking orders information error. [ERROR] %s' % str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={'error': 'Query picking orders information error'},
+                        content_type='application/json;charset=utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset=utf-8')
+
+
+@api_view(['GET'])
 def query_single_picking_orders(request, picking_no):
     LOG.info('Current method [query_], received picking_no is %s' % picking_no)
 
