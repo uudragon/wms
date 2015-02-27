@@ -534,7 +534,7 @@ def prepared(request):
     return Response(status=status.HTTP_200_OK, data=shipment_seria, content_type='application/json;charset=utf-8')
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @transaction.commit_manually
 def picking(request, picking_no):
     LOG.info('Current method [picking], received picking_no is %s' % picking_no)
@@ -545,9 +545,15 @@ def picking(request, picking_no):
                         content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'picking_no\'] can not be none.'})
 
+    message = request.DATA
+    
+    LOG.info('Current request body is %s' % message)
+
     try:
         picking_orders = PickingOrders.objects.select_for_update().filter(picking_no=picking_no, status=0).first()
         picking_orders.status = 1
+        picking_orders.updater = message.get('updater')
+        picking_orders.update_time = datetime.now()
         picking_orders.save()
         transaction.commit()
     except Exception as e:
@@ -559,7 +565,7 @@ def picking(request, picking_no):
     return Response(status=status.HTTP_200_OK)
 
 
-@api_view(['GET'])
+@api_view(['POST'])
 @transaction.commit_manually
 def picking_completed(request, picking_no):
     LOG.info('Current method [picking_completed], received picking_no is %s' % picking_no)
@@ -570,18 +576,69 @@ def picking_completed(request, picking_no):
                         content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'picking_no\'] can not be none.'})
     
+    message = request.DATA
+    
+    LOG.info('Current request body is %s' % message)
+    
     try:
         picking_orders = PickingOrders.objects.select_for_update().filter(picking_no=picking_no, status=1).first()
         picking_orders.status = 2
         picking_orders.save()
         picking_orders_details = PickingOrdersDetails.objects.filter(picking_no=picking_no)
+    
         shipment_nos = []
         for picking_detail in picking_orders_details:
             shipment_nos.append(picking_detail.id[37:72])
         shipments = Shipment.objects.select_for_update().filter(shipment_no__in=shipment_nos)
         for shipment in shipments:
+            shipment_details = ShipmentDetails.objects.filter(shipment_no=shipment.shipment_no)
+            out_goods = dict()
+            for item in shipment_details:
+                if item.is_gift:
+                    goods = WarehouseGoodsDetails.objects.filter(goods_code=item.code).filter(
+                        warehouse=shipment.warehouse).first()
+                    goods.qty -= item.qty
+                    goods.not_picking_qty -= item.qty
+                    goods.save()
+                    if goods.goods_code in out_goods:
+                        out_goods[goods.goods_code] += item.qty
+                    else:
+                        out_goods[goods.goods_code] = item.qty
+                elif item.is_product:
+                    product = WarehouseProductDetails.objects.filter(product_code=item.code).filter(
+                        warehouse=shipment.warehouse).first()
+                    product.qty -= item.qty
+                    product_details = ProductDetails.objects.filter(product_code=product.product_code)
+                    for detail in product_details:
+                        goods = WarehouseGoodsDetails.objects.filter(goods_code=detail.goods_code).filter(
+                            warehouse=shipment.warehouse).first()
+                        goods.qty -= detail.qty
+                        goods.picking_qty -= detail.qty
+                        goods.save()
+                        if goods.goods_code in out_goods:
+                            out_goods[goods.goods_code] += item.qty
+                        else:
+                            out_goods[goods.goods_code] = item.qty
+                    product.save()
+            LOG.info('Current output goods is %s' % out_goods)
+            now_time = datetime.now()
             shipment.status = 3
-            shipment.save()
+            shipment.updater = message.get('updater')
+            shipment.update_time = now_time
+            for goods_code, qty in out_goods.items():
+                storage_record = StorageRecords(
+                    goods_code=goods_code,
+                    goods_qty=qty,
+                    code=message.get('shipment_no'),
+                    warehouse=shipment.warehouse,
+                    type=STORAGE_RECORD_TYPE_OUTPUT,
+                    create_time=now_time,
+                    creator=message.get('updater'),
+                    update_time=now_time,
+                    updater=message.get('updater'),
+                    status=0
+                )
+                storage_record.save()
         transaction.commit()
     except Exception as e:
         LOG.error('Shipment picking error, message is %s' % str(e))

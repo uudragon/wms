@@ -423,11 +423,11 @@ error| String  | 错误信息
 	{‘error’:’Warehouse query error.’}
 	
 ----
-#####5.出库复核接口
-该接口用于客服人员对出库单的复核检查确认，经过改操作后，出库单的状态将由未审核（0）-->待发货（1）
+#####5.出库拣货接口
+该接口用于锁定拣货单状态，进行线下拣货操作。
 ######5.1 url
 	method: POST
-	wms/outbound/shipment/check/
+	wms/outbound/picking_orders/picking/${picking_no}/
 	注意：结尾的’/’不能省略
 ######5.2 header
 	Content_Type:application/json;charset=utf-8
@@ -435,36 +435,11 @@ error| String  | 错误信息
 ######5.3 请求参数
 名称|类型|是否必填|说明
 ---|---|---|---
-shipment_no|String|Y|发货单号
-warehouse|String|Y|库房编号
-updater|String|Y|需改人
-sent_date|String|Y|发货时间，yyyy-mm-dd
-details|array|Y|发货明细
-
-Details
-
-名称|类型|是否必填|说明
----|---|---|---
-shipment_no|String|Y|出库单号
-code|String|Y|编号
-is_product|int|Y|是否是产品。0：否；1：是
-is_gift|int|Y|是否赠品。0：否；1：是
-qty|int|Y|数量
-status|int|Y|状态。0：未确认；1：已确认
+updater|String|Y|操作人
 
 样例报文：
 	{
-		'warehouse':'w00001',
-	    'updater':'admin',
-	    'shipment_no':'S000001',
-	    'details':[{
-	        'shipment_no':'shipment001',
-	        'code':'goods001',
-	        'is_product':1,
-	        'is_gift':0,
-	        'qty':10,
-	        status:0
-	    }]
+	    'updater':'admin'
 	}
 
 ######5.4 响应报文
@@ -489,11 +464,12 @@ error| String  | 错误信息
 
 
 ----
-#####6.出库备货接口
-该接口用于仓库操作员按照发货单进行拣货，此接口中，出库单的状态先由待发货（1）-->备货中（2），用以锁定状态。并返回当前发货单号对应的发货单信息。
+#####6.出库拣货完成接口
+该接口用于仓库操作员按照拣货后调用此接口用于确认拣货完成。调用此接口后出库单的状态先由备货中（2）-->发货中（3），
+并且将出库商品记录入“商品出入库表”（状态为“预占”状态0，表示即将出库但尚未出库）并未扣除库存。
 ######6.1 url
 	method: POST
-	wms/outbound/shipment/prepared/
+	wms/outbound/picking_orders/picking_completed/${picking_no}/
 	注意：结尾的’/’不能省略
 ######6.2 header
 	Content_Type:application/json;charset=utf-8
@@ -501,12 +477,10 @@ error| String  | 错误信息
 ######6.3 请求参数
 名称|类型|是否必填|说明
 ---|---|---|---
-shipment_no|String|Y|发货单号
 updater|String|Y|需改人
 
 样例报文：
 	{
-	    'shipment_no':'S00001',
 	    'updater':'admin'
 	}
 
@@ -517,66 +491,7 @@ updater|String|Y|需改人
 	
 响应报文说明：
 
-名称|类型|是否必填|说明
----|---|---|---
-orders_no|String|Y|订单号
-shipment_no|String|Y|发货单号
-customer_code|String|Y|客户编号
-customer_name|String|Y|客户姓名
-address|String|Y|客户地址
-customer_tel|String|Y|客户电话
-amount|decimal|Y|付款金额
-shipped_qty|int|Y|发货数量
-has_invoice|int|Y|是否有发票。0：无；1：有
-sent_date|String|Y|发货时间
-create_time|String|Y|创建时间
-creator|String|Y|创建人
-update_time|String|Y|修改时间
-updater|String|Y|需改人
-status|int|Y|发货单状态。-1：无效；0：待审核；1：待发货；2：备货中；3：发货中；4：已发货
-details|array|Y|发货明细
-
-`Details`
-
-名称|类型|是否必填|说明
----|---|---|---
-shipment_no|String|Y|出库单号
-code|String|Y|编号
-name|String|Y|名称
-is_product|int|Y|是否产品。0：否；1：是
-is_gift|int|Y|是否赠品。0：否；1：是
-qty|int|Y|数量
-status|int|Y|状态。0：未确认；1：已确认
-
-
-样例报文：
-
-	{
-	    'orders_no':'00010101',
-	    'shipment_no':'shipment0001',
-	    'customer_code':'user001',
-	    'customer_name':'user1',
-	    'address':'北京天安门',
-	    'customer_tel':'18600000000',
-	    'amount':110.11,
-	    'shipped_qty':10,
-	    'has_invoice':0,
-        'sent_date':'2015-01-01',
-	    'create_time':'2015-01-01T00:00:00',
-	    'creator':'admin',
-	    'update_time':'2015-01-01T00:00:00',
-	    'updater':'admin',
-	    'status':0,
-	    'details':[{
-	        'shipment_no':'shipment001',
-	        'code':'goods001',
-	        'name':'商品1'
-	        'is_product':1,
-	        'is_gift':0,
-	        'qty':10,
-	        status:0
-	    }]
-	}
+无
 
 
 异常响应：
@@ -596,32 +511,80 @@ error| String  | 错误信息
 
 
 ----
-#####7.出库拣货完成接口
-该接口用于仓库操作员按照拣货后调用此接口用于确认拣货完成。调用此接口后出库单的状态先由备货中（2）-->发货中（3），
-并且将出库商品记录入“商品出入库表”（状态为“预占”状态0，表示即将出库但尚未出库）并对扣除库存。
+#####7.查询拣货单对应发货单
+按照拣货单号查询对应发货单
 ######7.1 url
 	method: POST
-	wms/outbound/shipment/picking/
+	wms/outbound/picking_orders/query_shipments/${picking_no}/
 	注意：结尾的’/’不能省略
 ######7.2 header
 	Content_Type:application/json;charset=utf-8
 	Accept:application/json
 ######7.3 请求参数
-名称|类型|是否必填|说明
----|---|---|---
-shipment_no|String|Y|发货单号
-updater|String|Y|需改人
-
-样例报文：
-	{
-		'shipment_no':'S00001',
-	    'updater':'admin'
-	}
+无
 
 ######7.4 响应报文
 成功响应：
 
 	HTTP_STATUS_CODE:200
+	
+名称|类型|是否必填|说明
+---|---|---|---
+pageSize|Int|Y|每页显示记录数
+pageNo|Int|Y|当前页号
+recordsCount|Int|Y|总记录数
+pageNumber|Int|Y|总页数
+records|Array|N|当前页记录
+
+<Records-Item>
+
+名称|类型|是否必填|说明
+---|---|---|---
+orders_no|String|Y|订单号
+shipment_no|String|Y|发货单号
+customer_code|String|Y|客户编号
+customer_name|String|Y|客户姓名
+address|String|Y|客户地址
+customer_tel|String|Y|客户电话
+amount|decimal|Y|付款金额
+shipped_qty|int|Y|发货数量
+has_invoice|int|Y|是否有发票。0：无；1：有
+express_code|String|O|快递公司编号
+express_orders_no|String|O|快递单号
+express_name|String|O|快递公司名称
+express_cost|decimal|O|快递费用
+courier|String|O|快递员
+courier_tel|String|O|快递员电话
+sent_date|String|O|发货时间
+create_time|String|Y|创建时间
+creator|String|Y|创建人
+update_time|String|Y|修改时间
+updater|String|Y|需改人
+status|int|Y|发货单状态。-1：无效；0：待审核；1：待发货；2：备货中；3：发货中；4：已发货
+
+样例报文：
+
+	{'pageSize':8,
+	'pageNo':1,
+	'recordsCount':15,
+	'pageNumber':2,
+	'records':[{
+	    'orders_no':'00010101',
+	    'shipment_no':'shipment0001',
+	    'customer_code':'user001',
+	    'customer_name':'user1',
+	    'address':'北京天安门',
+	    'customer_tel':'18600000000',
+	    'amount':110.11,
+	    'shipped_qty':10,
+	    'has_invoice':0,
+	    'create_time':'2015-01-01T00:00:00',
+	    'creator':'admin',
+	    'update_time':'2015-01-01T00:00:00',
+	    'updater':'admin',
+	    'status':0
+		}......]
+	}
 
 异常响应：
 
