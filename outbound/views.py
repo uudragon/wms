@@ -825,6 +825,7 @@ def assemble_picking_orders(request):
                 shipment.status = 2
                 shipment.updater = message.get('updater')
                 shipment.update_time = now_time
+                shipment.save()
             picking_orders_seria = PickingOrdersSerializer(picking_orders).data
             picking_orders_seria['details'] = picking_details_srias
         transaction.commit()
