@@ -204,6 +204,7 @@ class Shipment(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
     orders_no = models.CharField(db_column='ORDERS_NO', null=False, max_length=36)
     shipment_no = models.CharField(db_column='SHIPMENT_NO', null=False, unique=True, max_length=36)
+    picking_no = models.CharField(db_column='PICKING_NO', null=True, max_length=36)
     warehouse = models.CharField(db_column='WAREHOUSE', null=False, unique=True, max_length=36)
     customer_no = models.CharField(db_column='CUSTOMER_NO', null=False, max_length=36)
     customer_name = models.CharField(db_column='CUSTOMER_NAME', null=False, max_length=100)

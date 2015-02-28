@@ -554,12 +554,8 @@ def picking_completed(request, picking_no):
         picking_orders = PickingOrders.objects.select_for_update().filter(picking_no=picking_no, status=1).first()
         picking_orders.status = 2
         picking_orders.save()
-        picking_orders_details = PickingOrdersDetails.objects.filter(picking_no=picking_no)
-    
-        shipment_nos = []
-        for picking_detail in picking_orders_details:
-            shipment_nos.append(picking_detail.id[36:72])
-        shipments = Shipment.objects.select_for_update().filter(shipment_no__in=shipment_nos)
+
+        shipments = Shipment.objects.select_for_update().filter(picking_no=picking_no)
         for shipment in shipments:
             shipment_details = ShipmentDetails.objects.filter(shipment_no=shipment.shipment_no)
             out_goods = dict()
@@ -641,11 +637,7 @@ def query_shipments_by_picking_no(request, picking_no):
 
     resp_message = dict()
     try:
-        picking_orders_details = PickingOrdersDetails.objects.filter(picking_no=picking_no)
-        shipment_nos = []
-        for picking_detail in picking_orders_details:
-            shipment_nos.append(picking_detail.id[36:72])
-        shipments = Shipment.objects.filter(shipment_no__in=shipment_nos)
+        shipments = Shipment.objects.filter(picking_no=picking_no)
         paginator = Paginator(shipments, pageSize, orphans=0, allow_empty_first_page=True)
         total_page_count = paginator.num_pages
         if pageNo > total_page_count:
@@ -768,8 +760,10 @@ def assemble_picking_orders(request):
     try:
         shipments = Shipment.objects.select_for_update().filter(shipment_no__in=message.get('shipment_nos'))
         now_time = datetime.now()
+        picking_no = uuid.uuid4()
         for shipment in shipments:
             shipment.status = 2
+            shipment.picking_no = picking_no
             shipment.updater = message.get('updater')
             shipment.update_time = now_time
             shipment.save()
@@ -777,14 +771,14 @@ def assemble_picking_orders(request):
         shipment_details = ShipmentDetails.objects.filter(
             shipment_no__in=message.get('shipment_nos'))
         details_dict = dict()
-        picking_no = uuid.uuid4()
+
         total_qty = 0
         for shipment_detail in shipment_details:
             if shipment_detail.code in details_dict:
                 details_dict[shipment_detail.code].qty += shipment_detail.qty
             else:
                 picking_detail = PickingOrdersDetails(
-                    id='%s%s' % (picking_no, shipment_detail.shipment_no),
+                    id='%s%s' % (picking_no, shipment_detail.code),
                     picking_no=picking_no,
                     code=shipment_detail.code,
                     is_product=shipment_detail.is_product,
@@ -797,12 +791,9 @@ def assemble_picking_orders(request):
                 )
                 details_dict[shipment_detail.code] = picking_detail
             total_qty += shipment_detail.qty
-        LOG.debug(details_dict)
-        for picking_detail in details_dict.values():
-            LOG.debug('------->%s' % picking_detail)
-            picking_detail.save()
         picking_details_srias = []
         for picking_detail in details_dict.values():
+            picking_detail.save()
             picking_detail_seria = PickingOrdersDetailsSerializer(picking_detail)
             if picking_detail.is_product:
                 product = Product.objects.filter(product_code=picking_detail.code).first()
