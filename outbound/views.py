@@ -10,7 +10,7 @@ from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from big_house.models import ProductDetails, ShipmentDetails, Shipment, ProductPackageDetails, Product, Goods, \
-    WarehouseGoodsDetails, WarehouseProductDetails, StorageRecords, PickingOrdersDetails, PickingOrders
+    WarehouseGoodsDetails, WarehouseProductDetails, StorageRecords, PickingOrdersDetails, PickingOrders, Warehouse
 from big_house.serializers import ShipmentDetailsSerializer, ShipmentSerializer, PickingOrdersSerializer, \
     PickingOrdersDetailsSerializer
 from uudragon_wms.local.settings import DEFAULT_PAGE_SIZE, STORAGE_RECORD_TYPE_OUTPUT
@@ -393,6 +393,8 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}, sent_date=N
         shipment_no = uuid.uuid4()
         now_time = datetime.now()
         total_qty = 0
+        warehouse = Warehouse.objects.filter(type=1).first()
+        warehouse_no = warehouse.warehouse_code
         if len(in_one_list) != 0:
             LOG.debug('----------->Create one shipment')
             for product_code, product in in_one_dict.items():
@@ -415,6 +417,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}, sent_date=N
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
+                warehouse=warehouse_no,
                 orders_no=message.get('orders_no'),
                 customer_no=message.get('customer_code'),
                 customer_name=message.get('customer_name'),
@@ -465,6 +468,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}, sent_date=N
                 detail.save()
             shipment = Shipment(
                 shipment_no=shipment_no,
+                warehouse=warehouse_no,
                 orders_no=message.get('orders_no'),
                 customer_no=message.get('customer_code'),
                 customer_name=message.get('customer_name'),
