@@ -250,7 +250,7 @@ class ShipmentDetails(models.Model):
 class PickingOrders(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
     picking_no = models.CharField(db_column='PICKING_NO', null=False, unique=True, max_length=36)
-    picking_qty = models.IntegerField(db_column='PICKING_QTY', null=False, default=0),
+    picking_qty = models.IntegerField(db_column='PICKING_QTY', null=False, default=0)
     status = models.IntegerField(db_column='STATUS', null=False, default=0)
     create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)
     creator = models.CharField(db_column='CREATOR', null=False, max_length=50)
