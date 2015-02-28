@@ -767,11 +767,17 @@ def assemble_picking_orders(request):
                         data={'error': 'Request attribute [shipment_nos] must be an array.'})
     try:
         shipments = Shipment.objects.select_for_update().filter(shipment_no__in=message.get('shipment_nos'))
-        shipment_details = ShipmentDetails.objects.select_for_update().filter(
+        now_time = datetime.now()
+        for shipment in shipments:
+            shipment.status = 2
+            shipment.updater = message.get('updater')
+            shipment.update_time = now_time
+            shipment.save()
+        transaction.commit()
+        shipment_details = ShipmentDetails.objects.filter(
             shipment_no__in=message.get('shipment_nos'))
         details_dict = dict()
         picking_no = uuid.uuid4()
-        now_time = datetime.now()
         total_qty = 0
         for shipment_detail in shipment_details:
             if shipment_detail.code in details_dict:
@@ -791,7 +797,9 @@ def assemble_picking_orders(request):
                 )
                 details_dict[shipment_detail.code] = picking_detail
             total_qty += shipment_detail.qty
+        LOG.debug(details_dict)
         for picking_detail in details_dict.values():
+            LOG.debug('------->%s' % picking_detail)
             picking_detail.save()
         picking_details_srias = []
         for picking_detail in details_dict.values():
@@ -816,11 +824,6 @@ def assemble_picking_orders(request):
             status=0
         )
         picking_orders.save()
-        for shipment in shipments:
-            shipment.status = 2
-            shipment.updater = message.get('updater')
-            shipment.update_time = now_time
-            shipment.save()
         picking_orders_seria = PickingOrdersSerializer(picking_orders).data
         picking_orders_seria['details'] = picking_details_srias
         transaction.commit()
