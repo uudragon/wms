@@ -91,7 +91,7 @@ def check(request):
     LOG.info('Current received message is %s.' % message)
     
     try:
-        shipment = Shipment.objects.filter(shipment_no=message.get('shipment_no')).first()
+        shipment = Shipment.objects.select_for_update().filter(shipment_no=message.get('shipment_no')).first()
         if shipment is not None:
             ShipmentDetails.objects.filter(shipment_no=message.get('shipment_no')).delete()
             now_time = datetime.now()
@@ -111,8 +111,8 @@ def check(request):
                     create_time=now_time,
                     update_time=now_time
                 )
+                total_qty += rece_detail.get('qty')
                 shipment_detail.save()
-                total_qty += shipment_detail.qty
             shipment.shipped_qty = total_qty
             shipment.warehouse = message.get('warehouse')
             shipment.sent_date = datetime.strptime(message.get('sent_date'), '%Y-%m-%d')
@@ -120,7 +120,7 @@ def check(request):
             shipment.update_time = now_time
             shipment.status = 1
             shipment.save()
-            transaction.commit()
+        transaction.commit()
     except Exception as e:
         LOG.error('Check error. message is %s' % str(e))
         transaction.rollback()
