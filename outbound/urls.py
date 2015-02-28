@@ -6,7 +6,7 @@ __author__ = 'pluto'
 urlpatterns = patterns(
     'outbound.views',
     url(r'^split/$', 'split'),
-    url(r'^shipment/save/$', 'save_shipment'),
+    url(r'^save_shipment/$', 'save_shipment'),
     url(r'^shipment/amount_setting/$', 'set_orders_amount'),
     url(r'^shipments/$', 'query_shipments'),
     url(r'^picking_orders/create/$', 'assemble_picking_orders'),
