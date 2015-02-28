@@ -96,6 +96,7 @@ def check(request):
             ShipmentDetails.objects.filter(shipment_no=message.get('shipment_no')).delete()
             now_time = datetime.now()
             rece_details = message.get('details')
+            total_qty = 0
             for rece_detail in rece_details:
                 shipment_detail = ShipmentDetails(
                     id='%s%s' % (message.get('shipment_no'), rece_detail.get('code')),
@@ -111,6 +112,8 @@ def check(request):
                     update_time=now_time
                 )
                 shipment_detail.save()
+                total_qty += shipment_detail.qty
+            shipment.shipped_qty = total_qty
             shipment.warehouse = message.get('warehouse')
             shipment.sent_date = datetime.strptime(message.get('sent_date'), '%Y-%m-%d')
             shipment.updater = message.get('updater')
