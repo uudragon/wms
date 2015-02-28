@@ -899,11 +899,13 @@ def query_single_picking_orders(request, picking_no):
             picking_detail_seria = PickingOrdersDetailsSerializer(picking_detail)
             if picking_detail.is_product:
                 product = Product.objects.filter(product_code=picking_detail.code).first()
-                picking_detail_seria.name = product.product_name
+                name = product.product_name
             elif picking_detail.is_gift:
                 goods = Goods.objects.filter(goods_code=picking_detail.code).first()
-                picking_detail_seria.name = goods.goods_name
-            picking_details_srias.append(picking_detail_seria.data)
+                name = goods.goods_name
+            seria_data = picking_detail_seria.data
+            seria_data['name'] = name
+            picking_details_srias.append(seria_data)
         picking_orders_seria = PickingOrdersSerializer(picking_orders).data
         picking_orders_seria['details'] = picking_details_srias
     except Exception as e:
