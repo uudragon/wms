@@ -764,7 +764,7 @@ def assemble_picking_orders(request):
                 effective_nos.append(shipment.shipment_no)
         else:
             message.pop('shipment_nos')
-        if effective_nos.count() !=0:
+        if len(effective_nos) != 0:
             shipment_details = ShipmentDetails.objects.select_for_update().filter(shipment_no__in=effective_nos)
             details_dict = dict()
             picking_no = uuid.uuid4()
