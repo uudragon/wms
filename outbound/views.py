@@ -767,67 +767,62 @@ def assemble_picking_orders(request):
                         data={'error': 'Request attribute [shipment_nos] must be an array.'})
     try:
         shipments = Shipment.objects.select_for_update().filter(shipment_no__in=message.get('shipment_nos'))
-        effective_nos = []
+        shipment_details = ShipmentDetails.objects.select_for_update().filter(
+            shipment_no__in=message.get('shipment_nos'))
+        details_dict = dict()
+        picking_no = uuid.uuid4()
+        now_time = datetime.now()
+        total_qty = 0
+        for shipment_detail in shipment_details:
+            if shipment_detail.code in details_dict:
+                details_dict[shipment_detail.code].qty += shipment_detail.qty
+            else:
+                picking_detail = PickingOrdersDetails(
+                    id='%s%s' % (picking_no, shipment_detail.shipment_no),
+                    picking_no=picking_no,
+                    code=shipment_detail.code,
+                    is_product=shipment_detail.is_product,
+                    is_gift=shipment_detail.is_gift,
+                    qty=shipment_detail.qty,
+                    creator=message.get('creator'),
+                    create_time=now_time,
+                    updater=message.get('updater'),
+                    update_time=now_time
+                )
+                details_dict[shipment_detail.code] = picking_detail
+            total_qty += shipment_detail.qty
+        for picking_detail in details_dict.values():
+            picking_detail.save()
+        picking_details_srias = []
+        for picking_detail in details_dict.values():
+            picking_detail_seria = PickingOrdersDetailsSerializer(picking_detail)
+            if picking_detail.is_product:
+                product = Product.objects.filter(product_code=picking_detail.code).first()
+                name = product.product_name
+            elif picking_detail.is_gift:
+                goods = Goods.objects.filter(goods_code=picking_detail.code).first()
+                name = goods.goods_name
+            seria_data = picking_detail_seria.data
+            seria_data['name'] = name
+            picking_details_srias.append(seria_data)
+        LOG.debug('Total_qty is %s' % total_qty)
+        picking_orders = PickingOrders(
+            picking_no=picking_no,
+            picking_qty=total_qty,
+            creator=message.get('creator'),
+            create_time=now_time,
+            updater=message.get('updater'),
+            update_time=now_time,
+            status=0
+        )
+        picking_orders.save()
         for shipment in shipments:
-            if shipment.status == 1:
-                effective_nos.append(shipment.shipment_no)
-        else:
-            message.pop('shipment_nos')
-        if len(effective_nos) != 0:
-            shipment_details = ShipmentDetails.objects.select_for_update().filter(shipment_no__in=effective_nos)
-            details_dict = dict()
-            picking_no = uuid.uuid4()
-            now_time = datetime.now()
-            total_qty = 0
-            for shipment_detail in shipment_details:
-                if shipment_detail.code in details_dict:
-                    details_dict[shipment_detail.code].qty += shipment_detail.qty
-                else:
-                    picking_detail = PickingOrdersDetails(
-                        id='%s%s' % (picking_no, shipment_detail.shipment_no),
-                        picking_no=picking_no,
-                        code=shipment_detail.code,
-                        is_product=shipment_detail.is_product,
-                        is_gift=shipment_detail.is_gift,
-                        qty=shipment_detail.qty,
-                        creator=message.get('creator'),
-                        create_time=now_time,
-                        updater=message.get('updater'),
-                        update_time=now_time
-                    )
-                    details_dict[shipment_detail.code] = picking_detail
-                total_qty += shipment_detail.qty
-            picking_details_srias = []
-            for picking_detail in details_dict.values():
-                picking_detail.save()
-                picking_detail_seria = PickingOrdersDetailsSerializer(picking_detail)
-                if picking_detail.is_product:
-                    product = Product.objects.filter(product_code=picking_detail.code).first()
-                    name = product.product_name
-                elif picking_detail.is_gift:
-                    goods = Goods.objects.filter(goods_code=picking_detail.code).first()
-                    name = goods.goods_name
-                seria_data = picking_detail_seria.data
-                seria_data['name'] = name
-                picking_details_srias.append(seria_data)
-            LOG.debug('Total_qty is %s' % total_qty)
-            picking_orders = PickingOrders(
-                picking_no=picking_no,
-                picking_qty=total_qty,
-                creator=message.get('creator'),
-                create_time=now_time,
-                updater=message.get('updater'),
-                update_time=now_time,
-                status=0
-            )
-            picking_orders.save()
-            for shipment in shipments:
-                shipment.status = 2
-                shipment.updater = message.get('updater')
-                shipment.update_time = now_time
-                shipment.save()
-            picking_orders_seria = PickingOrdersSerializer(picking_orders).data
-            picking_orders_seria['details'] = picking_details_srias
+            shipment.status = 2
+            shipment.updater = message.get('updater')
+            shipment.update_time = now_time
+            shipment.save()
+        picking_orders_seria = PickingOrdersSerializer(picking_orders).data
+        picking_orders_seria['details'] = picking_details_srias
         transaction.commit()
     except Exception as e:
         LOG.error('Assemble picking_orders error. [ERROR] is %s' % str(e))
