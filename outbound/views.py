@@ -9,7 +9,6 @@ from django.db import transaction
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-import time
 from big_house.models import ProductDetails, ShipmentDetails, Shipment, ProductPackageDetails, Product, Goods, \
     WarehouseGoodsDetails, WarehouseProductDetails, StorageRecords, PickingOrdersDetails, PickingOrders
 from big_house.serializers import ShipmentDetailsSerializer, ShipmentSerializer, PickingOrdersSerializer, \
@@ -111,7 +110,8 @@ def check(request):
                     create_time=now_time,
                     update_time=now_time
                 )
-                total_qty += rece_detail.get('qty')
+                LOG.debug(type(shipment_detail.qty))
+                total_qty += shipment_detail.qty
                 shipment_detail.save()
             shipment.shipped_qty = total_qty
             shipment.warehouse = message.get('warehouse')
