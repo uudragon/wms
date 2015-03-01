@@ -658,6 +658,7 @@ def picking_completed(request, picking_no):
                     status=0
                 )
                 storage_record.save()
+            shipment.save()
         transaction.commit()
     except Exception as e:
         LOG.error('Shipment picking error, message is %s' % str(e))
