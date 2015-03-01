@@ -6,6 +6,7 @@ import logging
 import uuid
 from django.core.paginator import Paginator
 from django.db import transaction
+from django.db.models import Q
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -214,6 +215,58 @@ def query_shipment(request, shipment_no):
                         data={'error': 'Query shipment information error'},
                         content_type='application/json;charset=utf-8')
     return Response(status=status.HTTP_200_OK, data=shipment_seria, content_type='application/json;charset=utf-8')
+
+
+@api_view(['POST'])
+@transaction.commit_manually
+def modify_shipment_by_orderno(request, orders_no):
+    orders_no = orders_no
+
+    LOG.info('Current received orders_no is %s' % orders_no)
+
+    if orders_no is None:
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'Attribute[\'orders_no\'] can not be none.'})
+    message = request.DATA
+    
+    LOG.info('Current method [modify_shipment_by_orderno], received message is %s' % message)
+
+    if message.get('address') is None:
+        LOG.error('Attribute[\'address\'] can not be none.')
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'Attribute[\'address\'] can not be none.'})
+    if message.get('customer_tel') is None:
+        LOG.error('Attribute[\'customer_tel\'] can not be none.')
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'Attribute[\'customer_tel\'] can not be none.'})
+    if message.get('updater') is None:
+        LOG.error('Attribute[\'updater\'] can not be none.')
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'Attribute[\'updater\'] can not be none.'})
+    try:
+        shipments = Shipment.objects.select_for_update().filter(Q(status=0) | Q(status=1)).filter(orders_no=orders_no)
+        LOG.debug('Current count of shipments is %s' % len(shipments))
+        
+        now_time = datetime.now()
+        
+        for shipment in shipments:
+            shipment.address = message.get('address')
+            shipment.courier_tel = message.get('customer_tel')
+            shipment.update_time = now_time
+            shipment.updater = message.get('updater')
+            shipment.save()
+        transaction.commit()
+    except Exception as e:
+        LOG.error('Query shipment by orders_no error. [ERROR] %s' % str(e))
+        transaction.rollback()
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={'error': 'Query shipment by orders_no error.'},
+                        content_type='application/json;charset=utf-8')
+    return Response(status=status.HTTP_200_OK)
 
 
 @api_view(['GET'])
