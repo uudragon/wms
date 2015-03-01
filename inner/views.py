@@ -75,6 +75,10 @@ def picking(request, warehouse_code):
     message = request.DATA
     LOG.info('Current warehouse_code is %s, received message is %s' % (warehouse_code, message))
 
+    if warehouse_code is None:
+        warehouse = Warehouse.objects.filter(type=1).first()
+        warehouse_code = warehouse.warehouse_code
+
     product_code = message.get('product_code')
     if product_code is None:
         return Response(status=status.HTTP_400_BAD_REQUEST,
