@@ -12,6 +12,7 @@
 - [生成拣货单](#111-url)
 - [批量查询拣货单](#121-url)
 - [按拣货单号查询拣货明细](#131-url)
+- [按订单号修改拣货单信息](#141-url)
 
 ----
 #####1.订单拆分接口
@@ -1019,6 +1020,52 @@ qty|int|Y|数量
 	        'qty':10
 	    }]
 	}
+
+异常响应：
+
+	a．	HTTP_STATUS_CODE:400 Bad request；
+	b．	HTTP_STATUS_CODE:500 Server Error
+
+异常报文：
+
+名称 | 类型 | 说明
+------------ | ------------- | ------------
+error| String  | 错误信息
+
+样例报文：
+
+	{‘error’:’Shipments query error.’}
+
+----
+#####14.按订单号查询出库单信息
+按给定的订单号查询对应的出库单信息
+######14.1 url
+	method: POST
+	wms/outbound/shipments/modify_by_orders/${orders_no}/
+	注意：结尾的’/’不能省略, ${orders_no}为出库单号
+######14.2 header
+	Content_Type:application/json;charset=utf-8
+	Accept:application/json
+######14.3 请求参数
+
+名称|类型|是否必填|说明
+---|---|---|---
+address|String|Y|客户地址
+customer_tel|String|Y|客户电话
+updater|String|Y|修改人
+
+样例报文：
+
+	{
+	    'address':'北京天安门',
+	    'customer_tel':'18600000000',
+	    'updater':'admin'
+	}
+
+######14.4 响应报文
+成功响应：
+
+	HTTP_STATUS_CODE:200
 
 异常响应：
 
