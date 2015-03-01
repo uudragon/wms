@@ -208,11 +208,13 @@ def query_records(request, warehouse_code):
 
 @api_view(['POST'])
 def query_goods(request, warehouse_code):
-    warehouse = warehouse_code
-
     message = request.DATA
 
-    LOG.info('Current query warehouse is %s, received message is %s' % (warehouse, message))
+    LOG.info('Current query warehouse is %s, received message is %s' % (warehouse_code, message))
+    
+    if warehouse_code is None:
+        warehouse = Warehouse.objects.filter(type=1).first()
+        warehouse_code = warehouse.warehouse_code
 
     pageSize = message.pop('pageSize')
     if pageSize is None or pageSize == 0:
@@ -230,7 +232,7 @@ def query_goods(request, warehouse_code):
             select={'warehouse_name': 't_warehouse.name', 'goods_name': 't_goods.goods_name'},
             tables=['t_warehouse', 't_goods'],
             where=['t_w_goods_details.warehouse=t_warehouse.code',
-                   't_w_goods_details.goods_code=t_goods.goods_code']).filter(**message).filter(warehouse=warehouse)
+                   't_w_goods_details.goods_code=t_goods.goods_code']).filter(**message).filter(warehouse=warehouse_code)
         paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
         total_page_count = paginator.num_pages
         if pageNo > total_page_count:
@@ -259,11 +261,13 @@ def query_goods(request, warehouse_code):
 
 @api_view(['POST'])
 def query_products(request, warehouse_code):
-    warehouse = warehouse_code
-
     message = request.DATA
 
-    LOG.info('Current query warehouse is %s, received message is %s' % (warehouse, message))
+    LOG.info('Current query warehouse is %s, received message is %s' % (warehouse_code, message))
+
+    if warehouse_code is None:
+        warehouse = Warehouse.objects.filter(type=1).first()
+        warehouse_code = warehouse.warehouse_code
 
     pageSize = message.pop('pageSize')
     if pageSize is None or pageSize == 0:
@@ -282,7 +286,7 @@ def query_products(request, warehouse_code):
             tables=['t_warehouse', 't_product'],
             where=['t_w_product_details.warehouse=t_warehouse.code',
                    't_w_product_details.product_code=t_product.product_code']).filter(**message).filter(
-            warehouse=warehouse)
+            warehouse=warehouse_code)
         paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
         total_page_count = paginator.num_pages
         if pageNo > total_page_count:
