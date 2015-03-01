@@ -78,6 +78,7 @@ def picking(request, warehouse_code):
     if warehouse_code is None:
         warehouse = Warehouse.objects.filter(type=1).first()
         warehouse_code = warehouse.warehouse_code
+        LOG.debug('Current main warehouse is %s' % warehouse_code)
 
     product_code = message.get('product_code')
     if product_code is None:
