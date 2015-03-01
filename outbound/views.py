@@ -648,7 +648,7 @@ def picking_completed(request, picking_no):
                 storage_record = StorageRecords(
                     goods_code=goods_code,
                     goods_qty=qty,
-                    code=message.get('shipment_no'),
+                    code=shipment.shipment_no,
                     warehouse=shipment.warehouse,
                     type=STORAGE_RECORD_TYPE_OUTPUT,
                     create_time=now_time,
