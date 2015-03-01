@@ -724,23 +724,24 @@ def sent(request):
     LOG.info('Current received message is %s' % message)
     try:
         now_time = datetime.now()
-        shipment = Shipment.objects.select_for_update().filter(shipment_no=message.get('shipment_no')).first()
-        shipment.express_code = message.get('express_code')
-        shipment.express_orders_no = message.get('express_orders_no')
-        shipment.express_name = message.get('express_name')
-        shipment.express_cost = message.get('express_cost')
-        shipment.courier = message.get('courier')
-        shipment.courier_tel = message.get('courier_tel')
-        shipment.status = 4
-        shipment.updater = message.get('updater')
-        shipment.update_time = now_time
-        shipment.save()
-        records = StorageRecords.objects.filter(code=message.get('shipment_no'))
-        for record in records:
-            record.status = 1
-            record.updater = message.get('updater')
-            record.update_time = now_time
-            record.save()
+        shipment = Shipment.objects.select_for_update().filter(shipment_no=message.get('shipment_no'), status=3).first()
+        if shipment is not None:
+            shipment.express_code = message.get('express_code')
+            shipment.express_orders_no = message.get('express_orders_no')
+            shipment.express_name = message.get('express_name')
+            shipment.express_cost = message.get('express_cost')
+            shipment.courier = message.get('courier')
+            shipment.courier_tel = message.get('courier_tel')
+            shipment.status = 4
+            shipment.updater = message.get('updater')
+            shipment.update_time = now_time
+            shipment.save()
+            records = StorageRecords.objects.filter(code=message.get('shipment_no'))
+            for record in records:
+                record.status = 1
+                record.updater = message.get('updater')
+                record.update_time = now_time
+                record.save()
         transaction.commit()
     except Exception as e:
         LOG.error('Sent error, message is %s' % str(e))
