@@ -724,7 +724,7 @@ def sent(request):
     LOG.info('Current received message is %s' % message)
     try:
         now_time = datetime.now()
-        shipment = Shipment.objects.filter(shipment_no=message.get('shipment_no'), status=3).first()
+        shipment = Shipment.objects.select_for_update().filter(shipment_no=message.get('shipment_no')).first()
         shipment.express_code = message.get('express_code')
         shipment.express_orders_no = message.get('express_orders_no')
         shipment.express_name = message.get('express_name')
