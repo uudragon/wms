@@ -116,7 +116,7 @@ def picking(request, warehouse_code):
             else:
                 picking_qty = qtys[0]
 
-            picking_count = message.get('picking_count')
+            picking_count = int(message.get('picking_count'))
             if picking_count > picking_qty:
                 raise Exception('The picking_count is error, valid is %s, but now is %s' % (picking_qty, picking_count))
                 
