@@ -75,7 +75,7 @@ def picking(request, warehouse_code):
     message = request.DATA
     LOG.info('Current warehouse_code is %s, received message is %s' % (warehouse_code, message))
 
-    if warehouse_code is None:
+    if warehouse_code is None or warehouse_code == 'undefined':
         warehouse = Warehouse.objects.filter(type=1).first()
         warehouse_code = warehouse.warehouse_code
         LOG.debug('Current main warehouse is %s' % warehouse_code)
