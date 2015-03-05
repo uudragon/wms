@@ -694,7 +694,7 @@ def query_agency_package(request):
 
     resp_array = []
     try:
-        packages = ProductPackage.objects.filter(package_type=2).values(['package_code', 'package_name'])
+        packages = ProductPackage.objects.filter(package_type=2).values('package_code,package_name')
         for package in packages:
             seria = ProductPackageSerializer(package)
             resp_array.append(seria)
@@ -712,7 +712,7 @@ def query_site_package(request):
 
     resp_array = []
     try:
-        packages = ProductPackage.objects.filter(package_type=1).values(['package_code', 'package_name'])
+        packages = ProductPackage.objects.filter(package_type=1).values('package_code,package_name')
         for package in packages:
             seria = ProductPackageSerializer(package)
             resp_array.append(seria)
