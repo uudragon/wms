@@ -23,6 +23,7 @@ class ProductPackage(models.Model):
     package_code = models.CharField(db_column='PACKAGE_CODE', null=False, max_length=36, unique=True)
     package_name = models.CharField(db_column='PACKAGE_NAME', null=False, max_length=100)
     package_desc = models.CharField(db_column='PACKAGE_DESC', null=False, max_length=255)
+    package_type = models.IntegerField(db_column='PACKAGE_TYPE', null=False, max_length=4, default=1)
     create_time = models.DateTimeField(db_column='CREATE_TIME', null=False, auto_now_add=True)
     creator = models.CharField(db_column='CREATOR', null=False, max_length=50)
     update_time = models.DateTimeField(db_column='UPDATE_TIME', auto_now=True)

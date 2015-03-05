@@ -15,6 +15,8 @@ urlpatterns = patterns(
     url(r'^warehouses/$', 'query_warehouse_list'),
     url(r'^warehouse/(.+)/$', 'query_warehouse'),
     url(r'^package/save/$', 'save_package'),
+    url(r'^packages/agency/$', 'query_agency_package'),
+    url(r'^packages/site/$', 'query_site_package'),
     url(r'^package/(.+)/$', 'query_package'),
     url(r'^packages/$', 'query_packages'),
     url(r'^packages_all/$', 'query_packages_all'),

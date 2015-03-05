@@ -686,3 +686,39 @@ def query_goods_group_list(request):
                         data={'error': 'Query goods groups information error'},
                         content_type='application/json;charset=utf-8')
     return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset=utf-8')
+
+
+@api_view(['GET'])
+def query_agency_package(request):
+    LOG.info('Current method is [query_agency_package]')
+
+    resp_array = []
+    try:
+        packages = ProductPackage.objects.filter(package_type=2).values(['package_code', 'package_name'])
+        for package in packages:
+            seria = ProductPackageSerializer(package)
+            resp_array.append(seria)
+    except Exception as e:
+        LOG.error('Query agency packages error. [ERROR] %s' % str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={'error': 'Query agency packages error.'},
+                        content_type='application/json;charset=utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_array, content_type='application/json;charset=utf-8')
+
+
+@api_view(['GET'])
+def query_site_package(request):
+    LOG.info('Current method is [query_site_package]')
+
+    resp_array = []
+    try:
+        packages = ProductPackage.objects.filter(package_type=1).values(['package_code', 'package_name'])
+        for package in packages:
+            seria = ProductPackageSerializer(package)
+            resp_array.append(seria)
+    except Exception as e:
+        LOG.error('Query site packages error. [ERROR] %s' % str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={'error': 'Query site packages error.'},
+                        content_type='application/json;charset=utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_array, content_type='application/json;charset=utf-8')
