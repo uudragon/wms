@@ -697,8 +697,8 @@ def query_agency_package(request):
         packages = ProductPackage.objects.filter(package_type=2).values('package_code', 'package_name')
         for package in packages:
             rst = dict()
-            rst['package_code'] = package.package_code
-            rst['package_name'] = package.package_name
+            rst['package_code'] = package['package_code']
+            rst['package_name'] = package['package_name']
             resp_array.append(rst)
     except Exception as e:
         LOG.error('Query agency packages error. [ERROR] %s' % str(e))
@@ -717,8 +717,8 @@ def query_site_package(request):
         packages = ProductPackage.objects.filter(package_type=1).values('package_code', 'package_name')
         for package in packages:
             rst = dict()
-            rst['package_code'] = package.package_code
-            rst['package_name'] = package.package_name
+            rst['package_code'] = package['package_code']
+            rst['package_name'] = package['package_name']
             resp_array.append(rst)
     except Exception as e:
         LOG.error('Query site packages error. [ERROR] %s' % str(e))
