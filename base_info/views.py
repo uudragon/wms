@@ -529,6 +529,7 @@ def save_package(request):
             package.package_name = message.get('package_name')
             package.package_code = message.get('package_code')
             package.package_desc = message.get('package_desc')
+            package.package_price = message.get('package_price')
             package.updater = message.get('updater')
             package.update_time = datetime.now()
             package.yn = message.get('yn')
@@ -538,6 +539,7 @@ def save_package(request):
                 package_name=message.get('package_name'),
                 package_code=message.get('package_code'),
                 package_desc=message.get('package_desc'),
+                package_price=message.get('package_price'),
                 creator=message.get('creator'),
                 create_time=nowTime,
                 updater=message.get('updater'),
@@ -694,7 +696,7 @@ def query_agency_package(request):
 
     resp_array = []
     try:
-        packages = ProductPackage.objects.filter(package_type=2).values('package_code', 'package_name')
+        packages = ProductPackage.objects.filter(package_type=2).values('package_code', 'package_name', 'package_price')
         for package in packages:
             rst = dict()
             rst['package_code'] = package['package_code']
@@ -714,7 +716,7 @@ def query_site_package(request):
 
     resp_array = []
     try:
-        packages = ProductPackage.objects.filter(package_type=1).values('package_code', 'package_name')
+        packages = ProductPackage.objects.filter(package_type=1).values('package_code', 'package_name', 'package_price')
         for package in packages:
             rst = dict()
             rst['package_code'] = package['package_code']
