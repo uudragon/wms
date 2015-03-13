@@ -701,6 +701,7 @@ def query_agency_package(request):
             rst = dict()
             rst['package_code'] = package['package_code']
             rst['package_name'] = package['package_name']
+            rst['package_price'] = package['package_price']
             resp_array.append(rst)
     except Exception as e:
         LOG.error('Query agency packages error. [ERROR] %s' % str(e))
@@ -721,6 +722,7 @@ def query_site_package(request):
             rst = dict()
             rst['package_code'] = package['package_code']
             rst['package_name'] = package['package_name']
+            rst['package_price'] = package['package_price']
             resp_array.append(rst)
     except Exception as e:
         LOG.error('Query site packages error. [ERROR] %s' % str(e))
