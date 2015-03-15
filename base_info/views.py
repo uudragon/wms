@@ -696,7 +696,8 @@ def query_agency_package(request):
 
     resp_array = []
     try:
-        packages = ProductPackage.objects.filter(package_type=2).values('package_code', 'package_name', 'package_price')
+        packages = ProductPackage.objects.filter(package_type=2).order_by('package_name').values(
+            'package_code', 'package_name', 'package_price')
         for package in packages:
             rst = dict()
             rst['package_code'] = package['package_code']
@@ -717,7 +718,8 @@ def query_site_package(request):
 
     resp_array = []
     try:
-        packages = ProductPackage.objects.filter(package_type=1).values('package_code', 'package_name', 'package_price')
+        packages = ProductPackage.objects.filter(package_type=1).order_by('package_name').values(
+            'package_code', 'package_name', 'package_price')
         for package in packages:
             rst = dict()
             rst['package_code'] = package['package_code']
