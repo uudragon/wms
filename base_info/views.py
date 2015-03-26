@@ -713,6 +713,28 @@ def query_agency_package(request):
 
 
 @api_view(['GET'])
+def query_agency_orders_package(request):
+    LOG.info('Current method is [query_agency_package]')
+
+    resp_array = []
+    try:
+        packages = ProductPackage.objects.filter(package_type=3).order_by('package_name').values(
+            'package_code', 'package_name', 'package_price')
+        for package in packages:
+            rst = dict()
+            rst['package_code'] = package['package_code']
+            rst['package_name'] = package['package_name']
+            rst['package_price'] = package['package_price']
+            resp_array.append(rst)
+    except Exception as e:
+        LOG.error('Query agency packages error. [ERROR] %s' % str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        data={'error': 'Query agency packages error.'},
+                        content_type='application/json;charset=utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_array, content_type='application/json;charset=utf-8')
+
+
+@api_view(['GET'])
 def query_site_package(request):
     LOG.info('Current method is [query_site_package]')
 
