@@ -528,6 +528,7 @@ def save_package(request):
             ProductPackageDetails.objects.filter(package_code=package_code).delete()
             package.package_name = message.get('package_name')
             package.package_code = message.get('package_code')
+            package.package_type = message.get('package_type')
             package.package_desc = message.get('package_desc')
             package.package_price = message.get('package_price')
             package.updater = message.get('updater')
@@ -540,6 +541,7 @@ def save_package(request):
                 package_code=message.get('package_code'),
                 package_desc=message.get('package_desc'),
                 package_price=message.get('package_price'),
+                package_type=message.get('package_type'),
                 creator=message.get('creator'),
                 create_time=nowTime,
                 updater=message.get('updater'),
