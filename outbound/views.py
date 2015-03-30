@@ -40,6 +40,7 @@ def save_shipment(request):
             shipment = Shipment(
                 shipment_no=message.get('shipment_no'),
                 orders_no=message.get('orders_no'),
+                source=int(message.get('source')) if message.get('source') is not None else 1,
                 customer_no=message.get('customer_code'),
                 customer_name=message.get('customer_name'),
                 address=message.get('address'),
@@ -474,6 +475,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}, sent_date=N
                 shipment_no=shipment_no,
                 warehouse=warehouse_no,
                 orders_no=message.get('orders_no'),
+                agent_code=message.get('agent_code') if message.get('agent_code') is not None else None,
                 customer_no=message.get('customer_code'),
                 customer_name=message.get('customer_name'),
                 address=message.get('address'),
@@ -525,6 +527,7 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}, sent_date=N
                 shipment_no=shipment_no,
                 warehouse=warehouse_no,
                 orders_no=message.get('orders_no'),
+                agent_code=message.get('agent_code') if message.get('agent_code') is not None else None,
                 customer_no=message.get('customer_code'),
                 customer_name=message.get('customer_name'),
                 address=message.get('address'),
