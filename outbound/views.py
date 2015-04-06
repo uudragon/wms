@@ -383,44 +383,46 @@ def split(request):
             strptime = strptime + dtime.timedelta(days=2)
         else:
             strptime = strptime + dtime.timedelta(days=monthrange(strptime.year, strptime.month)[1])
-        effective_month = strptime.month
+        # effective_month = strptime.month
+        # num = 0
         in_one_list = []
-        num = 0
-        if effective_month in (9, 10, 11):
-            LOG.info('Effective_month are 9, 10, 11')
-            in_one_list = []
-        elif effective_month == 12:
-            LOG.info('Effective_month is 12')
-            num = 2
-        elif effective_month == 1:
-            num = 3
-        elif effective_month == 2:
-            num = 4
-        elif effective_month == 3:
-            LOG.info('Effective_month is 3')
-            num = 5
-        elif effective_month == 4:
-            LOG.info('Effective_month is 4')
-            num = 6
-        elif effective_month == 5:
-            LOG.info('Effective_month is 5')
-            num = 7
-        elif effective_month == 6:
-            LOG.info('Effective_month is 6')
-            num = 8
-        elif effective_month == 7:
-            LOG.info('Effective_month is 7')
-            num = 9
-        else:
-            LOG.info('Effective_month is 8')
-            in_one_list = products_dict.values()
-            products_dict.clear()
-        for i in range(num):
-            index = i + 1
-            if index in products_dict:
-                item = products_dict.pop(index)
-                LOG.debug('Current item is %s' % item)
-                in_one_list.append(item)
+        # 2015-04-05 dont split orders as old rules
+        # Split as month whhich count equals count of products.
+        # if effective_month in (9, 10, 11):
+        #     LOG.info('Effective_month are 9, 10, 11')
+        #     in_one_list = []
+        # elif effective_month == 12:
+        #     LOG.info('Effective_month is 12')
+        #     num = 2
+        # elif effective_month == 1:
+        #     num = 3
+        # elif effective_month == 2:
+        #     num = 4
+        # elif effective_month == 3:
+        #     LOG.info('Effective_month is 3')
+        #     num = 5
+        # elif effective_month == 4:
+        #     LOG.info('Effective_month is 4')
+        #     num = 6
+        # elif effective_month == 5:
+        #     LOG.info('Effective_month is 5')
+        #     num = 7
+        # elif effective_month == 6:
+        #     LOG.info('Effective_month is 6')
+        #     num = 8
+        # elif effective_month == 7:
+        #     LOG.info('Effective_month is 7')
+        #     num = 9
+        # else:
+        #     LOG.info('Effective_month is 8')
+        #     in_one_list = products_dict.values()
+        #     products_dict.clear()
+        # for i in range(num):
+        #     index = i + 1
+        #     if index in products_dict:
+        #         item = products_dict.pop(index)
+        #         LOG.debug('Current item is %s' % item)
+        #         in_one_list.append(item)
         shipments = assemble_shipments(in_one_list, products_dict, message, strptime)
     except Exception as e:
         LOG.error('Orders split error.\n [ERROR]:%s' % str(e))
