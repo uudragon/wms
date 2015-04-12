@@ -37,16 +37,17 @@ def save_shipment(request):
             shipment.updater = message.get('updater')
             shipment.update_time = now_time
         else:
+            warehouse = Warehouse.objects.filter(type=1).first()
             shipment = Shipment(
                 shipment_no=message.get('shipment_no'),
                 orders_no=message.get('orders_no'),
+                warehouse=warehouse.warehouse_code,
                 source=int(message.get('source')) if message.get('source') is not None else 1,
                 customer_no=message.get('customer_code'),
                 customer_name=message.get('customer_name'),
                 address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
                 has_invoice=int(message.get('has_invoice')),
-                sent_date=datetime.strptime(message.get('sent_date'), '%Y-%m-%d'),
                 amount=message.get('amount'),
                 create_time=now_time,
                 creator=message.get('creator'),
