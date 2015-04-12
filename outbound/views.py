@@ -55,7 +55,7 @@ def save_shipment(request):
                 creator=message.get('creator'),
                 update_time=now_time,
                 updater=message.get('updater'),
-                status=0
+                status=1
             )
         rece_details = message.get('details')
         total_qty = 0
@@ -67,7 +67,7 @@ def save_shipment(request):
                 is_product=rece_detail.get('is_product'),
                 is_gift=rece_detail.get('is_gift'),
                 qty=rece_detail.get('qty'),
-                status=1,
+                status=0,
                 creator=message.get('updater'),
                 updater=message.get('updater'),
                 create_time=now_time,
