@@ -43,7 +43,7 @@ def save_shipment(request):
                 orders_no=message.get('orders_no'),
                 warehouse=warehouse.warehouse_code,
                 source=int(message.get('source')) if message.get('source') is not None else 1,
-                customer_no=message.get('customer_code'),
+                customer_no=message.get('customer_no'),
                 customer_name=message.get('customer_name'),
                 address=message.get('address'),
                 customer_tel=message.get('customer_tel'),
