@@ -975,7 +975,7 @@ def merge_shipments(request):
 
     LOG.info('Current method is [merge_shipments], received message is %s' % message)
 
-    shipment_nos = message('shipment_nos')
+    shipment_nos = message.get('shipment_nos')
     if shipment_nos is None or len(shipment_nos) == 0:
         LOG.error('Attribute[\'shipment_nos\'] can not be empty.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
