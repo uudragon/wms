@@ -1090,7 +1090,7 @@ error| String  | 错误信息
 合并后的出库单发货日期以原出库单中最早发货时间为准。
 ######15.1 url
 	method: POST
-	wms/outbound/shipments/merge/
+	wms/outbound/shipment/merge/
 	注意：结尾的’/’不能省略
 ######15.2 header
 	Content_Type:application/json;charset=utf-8
