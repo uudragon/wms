@@ -17,6 +17,7 @@ urlpatterns = patterns(
     url(r'^picking_orders/$', 'query_picking_orders_list'),
     url(r'^picking_orders/query_shipments/(.+)/$', 'query_shipments_by_picking_no'),
     url(r'^shipment/sent/$', 'sent'),
+    url(r'^shipment/merge/$', 'merge_shipments'),
     url(r'^shipments/orders(.+)/$', 'query_by_ordersno'),
     url(r'^picking_orders/(.+)/$', 'query_single_picking_orders'),
     url(r'^shipment/(.+)/$', 'query_shipment'),

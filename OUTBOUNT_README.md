@@ -13,6 +13,7 @@
 - [批量查询拣货单](#121-url)
 - [按拣货单号查询拣货明细](#131-url)
 - [按订单号修改拣货单信息](#141-url)
+- [合并出库单](#151-url)
 
 ----
 #####1.订单拆分接口
@@ -1063,6 +1064,52 @@ updater|String|Y|修改人
 	}
 
 ######14.4 响应报文
+成功响应：
+
+	HTTP_STATUS_CODE:200
+
+异常响应：
+
+	a．	HTTP_STATUS_CODE:400 Bad request；
+	b．	HTTP_STATUS_CODE:500 Server Error
+
+异常报文：
+
+名称 | 类型 | 说明
+------------ | ------------- | ------------
+error| String  | 错误信息
+
+样例报文：
+
+	{‘error’:’Shipments query error.’}
+
+
+----
+#####15.合并出库单
+按照给定的出库单号合并出库单，待合并的出库单状态为“为审核状态”。如果给定的出库单号包含其它状态则系统自动过滤。
+合并后的出库单发货日期以原出库单中最早发货时间为准。
+######15.1 url
+	method: POST
+	wms/outbound/shipments/merge/
+	注意：结尾的’/’不能省略
+######15.2 header
+	Content_Type:application/json;charset=utf-8
+	Accept:application/json
+######15.3 请求参数
+
+名称|类型|是否必填|说明
+---|---|---|---
+shipment_nos|Array|Y|出库单号列表
+updater|String|Y|修改人
+
+样例报文：
+
+	{
+	    'shipment_nos':['0001','0002'],
+	    'updater':'admin'
+	}
+
+######15.4 响应报文
 成功响应：
 
 	HTTP_STATUS_CODE:200

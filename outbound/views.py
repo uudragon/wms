@@ -967,3 +967,56 @@ def query_single_picking_orders(request, picking_no):
                         date={'error': 'Query picking_orders error.'})
     return Response(status=status.HTTP_200_OK, data=picking_orders_seria, content_type='application/json;charset=utf-8')
 
+
+@api_view(['POST'])
+@transaction.commit_manually
+def merge_shipments(request):
+    message = request.DATA
+
+    LOG.info('Current method is [merge_shipments], received message is %s' % message)
+
+    shipment_nos = message('shipment_nos')
+    if shipment_nos is None or len(shipment_nos) == 0:
+        LOG.error('Attribute[\'shipment_nos\'] can not be empty.')
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'Attribute[\'shipment_nos\'] can not be empty.'})
+    updater = message.get('updater')
+    if updater is None:
+        LOG.error('Attribute[\'updater\'] can not be none.')
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'Attribute[\'updater\'] can not be none.'})
+    now_time = datetime.now()
+    try:
+        shipment = Shipment.objects.filter(shipment_no__in=shipment_nos).filter(
+            status=0).order_by('sent_date').first()
+        shipment_nos.remove(shipment.shipment_no)
+        shipment_details = ShipmentDetails.objects.filter(shipment_no__in=shipment_nos).filter(status=0)
+        Shipment.objects.filter(shipment_no__in=shipment_nos).filter(status=0).delete()
+        ShipmentDetails.objects.filter(shipment_no__in=shipment_nos).filter(status=0).delete()
+        for detail in shipment_details:
+            detail = ShipmentDetails(
+                id="%s%s" % (shipment.shipment_no, detail.code),
+                shipment_no=shipment.shipment_no,
+                code=detail.code,
+                qty=detail.qty,
+                is_product=detail.is_product,
+                is_gift=detail.is_gift,
+                create_time=now_time,
+                creator=updater,
+                update_time=now_time,
+                updater=updater,
+                status=0
+            )
+            detail.save()
+        shipment.update_time = now_time
+        shipment.save()
+        transaction.commit()
+    except Exception as e:
+        LOG.error('Merge shipments error. [ERROR] is %s' % str(e))
+        transaction.rollback()
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        content_type='application/json;charset=utf-8',
+                        date={'error': 'Merge shipments error.'})
+    return Response(status=status.HTTP_200_OK)
