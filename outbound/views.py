@@ -993,7 +993,6 @@ def merge_shipments(request):
             status=0).order_by('sent_date').first()
         shipment_nos.remove(shipment.shipment_no)
         shipment_details = ShipmentDetails.objects.filter(shipment_no__in=shipment_nos).filter(status=0)
-        Shipment.objects.filter(shipment_no__in=shipment_nos).filter(status=0).delete()
         ShipmentDetails.objects.filter(shipment_no__in=shipment_nos).filter(status=0).delete()
         for detail in shipment_details:
             detail = ShipmentDetails(
@@ -1012,6 +1011,14 @@ def merge_shipments(request):
             detail.save()
         shipment.update_time = now_time
         shipment.save()
+        Shipment.objects.filter(shipment_no__in=shipment_nos).filter(status=0).delete()
+        another = Shipment.objects.filter(shipment_no__ne=shipment.shipment_no).order_by('sent_date')
+        cur_date = shipment.sent_date
+        for item in another:
+            item.sent_date = cur_date + dtime.timedelta(day=monthrange(cur_date.year, cur_date.month)[1])
+            cur_date = item.sent_date
+            LOG.debug('Sent_date updated [%s]' % item.sent_date)
+            item.save()
         transaction.commit()
     except Exception as e:
         LOG.error('Merge shipments error. [ERROR] is %s' % str(e))
