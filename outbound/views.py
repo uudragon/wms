@@ -1015,7 +1015,7 @@ def merge_shipments(request):
         another = Shipment.objects.exclude(shipment_no=shipment.shipment_no).filter(orders_no=shipment.orders_no).order_by('sent_date')
         cur_date = shipment.sent_date
         for item in another:
-            item.sent_date = cur_date + dtime.timedelta(day=monthrange(cur_date.year, cur_date.month)[1])
+            item.sent_date = cur_date + dtime.timedelta(days=monthrange(cur_date.year, cur_date.month)[1])
             cur_date = item.sent_date
             LOG.debug('Sent_date updated [%s]' % item.sent_date)
             item.save()
