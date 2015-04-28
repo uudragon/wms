@@ -993,7 +993,6 @@ def merge_shipments(request):
             status=0).order_by('sent_date').first()
         shipment_nos.remove(shipment.shipment_no)
         shipment_details = ShipmentDetails.objects.filter(shipment_no__in=shipment_nos).filter(status=0)
-        ShipmentDetails.objects.filter(shipment_no__in=shipment_nos).filter(status=0).delete()
         for detail in shipment_details:
             detail = ShipmentDetails(
                 id="%s%s" % (shipment.shipment_no, detail.code),
@@ -1011,6 +1010,7 @@ def merge_shipments(request):
             detail.save()
         shipment.update_time = now_time
         shipment.save()
+        ShipmentDetails.objects.filter(shipment_no__in=shipment_nos).filter(status=0).delete()
         Shipment.objects.filter(shipment_no__in=shipment_nos).filter(status=0).delete()
         another = Shipment.objects.exclude(shipment_no=shipment.shipment_no).filter(orders_no=shipment.orders_no).order_by('sent_date')
         cur_date = shipment.sent_date
