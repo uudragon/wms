@@ -21,3 +21,12 @@ INBOUND_RECEIPT_DETAIL_STATUS_COMPLETED = 2
 #BILL TYPE
 STORAGE_RECORD_TYPE_RECEIPT = 1
 STORAGE_RECORD_TYPE_OUTPUT = 5
+
+CLIENT_ID = 'K10101010'
+PRIVATE_KEY = '123456'
+LOGISTIC_PROVIDER_ID = 'YTO'
+
+TO_SENDER_REQUEST_HEADERS = {'content-type': 'application/x-www-form-urlencoded',
+                        'Accept': 'application/x-www-form-urlencoded'}
+
+SENDER_SERVICE_API = 'http://58.32.246.71:8088/CommonOrderModeBServlet.action'

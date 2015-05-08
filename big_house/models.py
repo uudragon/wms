@@ -3,6 +3,19 @@ from django.db import models
 # Create your models here.
 
 
+class Contact(models.Model):
+    id = models.CharField(db_column='ID', primary_key=True, max_length=72)
+    name = models.CharField(db_column='name', null=False, max_length=255)
+    prov = models.CharField(db_column='prov', null=False, max_length=64)
+    city = models.CharField(db_column='city', null=False, max_length=64)
+    address = models.CharField(db_column='address', null=False, max_length=255)
+    post = models.CharField(db_column='post', null=False, max_length=20)
+    tel = models.CharField(db_column='tel', null=False, max_length=20)
+
+    class Meta:
+        db_table = 'T_CONTACT'
+
+
 class GoodsGroup(models.Model):
     id = models.AutoField(db_column='ID', primary_key=True)
     group_code = models.CharField(db_column='GROUP_CODE', null=False, max_length=36, unique=True)
@@ -213,6 +226,10 @@ class Shipment(models.Model):
     warehouse = models.CharField(db_column='WAREHOUSE', null=False, unique=True, max_length=36)
     customer_no = models.CharField(db_column='CUSTOMER_NO', null=False, max_length=36)
     customer_name = models.CharField(db_column='CUSTOMER_NAME', null=False, max_length=100)
+    prov = models.CharField(db_column='PROVINCE', null=True, max_length=255)
+    city = models.CharField(db_column='CITY', null=True, max_length=255)
+    customer_phone = models.CharField(db_column='CUSTOMER_PHONE', null=True, max_length=20)
+    post = models.CharField(db_column='POST', null=True, max_length=20)
     address = models.CharField(db_column='ADDRESS', null=False, max_length=255)
     customer_tel = models.CharField(db_column='CUSTOMER_TEL', null=False, max_length=50)
     has_invoice = models.IntegerField(db_column='HAS_INVOICE', null=False, default=0)
@@ -223,6 +240,7 @@ class Shipment(models.Model):
     express_name = models.CharField(db_column='EXPRESS_NAME', null=True, max_length=255)
     express_cost = models.DecimalField(db_column='EXPRESS_COST', null=True, max_digits=20,
                                        decimal_places=2, default=0.00)
+    big_pen = models.CharField(db_column='BIG_PEN', null=True, max_length=100)
     sent_date = models.DateField(db_column='SENT_DATE', null=True)
     courier = models.CharField(db_column='COURIER', null=True, max_length=100)
     courier_tel = models.CharField(db_column='COURIER_TEL', null=True, max_length=32)
@@ -240,6 +258,7 @@ class ShipmentDetails(models.Model):
     id = models.CharField(db_column='ID', primary_key=True, max_length=72)
     shipment_no = models.CharField(db_column='SHIPMENT_NO', null=False, max_length=36)
     code = models.CharField(db_column='CODE', null=False, max_length=36)
+    name = models.CharField(db_column='NAME', null=True, max_length=255)
     is_product = models.IntegerField(db_column='IS_PRODUCT', null=False, max_length=4, default=1)
     is_gift = models.IntegerField(db_column='IS_GIFT', null=False, max_length=4, default=0)
     qty = models.IntegerField(db_column='QTY', null=False, default=0)
