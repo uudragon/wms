@@ -14,6 +14,7 @@
 - [按拣货单号查询拣货明细](#131-url)
 - [按订单号修改拣货单信息](#141-url)
 - [合并出库单](#151-url)
+- [上传快递单接口](#161-url)
 
 ----
 #####1.订单拆分接口
@@ -659,59 +660,6 @@ error| String  | 错误信息
 	{‘error’:’Warehouse query error.’}
 	
 
-
-----
-#####8.上传快递单接口
-该接口用于向快递公司上传发货单信息，后去发货单号与大头笔信息
-######8.1 url
-	method: POST
-	wms/outbound/request_express_info/
-	注意：结尾的’/’不能省略
-######8.2 header
-	Content_Type:application/json;charset=utf-8
-	Accept:application/json
-######8.3 请求参数
-名称|类型|是否必填|说明
----|---|---|---
-shipment_no|String|Y|发货单号
-updater|String|Y|需改人
-
-样例报文：
-	{
-		'shipment_no':'S00001',
-	    'updater':'admin'
-	}
-
-######8.4 响应报文
-成功响应：
-
-	HTTP_STATUS_CODE:200
-
-名称|类型|是否必填|说明
----|---|---|---
-express_orderno|String|Y|快递单号
-
-样例报文：
-	{
-		'express_orderno':'S00001'
-	}
-
-异常响应：
-
-	a．	HTTP_STATUS_CODE:400 Bad request；
-	b．	HTTP_STATUS_CODE:500 Server Error
-
-异常报文：
-
-名称 | 类型 | 说明
------------- | ------------- | ------------
-error| String  | 错误信息
-
-样例报文：
-
-	{‘error’:’Warehouse query error.’}
-
-
 ----
 #####9.按订单号查询出库单信息
 按给定的订单号查询对应的出库单信息
@@ -1181,3 +1129,56 @@ error| String  | 错误信息
 样例报文：
 
 	{‘error’:’Shipments query error.’}
+	
+
+
+----
+#####16.上传快递单接口
+该接口用于向快递公司上传发货单信息，后去发货单号与大头笔信息
+######16.1 url
+	method: POST
+	wms/outbound/request_express_info/
+	注意：结尾的’/’不能省略
+######16.2 header
+	Content_Type:application/json;charset=utf-8
+	Accept:application/json
+######16.3 请求参数
+名称|类型|是否必填|说明
+---|---|---|---
+shipment_no|String|Y|发货单号
+updater|String|Y|需改人
+
+样例报文：
+	{
+		'shipment_no':'S00001',
+	    'updater':'admin'
+	}
+
+######16.4 响应报文
+成功响应：
+
+	HTTP_STATUS_CODE:200
+
+名称|类型|是否必填|说明
+---|---|---|---
+express_orderno|String|Y|快递单号
+
+样例报文：
+	{
+		'express_orderno':'S00001'
+	}
+
+异常响应：
+
+	a．	HTTP_STATUS_CODE:400 Bad request；
+	b．	HTTP_STATUS_CODE:500 Server Error
+
+异常报文：
+
+名称 | 类型 | 说明
+------------ | ------------- | ------------
+error| String  | 错误信息
+
+样例报文：
+
+	{‘error’:’Warehouse query error.’}
