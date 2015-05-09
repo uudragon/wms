@@ -750,6 +750,7 @@ def sent(request):
     message = request.DATA
 
     LOG.info('Current received message is %s' % message)
+    mail_no = ''
     try:
         now_time = datetime.now()
         shipment = Shipment.objects.select_for_update().filter(shipment_no=message.get('shipment_no'), status=3).first()
@@ -906,7 +907,7 @@ def sent(request):
                     mailno_nodes = root.getElementsByTagName('mailNo')
                     LOG.info('The mailNo of response message is %s' % mailno_nodes[0].nodeValue)
                     shipment.express_orders_no = mailno_nodes[0].nodeValue
-                    shipment.express_name = DEFAULT_SENDER_NAME
+                    shi= DEFAULT_SENDER_NAME
                     big_pen_nodes = root.getElementsByTagName('bigPen')
                     shipment.big_pen = big_pen_nodes[0].nodeValue
                     shipment.status = 4
@@ -928,8 +929,8 @@ def sent(request):
         transaction.rollback()
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         content_type='application/json;charset=utf-8',
-                        date={'error': 'Sent error. reason is %s' % str(e)})
-    return Response(status=status.HTTP_200_OK)
+                        date={'error': '\xe9\x9d\xa2\xe5\x8d\x95\xe6\x8b\x89\xe5\x8e\xbb\xe5\xa4\xb1\xe8\xb4\xa5\xef\xbc\x8c\xe5\x8e\x9f\xe5\x9b\xa0\xe6\x98\xaf:%s' % str(e)})
+    return Response(status=status.HTTP_200_OK, data={'mail_no': mail_no}, content_type='application/json;charset=utf-8')
 
 
 @api_view(['POST'])
