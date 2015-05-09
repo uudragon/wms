@@ -938,6 +938,7 @@ def request_express_info(request):
                     mailno_nodes = root.getElementsByTagName('mailNo')
                     LOG.info('The mailNo of response message is %s' % mailno_nodes[0].nodeValue)
                     shipment.express_orders_no = mailno_nodes[0].nodeValue
+                    mail_no = mailno_nodes[0].nodeValue
                     shipment.express_name = DEFAULT_SENDER_NAME
                     big_pen_nodes = root.getElementsByTagName('bigPen')
                     shipment.big_pen = big_pen_nodes[0].nodeValue
@@ -947,6 +948,8 @@ def request_express_info(request):
                 else:
                     reason_nodes = root.getElementsByTagName('reason')
                     raise Exception(reason_nodes[0].nodeValue)
+            else:
+                raise Exception('Communication Error.')
         transaction.commit()
     except Exception as e:
         LOG.error('Sent error, message is %s' % str(e))
