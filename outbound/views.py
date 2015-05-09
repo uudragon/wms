@@ -750,6 +750,37 @@ def sent(request):
     message = request.DATA
 
     LOG.info('Current received message is %s' % message)
+    try:
+        now_time = datetime.now()
+        shipment = Shipment.objects.select_for_update().filter(shipment_no=message.get('shipment_no'), status=3).first()
+
+        if shipment is not None:
+            shipment.status = 4
+            shipment.updater = message.get('updater')
+            shipment.update_time = now_time
+            shipment.save()
+            records = StorageRecords.objects.filter(code=shipment.shipment_no)
+            for record in records:
+                record.status = 1
+                record.updater = message.get('updater')
+                record.update_time = now_time
+                record.save()
+        transaction.commit()
+    except Exception as e:
+        LOG.error('Sent error, message is %s' % str(e))
+        transaction.rollback()
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        content_type='application/json;charset=utf-8',
+                        date={'error': str(e)})
+    return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['POST'])
+@transaction.commit_manually
+def request_express_info(request):
+    message = request.DATA
+
+    LOG.info('Current received message is %s' % message)
     mail_no = ''
     try:
         now_time = datetime.now()
@@ -907,19 +938,12 @@ def sent(request):
                     mailno_nodes = root.getElementsByTagName('mailNo')
                     LOG.info('The mailNo of response message is %s' % mailno_nodes[0].nodeValue)
                     shipment.express_orders_no = mailno_nodes[0].nodeValue
-                    shi= DEFAULT_SENDER_NAME
+                    shipment.express_name = DEFAULT_SENDER_NAME
                     big_pen_nodes = root.getElementsByTagName('bigPen')
                     shipment.big_pen = big_pen_nodes[0].nodeValue
-                    shipment.status = 4
                     shipment.updater = message.get('updater')
                     shipment.update_time = now_time
                     shipment.save()
-                    records = StorageRecords.objects.filter(code=shipment.shipment_no)
-                    for record in records:
-                        record.status = 1
-                        record.updater = message.get('updater')
-                        record.update_time = now_time
-                        record.save()
                 else:
                     reason_nodes = root.getElementsByTagName('reason')
                     raise Exception(reason_nodes[0].nodeValue)
@@ -930,7 +954,8 @@ def sent(request):
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         content_type='application/json;charset=utf-8',
                         date={'error': str(e)})
-    return Response(status=status.HTTP_200_OK, data={'mail_no': mail_no}, content_type='application/json;charset=utf-8')
+    return Response(status=status.HTTP_200_OK, data={'express_orderno': mail_no}, content_type='application/json;charset=utf-8')
+
 
 
 @api_view(['POST'])

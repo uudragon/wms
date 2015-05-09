@@ -20,5 +20,6 @@ urlpatterns = patterns(
     url(r'^shipment/merge/$', 'merge_shipments'),
     url(r'^shipments/orders(.+)/$', 'query_by_ordersno'),
     url(r'^picking_orders/(.+)/$', 'query_single_picking_orders'),
+    url(r'^request_express_info/$', 'request_express_info'),
     url(r'^shipment/(.+)/$', 'query_shipment'),
 )
