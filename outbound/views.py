@@ -929,7 +929,7 @@ def sent(request):
         transaction.rollback()
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         content_type='application/json;charset=utf-8',
-                        date={'error': '\xe9\x9d\xa2\xe5\x8d\x95\xe6\x8b\x89\xe5\x8e\xbb\xe5\xa4\xb1\xe8\xb4\xa5\xef\xbc\x8c\xe5\x8e\x9f\xe5\x9b\xa0\xe6\x98\xaf:%s' % str(e)})
+                        date={'error': str(e)})
     return Response(status=status.HTTP_200_OK, data={'mail_no': mail_no}, content_type='application/json;charset=utf-8')
 
 
