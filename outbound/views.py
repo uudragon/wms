@@ -21,7 +21,7 @@ from big_house.models import ProductDetails, ShipmentDetails, Shipment, ProductP
 from big_house.serializers import ShipmentDetailsSerializer, ShipmentSerializer, PickingOrdersSerializer, \
     PickingOrdersDetailsSerializer
 from uudragon_wms.local.settings import DEFAULT_PAGE_SIZE, STORAGE_RECORD_TYPE_OUTPUT, CLIENT_ID, LOGISTIC_PROVIDER_ID, \
-    PRIVATE_KEY, TO_SENDER_REQUEST_HEADERS, SENDER_SERVICE_API
+    PRIVATE_KEY, TO_SENDER_REQUEST_HEADERS, SENDER_SERVICE_API, DEFAULT_SENDER_NAME
 
 
 LOG = logging.getLogger(__name__)
@@ -906,7 +906,7 @@ def sent(request):
                     mailno_nodes = root.getElementsByTagName('mailNo')
                     LOG.info('The mailNo of response message is %s' % mailno_nodes[0].nodeValue)
                     shipment.express_orders_no = mailno_nodes[0].nodeValue
-                    shipment.express_name = '圆通速递'
+                    shipment.express_name = DEFAULT_SENDER_NAME
                     big_pen_nodes = root.getElementsByTagName('bigPen')
                     shipment.big_pen = big_pen_nodes[0].nodeValue
                     shipment.status = 4

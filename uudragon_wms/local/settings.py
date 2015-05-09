@@ -30,3 +30,5 @@ TO_SENDER_REQUEST_HEADERS = {'content-type': 'application/x-www-form-urlencoded'
                         'Accept': 'application/x-www-form-urlencoded'}
 
 SENDER_SERVICE_API = 'http://58.32.246.71:8088/CommonOrderModeBServlet.action'
+
+DEFAULT_SENDER_NAME = '\xe5\x9c\x86\xe9\x80\x9a\xe9\x80\x9f\xe9\x80\x92'
