@@ -373,7 +373,7 @@ def split(request):
                         data={'error': 'Attribute[\'updater\'] can not be none.'})
     try:
         package_details = ProductPackageDetails.objects.extra(
-            select={'product_level': 't_product.product_level'},
+            select={'product_level': 't_product.product_level', 'product_name': 't_product.product_name'},
             tables=['t_product'],
             where=['t_product_package_details.product_code=t_product.product_code'],
         ).filter(package_code=message.get('package_code'))
