@@ -219,7 +219,7 @@ def query_goods_list(request):
         for key in message.iterkeys():
             key += '__contains'
             LOG.debug('Condition of query is %s' % message)
-        query_list = Goods.objects.filter(**message)
+        query_list = Goods.objects.filter(**message).filter(yn=1).order_by('goods_name')
         paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
         total_page_count = paginator.num_pages
         if pageNo > total_page_count:
@@ -266,7 +266,7 @@ def query_product_list(request):
         for key in message.iterkeys():
             key += '__contains'
             LOG.debug('Condition of query is %s' % message)
-        query_list = Product.objects.filter(**message).filter(yn=1)
+        query_list = Product.objects.filter(**message).filter(yn=1).order_by('product_name')
         paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
         total_page_count = paginator.num_pages
         if pageNo > total_page_count:
@@ -382,7 +382,7 @@ def query_warehouse_list(request):
         for key in message.iterkeys():
             key += '__contains'
             LOG.debug('Condition of query is %s' % message)
-        query_list = Warehouse.objects.filter(**message)
+        query_list = Warehouse.objects.filter(**message).filter(yn=1)
         paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
         total_page_count = paginator.num_pages
         if pageNo > total_page_count:
