@@ -211,8 +211,7 @@ def query_shipment(request, shipment_no):
         #     where=['t_shipment_details.goods_code=t_goods.goods_code']
         # ).filter(shipment_no=shipment_no)
         shipment_details = ShipmentDetails.objects.extra(
-            select={'name': '(case is_product when 1 then (select product_name from t_product where product_code=code) else (select goods_name from t_goods where goods_code=code) end)'},
-        ).filter(shipment_no=shipment_no)
+            select={'name': '(case is_product when 1 then (select product_name from t_product where product_code=code) else (select goods_name from t_goods where goods_code=code) end)'}).filter(shipment_no=shipment_no)
         details_seria = []
         for detail in shipment_details:
             seria = ShipmentDetailsSerializer(detail).data
@@ -898,8 +897,7 @@ def request_express_info(request):
 
             items = dom.createElement('items')
             shipment_details = ShipmentDetails.objects.extra(
-                select={'name': '(case is_product when 1 then (select product_name from t_product where product_code=code) else (select goods_name from t_goods where goods_code=code) end)'},
-            ).filter(shipment_no=message.get('shipment_no'))
+                select={'name': '(case is_product when 1 then (select product_name from t_product where product_code=code) else (select goods_name from t_goods where goods_code=code) end)'}).filter(shipment_no=message.get('shipment_no'))
             for detail in shipment_details:
                 item = dom.createElement('item')
                 item_name = dom.createElement('itemName')
