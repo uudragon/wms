@@ -186,7 +186,7 @@ def query_product(request, product_code):
             select={'goods_name': 't_goods.goods_name'},
             tables=['t_goods'],
             where=['t_product_details.goods_code=t_goods.goods_code']
-        ).filter(package_code=code)
+        ).filter(product_code=code)
 
         details_array = []
         for detail in details:
