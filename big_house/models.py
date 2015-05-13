@@ -89,7 +89,6 @@ class ProductDetails(models.Model):
     id = models.CharField(db_column='id', primary_key=True, max_length=72)
     product_code = models.CharField(db_column='PRODUCT_CODE', null=False, max_length=36)
     goods_code = models.CharField(db_column='GOODS_CODE', null=False, max_length=36)
-    goods_name = models.CharField(db_column='GOODS_NAME', max_length=200, null=False)
     qty = models.IntegerField(db_column='GOODS_QTY', null=False, default=1)
     is_gift = models.SmallIntegerField(db_column='IS_GIFT', null=False, default=0)
 
@@ -258,7 +257,6 @@ class ShipmentDetails(models.Model):
     id = models.CharField(db_column='ID', primary_key=True, max_length=72)
     shipment_no = models.CharField(db_column='SHIPMENT_NO', null=False, max_length=36)
     code = models.CharField(db_column='CODE', null=False, max_length=36)
-    name = models.CharField(db_column='NAME', null=True, max_length=255)
     is_product = models.IntegerField(db_column='IS_PRODUCT', null=False, max_length=4, default=1)
     is_gift = models.IntegerField(db_column='IS_GIFT', null=False, max_length=4, default=0)
     qty = models.IntegerField(db_column='QTY', null=False, default=0)

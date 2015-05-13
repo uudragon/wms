@@ -141,7 +141,6 @@ def define_product(request):
                 id='%s%s' % (product_code, detail.get('goods_code')),
                 goods_code=detail.get('goods_code'),
                 product_code=product_code,
-                goods_name=detail.get('goods_name'),
                 qty=detail.get('qty'),
                 is_gift=detail.get('is_gift'),
             )
@@ -183,7 +182,11 @@ def query_product(request, product_code):
     LOG.debug('Current received product_code is %s' % code)
 
     try:
-        details = ProductDetails.objects.filter(product_code=code)
+        details = ProductDetails.objects.extra(
+            select={'goods_name': 't_goods.goods_name'},
+            tables=['t_goods'],
+            where=['t_product_details.goods_code=t_goods.goods_code']
+        ).filter(package_code=code)
 
         details_array = []
         for detail in details:
@@ -413,7 +416,7 @@ def query_warehouse_list(request):
 def query_packages_all(request):
     resp_array = []
     try:
-        query_list = ProductPackage.objects.all()
+        query_list = ProductPackage.objects.filter(yn=1).order_by('package_name')
 
         for item in query_list:
             package_seria = ProductPackageSerializer(item)
@@ -445,7 +448,7 @@ def query_packages(request):
         for key in message.iterkeys():
             key += '__contains'
             LOG.debug('Condition of query is %s' % message)
-        query_list = ProductPackage.objects.filter(**message).filter(yn=1)
+        query_list = ProductPackage.objects.filter(**message).filter(yn=1).order_by('package_name')
         paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
         total_page_count = paginator.num_pages
         if pageNo > total_page_count:
@@ -663,7 +666,7 @@ def query_goods_group_list(request):
         for key in message.iterkeys():
             key += '__contains'
             LOG.debug('Condition of query is %s' % message)
-        query_list = GoodsGroup.objects.filter(**message).filter(yn=1)
+        query_list = GoodsGroup.objects.filter(**message).filter(yn=1).order_by('group_name')
         paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
         total_page_count = paginator.num_pages
         if pageNo > total_page_count:

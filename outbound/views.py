@@ -210,7 +210,9 @@ def query_shipment(request, shipment_no):
         #     tables=['t_shipment_details', 't_goods'],
         #     where=['t_shipment_details.goods_code=t_goods.goods_code']
         # ).filter(shipment_no=shipment_no)
-        shipment_details = ShipmentDetails.objects.filter(shipment_no=shipment_no)
+        shipment_details = ShipmentDetails.objects.extra(
+            select={'name': '(case is_product when 1 then (select product_name from t_product where product_code=code) else (select goods_name from t_goods where goods_code=code) end)'},
+        ).filter(shipment_no=shipment_no)
         details_seria = []
         for detail in shipment_details:
             seria = ShipmentDetailsSerializer(detail).data
@@ -476,7 +478,6 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}, sent_date=N
                     code=product_code,
                     qty=product.qty,
                     is_product=1,
-                    name=product.product_name,
                     is_gift=0,
                     create_time=now_time,
                     creator=message.get('creator'),
@@ -532,7 +533,6 @@ def assemble_shipments(in_one_list=[], products_dict={}, message={}, sent_date=N
                     shipment_no=shipment_no,
                     code=product_code,
                     qty=product.qty,
-                    name=product.product_name,
                     is_product=1,
                     is_gift=0,
                     create_time=now_time,
@@ -897,7 +897,9 @@ def request_express_info(request):
             root.appendChild(special)
 
             items = dom.createElement('items')
-            shipment_details = ShipmentDetails.objects.filter(shipment_no=message.get('shipment_no'))
+            shipment_details = ShipmentDetails.objects.extra(
+                select={'name': '(case is_product when 1 then (select product_name from t_product where product_code=code) else (select goods_name from t_goods where goods_code=code) end)'},
+            ).filter(shipment_no=message.get('shipment_no'))
             for detail in shipment_details:
                 item = dom.createElement('item')
                 item_name = dom.createElement('itemName')
