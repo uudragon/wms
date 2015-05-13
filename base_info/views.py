@@ -183,7 +183,7 @@ def query_product(request, product_code):
 
     try:
         details = ProductDetails.objects.extra(
-            select={'goods_name': 't_goods.goods_name'},
+            select={'goods_name': 't_goods.goods_name', 'goods_type': 't_goods.goods_type'},
             tables=['t_goods'],
             where=['t_product_details.goods_code=t_goods.goods_code']
         ).filter(product_code=code)
