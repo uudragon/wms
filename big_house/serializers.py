@@ -37,7 +37,7 @@ class ProductSerializer(serializers.ModelSerializer):
 class ProductDetailsSerializer(serializers.ModelSerializer):
 
     goods_name = serializers.CharField(max_length=255)
-    goods_type = serializers.IntegerField
+    goods_type = serializers.IntegerField()
 
     class Meta:
         model = ProductDetails
