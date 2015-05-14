@@ -191,6 +191,7 @@ def query_product(request, product_code):
         details_array = []
         for detail in details:
             detailSeria = ProductDetailsSerializer(detail)
+            LOG.debug('Product Detail is %s' % detailSeria.data)
             details_array.append(detailSeria.data)
         product = Product.objects.get(product_code=code)
         productSeria = ProductSerializer(product)
