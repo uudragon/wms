@@ -137,6 +137,7 @@ def putin(request):
             putin_qty = putin_dict.get(detail.goods_code) \
                 if putin_dict.get(detail.goods_code) is not None else 0
             cur_actual_qty = detail.actual_qty + putin_qty
+            LOG.info('Current actual qty is %s, putin qty is %s' % (cur_actual_qty, putin_qty))
             if detail.qty < cur_actual_qty:
                 LOG.error('Actual qty of goods is gt the expect qty.')
                 raise Exception('Actual qty of goods is gt the expect qty.')
@@ -146,6 +147,7 @@ def putin(request):
                 detail.status = INBOUND_RECEIPT_DETAIL_STATUS_PRE_STORAGE
             detail.actual_qty = cur_actual_qty
             if detail.qty == detail.actual_qty:
+                LOG.info('Expect QTY is %s, Actual QTY is %s' % (detail.qty, detail.actual_qty))
                 completed = True
             else:
                 completed = False
