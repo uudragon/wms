@@ -131,7 +131,7 @@ def putin(request):
         putin_dict[detail.get('goods_code')] = int(detail.get('putin_qty'))
     LOG.info('Current putin dict is %s' % putin_dict)
     try:
-        receipt_details = ReceiptDetails.objects.filter(receipt_code=receipt_code)
+        receipt_details = ReceiptDetails.objects.filter(receipt_code=receipt_code).select_for_update()
         completed = False
         for detail in receipt_details:
             putin_qty = putin_dict.get(detail.goods_code) \
@@ -225,7 +225,7 @@ def query_receipt_list(request):
             select={'warehouse_name': 't_warehouse.name'},
             tables=['t_warehouse'],
             where=['t_receipt.warehouse=t_warehouse.code']
-        ).filter(**message).filter(status__gt=-2)
+        ).filter(**message).filter(status__gt=-1)
         paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
         total_page_count = paginator.num_pages
         if pageNo > total_page_count:
