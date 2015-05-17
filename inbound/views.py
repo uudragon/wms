@@ -223,7 +223,7 @@ def query_receipt_list(request):
             select={'warehouse_name': 't_warehouse.name'},
             tables=['t_warehouse'],
             where=['t_receipt.warehouse=t_warehouse.code']
-        ).filter(**message)
+        ).filter(**message).filter(status__gt=1)
         paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
         total_page_count = paginator.num_pages
         if pageNo > total_page_count:
@@ -257,7 +257,7 @@ def query_receipt(request, receipt_code):
 
     try:
         details = ReceiptDetails.objects.extra(
-            select={'goods_name': 't_goods.goods_name'},
+            select={'goods_name': 't_goods.goods_name', 'goods_type': 't_goods.goods_type'},
             tables=['t_goods'],
             where=['t_receipt_details.goods_code=t_goods.goods_code']
         ).filter(receipt_code=code)

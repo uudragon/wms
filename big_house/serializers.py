@@ -69,6 +69,7 @@ class ReceiptSerializer(serializers.ModelSerializer):
 class ReceiptDetailsSerializer(serializers.ModelSerializer):
 
     goods_name = serializers.CharField(max_length=255, read_only=True)
+    goods_type = serializers.IntegerField()
 
     class Meta:
         model = ReceiptDetails
