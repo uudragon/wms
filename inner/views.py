@@ -133,7 +133,7 @@ def picking(request, warehouse_code):
                 product_detail = WarehouseProductDetails.objects.filter(
                     product_code=product_code).select_for_update().first()
                 if product_detail is not None:
-                    product_detail.qty += picking_qty
+                    product_detail.qty += picking_count
                     product_detail.updater = message.get('updater')
                     product_detail.update_time = now_time
                 else:
