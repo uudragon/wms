@@ -114,7 +114,6 @@ def check(request):
                     id='%s%s' % (message.get('shipment_no'), rece_detail.get('code')),
                     shipment_no=message.get('shipment_no'),
                     code=rece_detail.get('code'),
-                    name=rece_detail.get('name') if rece_detail.get('name') is not None else None,
                     is_product=rece_detail.get('is_product'),
                     is_gift=rece_detail.get('is_gift'),
                     qty=int(rece_detail.get('qty')),
