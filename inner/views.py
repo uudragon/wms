@@ -126,7 +126,7 @@ def picking(request, warehouse_code):
                 now_time = datetime.now()
                 for goods in goods_list:
                     goods.not_picking_qty -= picking_count * goods_dict.get(goods.goods_code)
-                    goods.picking_qty += goods.picking_qty + picking_count * goods_dict.get(goods.goods_code)
+                    goods.picking_qty += picking_count * goods_dict.get(goods.goods_code)
                     goods.updater = message.get('updater')
                     goods.update_time = now_time
                     goods.save()
