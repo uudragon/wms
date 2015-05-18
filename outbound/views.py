@@ -28,6 +28,7 @@ LOG = logging.getLogger(__name__)
 
 
 @api_view(['POST'])
+@transaction.commit_manually
 def save_shipment(request):
     message = request.DATA
 
