@@ -221,7 +221,7 @@ def query_goods_list(request):
     resp_message = dict()
     try:
         for key in message.iterkeys():
-            key += '__contains'
+            key += '__icontains'
             LOG.debug('Condition of query is %s' % message)
         query_list = Goods.objects.filter(**message).filter(yn=1).order_by('goods_name')
         paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
