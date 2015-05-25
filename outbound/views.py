@@ -1260,3 +1260,33 @@ def merge_shipments(request):
                         content_type='application/json;charset=utf-8',
                         date={'error': 'Merge shipments error.'})
     return Response(status=status.HTTP_200_OK)
+
+
+@api_view(['GET'])
+@transaction.commit_manually
+def query_print_shipments(request):
+    LOG.info('Current method is [query_shipments_by_picking_completed]')
+
+    shipment_serias = []
+    try:
+        shipments = Shipment.objects.select_for_update().filter(status=3).order_by('sent_date')
+        for shipment in shipments:
+            shipment.status = 4
+            shipment.save()
+            shipment_seria = ShipmentDetailsSerializer(shipment)
+            shipment_details = ShipmentDetails.objects.extra(
+                select={'name': '(case is_product when 1 then (select product_name from t_product where product_code=code) else (select goods_name from t_goods where goods_code=code) end)'}).filter(shipment_no=shipment_no)
+            details_seria = []
+            for detail in shipment_details:
+                seria = ShipmentDetailsSerializer(detail).data
+                details_seria.append(seria)
+            shipment_seria['details'] = details_seria
+            shipment_serias.append(shipment_seria)
+        transaction.commit()
+    except Exception as e:
+        LOG.error('Query shipments error. [ERROR] is %s' % str(e))
+        transaction.rollback()
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        content_type='application/json;charset=utf-8',
+                        date={'error': 'Query shipments error.'})
+    return Response(status=status.HTTP_200_OK, data=shipment_serias, content_type='application/json;charset=utf-8')
