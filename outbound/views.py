@@ -626,63 +626,67 @@ def picking_completed(request, picking_no):
         picking_orders.status = 2
         picking_orders.save()
 
-        shipments = Shipment.objects.select_for_update().filter(picking_no=picking_no)
-        for shipment in shipments:
-            shipment_details = ShipmentDetails.objects.filter(shipment_no=shipment.shipment_no)
-            out_goods = dict()
-            for item in shipment_details:
-                if item.is_gift:
-                    goods = WarehouseGoodsDetails.objects.filter(goods_code=item.code).filter(
-                        warehouse=shipment.warehouse).first()
-                    if goods is None:
-                        goods = Goods.objects.filter(goods_code=item.code).first()
-                        raise Exception('\xe5\x95\x86\xe5\x93\x81%s\xe5\xba\x93\xe5\xad\x98\xe4\xb8\x8d\xe8\xb6\xb3' % goods.goods_name)
-                    goods.qty -= item.qty
-                    goods.not_picking_qty -= item.qty
+        # shipments = Shipment.objects.select_for_update().filter(picking_no=picking_no)
+        # for shipment in shipments:
+        #     shipment_details = ShipmentDetails.objects.filter(shipment_no=shipment.shipment_no)
+        warehouse = Warehouse.objects.filter(type=1).first()
+        picking_details = PickingOrdersDetails.objects.select_for_update().filter(picking_no=picking_no)
+        out_goods = dict()
+        for item in picking_details:
+            if item.is_gift:
+                goods = WarehouseGoodsDetails.objects.filter(goods_code=item.code).filter(
+                    warehouse=warehouse.warehouse_code).first()
+                if goods is None:
+                    goods = Goods.objects.filter(goods_code=item.code).first()
+                    raise Exception('\xe5\x95\x86\xe5\x93\x81%s\xe5\xba\x93\xe5\xad\x98\xe4\xb8\x8d\xe8\xb6\xb3' % goods.goods_name)
+                goods.qty -= item.qty
+                goods.not_picking_qty -= item.qty
+                goods.save()
+                if goods.goods_code in out_goods:
+                    out_goods[goods.goods_code] += item.qty
+                else:
+                    out_goods[goods.goods_code] = item.qty
+            elif item.is_product:
+                product = WarehouseProductDetails.objects.filter(product_code=item.code).filter(
+                    warehouse=warehouse.warehouse_code).first()
+                if product is None:
+                    product = product.objects.filter(goods_code=item.code).first()
+                    raise Exception('\xe4\xba\xa7\xe5\x93\x81%s\xe5\xba\x93\xe5\xad\x98\xe4\xb8\x8d\xe8\xb6\xb3' % product.product_name)
+                product.qty -= item.qty
+                product_details = ProductDetails.objects.filter(product_code=product.product_code)
+                for detail in product_details:
+                    goods = WarehouseGoodsDetails.objects.filter(goods_code=detail.goods_code).filter(
+                        warehouse=warehouse.warehouse_code).first()
+                    goods.qty -= detail.qty
+                    goods.picking_qty -= detail.qty
                     goods.save()
                     if goods.goods_code in out_goods:
                         out_goods[goods.goods_code] += item.qty
                     else:
                         out_goods[goods.goods_code] = item.qty
-                elif item.is_product:
-                    product = WarehouseProductDetails.objects.filter(product_code=item.code).filter(
-                        warehouse=shipment.warehouse).first()
-                    if product is None:
-                        product = product.objects.filter(goods_code=item.code).first()
-                        raise Exception('\xe4\xba\xa7\xe5\x93\x81%s\xe5\xba\x93\xe5\xad\x98\xe4\xb8\x8d\xe8\xb6\xb3' % product.product_name)
-                    product.qty -= item.qty
-                    product_details = ProductDetails.objects.filter(product_code=product.product_code)
-                    for detail in product_details:
-                        goods = WarehouseGoodsDetails.objects.filter(goods_code=detail.goods_code).filter(
-                            warehouse=shipment.warehouse).first()
-                        goods.qty -= detail.qty
-                        goods.picking_qty -= detail.qty
-                        goods.save()
-                        if goods.goods_code in out_goods:
-                            out_goods[goods.goods_code] += item.qty
-                        else:
-                            out_goods[goods.goods_code] = item.qty
-                    product.save()
-            LOG.info('Current output goods is %s' % out_goods)
-            now_time = datetime.now()
+                product.save()
+        LOG.info('Current output goods is %s' % out_goods)
+        now_time = datetime.now()
+        shipments = Shipment.objects.select_for_update().filter(picking_no=picking_no)
+        for shipment in shipments:
             shipment.status = 3
             shipment.updater = message.get('updater')
             shipment.update_time = now_time
-            for goods_code, qty in out_goods.items():
-                storage_record = StorageRecords(
-                    goods_code=goods_code,
-                    goods_qty=qty,
-                    code=shipment.shipment_no,
-                    warehouse=shipment.warehouse,
-                    type=STORAGE_RECORD_TYPE_OUTPUT,
-                    create_time=now_time,
-                    creator=message.get('updater'),
-                    update_time=now_time,
-                    updater=message.get('updater'),
-                    status=0
-                )
-                storage_record.save()
             shipment.save()
+        for goods_code, qty in out_goods.items():
+            storage_record = StorageRecords(
+                goods_code=goods_code,
+                goods_qty=qty,
+                code=shipment.shipment_no,
+                warehouse=shipment.warehouse,
+                type=STORAGE_RECORD_TYPE_OUTPUT,
+                create_time=now_time,
+                creator=message.get('updater'),
+                update_time=now_time,
+                updater=message.get('updater'),
+                status=0
+            )
+            storage_record.save()
         transaction.commit()
     except Exception as e:
         LOG.error('Shipment picking error, message is %s' % str(e))
