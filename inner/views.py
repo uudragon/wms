@@ -38,24 +38,29 @@ def picking_statistic(request, warehouse_code):
             goods_list = WarehouseGoodsDetails.objects.filter(goods_code__in=goods_codes).filter(
                 warehouse=warehouse_code).select_for_update()
             LOG.debug('WarehouseGoodsDetails list is %s' % goods_list)
-            qtys = []
-            for goods in goods_list:
-                if goods.goods_code in goods_dict:
-                    picking_qty = (goods.not_picking_qty / goods_dict.get(goods.goods_code)) \
-                        if (goods_dict.get(goods.goods_code) is not None
-                            and goods_dict.get(goods.goods_code) != 0) else 0
-                    qtys.append(picking_qty)
-                else:
-                    qtys.append(0)
 
-            LOG.debug('Current picking qty list is %s' % qtys)
-
-            if len(qtys) > 1:
-                picking_qty = min(*qtys)
-            elif len(qtys) == 0:
+            if len(goods_list) != len(goods_codes):
+                LOG.error('Expect legnth is %s, actual is %s' % (len(goods_codes), len(goods_list)))
                 picking_qty = 0
             else:
-                picking_qty = qtys[0]
+                qtys = []
+                for goods in goods_list:
+                    if goods.goods_code in goods_dict:
+                        picking_qty = (goods.not_picking_qty / goods_dict.get(goods.goods_code)) \
+                            if (goods_dict.get(goods.goods_code) is not None
+                                and goods_dict.get(goods.goods_code) != 0) else 0
+                        qtys.append(picking_qty)
+                    else:
+                        qtys.append(0)
+
+                LOG.debug('Current picking qty list is %s' % qtys)
+
+                if len(qtys) > 1:
+                    picking_qty = min(*qtys)
+                elif len(qtys) == 0:
+                    picking_qty = 0
+                else:
+                    picking_qty = qtys[0]
 
             LOG.debug('Current count of product can be picked is %s' % picking_qty)
         transaction.commit()
