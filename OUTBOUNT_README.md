@@ -1232,18 +1232,18 @@ error| String  | 错误信息
 ----
 #####18 查询待打印出库单接口
 查询当前需要打印的出库单接口
-######2.1 url
+######18.1 url
 	method: GET
 	wms/outbound/shipments/print/
 	注意：结尾的’/’不能省略
-######2.2 header
+######18.2 header
 	Content_Type:application/json;charset=utf-8
 	Accept:application/json
-######2.3 请求参数
+######18.3 请求参数
 
 无
 
-######2.4 响应报文
+######18.4 响应报文
 成功响应：
 
 	HTTP_STATUS_CODE:200
