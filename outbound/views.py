@@ -634,6 +634,9 @@ def picking_completed(request, picking_no):
                 if item.is_gift:
                     goods = WarehouseGoodsDetails.objects.filter(goods_code=item.code).filter(
                         warehouse=shipment.warehouse).first()
+                    if goods is None:
+                        goods = Goods.objects.filter(goods_code=item.code).first()
+                        raise Exception('\xe5\x95\x86\xe5\x93\x81%s\xe5\xba\x93\xe5\xad\x98\xe4\xb8\x8d\xe8\xb6\xb3' % goods.goods_name)
                     goods.qty -= item.qty
                     goods.not_picking_qty -= item.qty
                     goods.save()
@@ -644,6 +647,9 @@ def picking_completed(request, picking_no):
                 elif item.is_product:
                     product = WarehouseProductDetails.objects.filter(product_code=item.code).filter(
                         warehouse=shipment.warehouse).first()
+                    if product is None:
+                        product = product.objects.filter(goods_code=item.code).first()
+                        raise Exception('\xe4\xba\xa7\xe5\x93\x81%s\xe5\xba\x93\xe5\xad\x98\xe4\xb8\x8d\xe8\xb6\xb3' % product.product_name)
                     product.qty -= item.qty
                     product_details = ProductDetails.objects.filter(product_code=product.product_code)
                     for detail in product_details:
@@ -683,7 +689,7 @@ def picking_completed(request, picking_no):
         transaction.rollback()
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         content_type='application/json;charset=utf-8',
-                        date={'error': 'Shipment picking error.'})
+                        date={'error': str(e)})
     return Response(status=status.HTTP_200_OK)
 
 
