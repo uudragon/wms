@@ -131,7 +131,6 @@ def check(request):
             shipment.sent_date = datetime.strptime(message.get('sent_date'), '%Y-%m-%d')
             shipment.updater = message.get('updater')
             shipment.update_time = now_time
-            shipment.status = 1
             shipment.save()
         transaction.commit()
     except Exception as e:
@@ -1159,6 +1158,44 @@ def query_single_picking_orders(request, picking_no):
                         content_type='application/json;charset=utf-8',
                         date={'error': 'Query picking_orders error.'})
     return Response(status=status.HTTP_200_OK, data=picking_orders_seria, content_type='application/json;charset=utf-8')
+
+
+@api_view(['POST'])
+@transaction.commit_manually
+def batch_check(request):
+    message = request.DATA
+
+    LOG.info('Current method is [batch_check], received message is %s' % message)
+
+    shipment_nos = message.get('shipment_nos')
+    if shipment_nos is None or len(shipment_nos) == 0:
+        LOG.error('Attribute[\'shipment_nos\'] can not be empty.')
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'Attribute[\'shipment_nos\'] can not be empty.'})
+    updater = message.get('updater')
+    if updater is None:
+        LOG.error('Attribute[\'updater\'] can not be none.')
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'Attribute[\'updater\'] can not be none.'})
+    now_time = datetime.now()
+    try:
+        shipments = Shipment.objects.select_for_update().filter(shipment_no__in=shipment_nos).filter(
+            status=0)
+        for shipment in shipments:
+            shipment.updater = message.get('updater')
+            shipment.update_time = now_time
+            shipment.status = 1
+            shipment.save()
+        transaction.commit()
+    except Exception as e:
+        LOG.error('Check shipments error. [ERROR] is %s' % str(e))
+        transaction.rollback()
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        content_type='application/json;charset=utf-8',
+                        date={'error': 'Check shipments error.'})
+    return Response(status=status.HTTP_200_OK)
 
 
 @api_view(['POST'])
