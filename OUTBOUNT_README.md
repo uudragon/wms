@@ -15,6 +15,7 @@
 - [按订单号修改拣货单信息](#141-url)
 - [合并出库单](#151-url)
 - [上传快递单接口](#161-url)
+- [批量出库复核接口](#171-url)
 
 ----
 #####1.订单拆分接口
@@ -1182,3 +1183,48 @@ error| String  | 错误信息
 样例报文：
 
 	{‘error’:’Warehouse query error.’}
+
+----
+#####17.批量出库复合接口
+按照给定的出库单号批量复合出库单，出库单状态为“未审核状态”。如果给定的出库单号包含其它状态则系统自动过滤。
+######17.1 url
+	method: POST
+	wms/outbound/shipments/check/
+	注意：结尾的’/’不能省略
+######17.2 header
+	Content_Type:application/json;charset=utf-8
+	Accept:application/json
+######17.3 请求参数
+
+名称|类型|是否必填|说明
+---|---|---|---
+shipment_nos|Array|Y|出库单号列表
+updater|String|Y|修改人
+
+样例报文：
+
+	{
+	    'shipment_nos':['0001','0002'],
+	    'updater':'admin'
+	}
+
+######17.4 响应报文
+成功响应：
+
+	HTTP_STATUS_CODE:200
+
+异常响应：
+
+	a．	HTTP_STATUS_CODE:400 Bad request；
+	b．	HTTP_STATUS_CODE:500 Server Error
+
+异常报文：
+
+名称 | 类型 | 说明
+------------ | ------------- | ------------
+error| String  | 错误信息
+
+样例报文：
+
+	{‘error’:’Check shipments error.’}
+	
