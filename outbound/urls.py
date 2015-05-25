@@ -8,6 +8,7 @@ urlpatterns = patterns(
     url(r'^split/$', 'split'),
     url(r'^shipment/save/$', 'save_shipment'),
     url(r'^shipment/check/$', 'check'),
+    url(r'^shipments/check/$', 'batch_check'),
     url(r'^shipment/amount_setting/$', 'set_orders_amount'),
     url(r'^shipment/modify_by_orders/(.+)/$', 'modify_shipment_by_orderno'),
     url(r'^shipments/$', 'query_shipments'),
