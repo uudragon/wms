@@ -1281,7 +1281,7 @@ def query_print_shipments(request):
             shipment.save()
             shipment_seria = ShipmentDetailsSerializer(shipment)
             shipment_details = ShipmentDetails.objects.extra(
-                select={'name': '(case is_product when 1 then (select product_name from t_product where product_code=code) else (select goods_name from t_goods where goods_code=code) end)'}).filter(shipment_no=shipment_no)
+                select={'name': '(case is_product when 1 then (select product_name from t_product where product_code=code) else (select goods_name from t_goods where goods_code=code) end)'}).filter(shipment_no=shipment.shipment_no)
             details_seria = []
             for detail in shipment_details:
                 seria = ShipmentDetailsSerializer(detail).data
