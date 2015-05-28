@@ -1113,6 +1113,7 @@ def request_express(shipment, shipment_details):
                                      headers=TO_SENDER_REQUEST_HEADERS, data=request_body, timeout=60)
             if response.ok:
                 resp_body = response.content
+                LOG.info('Current response message is %s' % resp_body)
                 resp_dom = xml.dom.minidom.parseString(resp_body)
                 root = resp_dom.documentElement
                 success_nodes = root.getElementsByTagName('success')
