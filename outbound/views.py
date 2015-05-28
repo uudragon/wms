@@ -998,6 +998,8 @@ def request_express(shipment, shipment_details):
             flag.appendChild(dom.createTextNode('0'))
             root.appendChild(flag)
 
+            LOG.debug('----------->1')
+
             contact = Contact.objects.all().first()
 
             sender = dom.createElement('sender')
@@ -1054,6 +1056,8 @@ def request_express(shipment, shipment_details):
             itemsValue.appendChild(dom.createTextNode(str(shipment.amount)))
             root.appendChild(itemsValue)
 
+            LOG.debug('----------->2')
+
             if shipment.amount != 0.0:
                 agencyFund = dom.createElement('agencyFund')
                 agencyFund.appendChild(dom.createTextNode(str(shipment.amount)))
@@ -1070,6 +1074,8 @@ def request_express(shipment, shipment_details):
             special = dom.createElement('special')
             special.appendChild(dom.createTextNode(str(0.0)))
             root.appendChild(special)
+
+            LOG.debug('----------->3')
 
             items = dom.createElement('items')
             for detail in shipment_details:
