@@ -1122,6 +1122,7 @@ def request_express(shipment, shipment_details):
             else:
                 raise Exception('Communication Error.')
     except Exception as e:
+        LOG.error(e)
         raise e
     return shipment
 
