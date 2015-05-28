@@ -1109,6 +1109,8 @@ def request_express(shipment, shipment_details):
 
             request_body = urllib.urlencode(req_dict)
 
+            LOG.info('Current request message is %s' % request_body)
+
             response = requests.post(SENDER_SERVICE_API,
                                      headers=TO_SENDER_REQUEST_HEADERS, data=request_body, timeout=60)
             if response.ok:
