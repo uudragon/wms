@@ -628,7 +628,8 @@ def picking_completed(request, picking_no):
 
         shipments = Shipment.objects.select_for_update().filter(picking_no=picking_no)
         for shipment in shipments:
-            shipment_details = ShipmentDetails.objects.filter(shipment_no=shipment.shipment_no)
+            shipment_details = ShipmentDetails.objects.extra(
+                select={'name': '(case is_product when 1 then (select product_name from t_product where product_code=code) else (select goods_name from t_goods where goods_code=code) end)'}).filter(shipment_no=shipment.shipment_no)
             out_goods = dict()
             for item in shipment_details:
                 if item.is_gift:
