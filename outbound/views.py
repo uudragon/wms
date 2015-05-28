@@ -665,6 +665,7 @@ def picking_completed(request, picking_no):
                     product.save()
             LOG.info('Current output goods is %s' % out_goods)
             now_time = datetime.now()
+            shipment = request_express(shipment, shipment_details)
             shipment.status = 3
             shipment.updater = message.get('updater')
             shipment.update_time = now_time
@@ -957,6 +958,172 @@ def request_express_info(request):
                         date={'error': str(e)})
     return Response(status=status.HTTP_200_OK, data={'express_orderno': mail_no}, content_type='application/json;charset=utf-8')
 
+
+def request_express(shipment, shipment_details):
+    try:
+        if shipment is not None:
+            impl = xml.dom.minidom.getDOMImplementation()
+            dom = impl.createDocument(None, 'RequestOrder', None)
+            root = dom.documentElement
+
+            clientID = dom.createElement('clientID')
+            clientID.appendChild(dom.createTextNode(CLIENT_ID))
+            root.appendChild(clientID)
+
+            logisticProviderID = dom.createElement('logisticProviderID')
+            logisticProviderID.appendChild(dom.createTextNode(LOGISTIC_PROVIDER_ID))
+            root.appendChild(logisticProviderID)
+
+            customerId = dom.createElement('customerId ')
+            customerId.appendChild(dom.createTextNode(CLIENT_ID))
+            root.appendChild(customerId)
+
+            txLogisticID = dom.createElement('txLogisticID')
+            txLogisticID.appendChild(dom.createTextNode(shipment.shipment_no))
+            root.appendChild(txLogisticID)
+
+            tradeNo = dom.createElement('tradeNo')
+            tradeNo.appendChild(dom.createTextNode(''))
+            root.appendChild(tradeNo)
+
+            orderType = dom.createElement('orderType')
+            orderType.appendChild(dom.createTextNode('1'))
+            root.appendChild(orderType)
+
+            serviceType = dom.createElement('serviceType')
+            serviceType.appendChild(dom.createTextNode('0'))
+            root.appendChild(serviceType)
+
+            flag = dom.createElement('flag')
+            flag.appendChild(dom.createTextNode('0'))
+            root.appendChild(flag)
+
+            contact = Contact.objects.all().first()
+
+            sender = dom.createElement('sender')
+            sender_name = dom.createElement('name')
+            sender_name.appendChild(dom.createTextNode(contact.name))
+            sender.appendChild(sender_name)
+            sender_postCode = dom.createElement('postCode')
+            sender_postCode.appendChild(dom.createTextNode(contact.post))
+            sender.appendChild(sender_postCode)
+            sender_phone = dom.createElement('phone')
+            sender_phone.appendChild(dom.createTextNode(contact.tel))
+            sender_prov = dom.createElement('prov')
+            sender_prov.appendChild(dom.createTextNode(contact.prov))
+            sender.appendChild(sender_prov)
+            sender_city = dom.createElement('city')
+            sender_city.appendChild(dom.createTextNode(contact.city))
+            sender.appendChild(sender_city)
+            sender_address = dom.createElement('address')
+            sender_address.appendChild(dom.createTextNode(contact.address))
+            sender.appendChild(sender_address)
+
+            root.appendChild(sender)
+
+            receiver = dom.createElement('receiver')
+            receiver_name = dom.createElement('name')
+            receiver_name.appendChild(dom.createTextNode(shipment.customer_name))
+            receiver.appendChild(receiver_name)
+            receiver_postCode = dom.createElement('postCode')
+            receiver_postCode.appendChild(dom.createTextNode(shipment.post))
+            receiver.appendChild(receiver_postCode)
+            receiver_phone = dom.createElement('phone')
+            receiver_phone.appendChild(dom.createTextNode(shipment.customer_phone))
+            receiver.appendChild(receiver_phone)
+            receiver_mobile = dom.createElement('mobile')
+            receiver_mobile.appendChild(dom.createTextNode(shipment.customer_tel))
+            receiver.appendChild(receiver_mobile)
+            receiver_prov = dom.createElement('prov')
+            receiver_prov.appendChild(dom.createTextNode(shipment.prov))
+            receiver.appendChild(receiver_prov)
+            receiver_city = dom.createElement('city')
+            receiver_city.appendChild(dom.createTextNode(shipment.city))
+            receiver.appendChild(receiver_city)
+            receiver_address = dom.createElement('address')
+            receiver_address.appendChild(dom.createTextNode(shipment.address))
+            receiver.appendChild(receiver_address)
+
+            root.appendChild(receiver)
+
+            goodsValue = dom.createElement('goodsValue')
+            goodsValue.appendChild(dom.createTextNode(str(shipment.amount)))
+            root.appendChild(goodsValue)
+
+            itemsValue = dom.createElement('itemsValue')
+            itemsValue.appendChild(dom.createTextNode(str(shipment.amount)))
+            root.appendChild(itemsValue)
+
+            if shipment.amount != 0.0:
+                agencyFund = dom.createElement('agencyFund')
+                agencyFund.appendChild(dom.createTextNode(str(shipment.amount)))
+                root.appendChild(agencyFund)
+
+            totalServiceFee = dom.createElement('totalServiceFee')
+            totalServiceFee.appendChild(dom.createTextNode(shipment.amount))
+            root.appendChild(totalServiceFee)
+
+            insuranceValue = dom.createElement('insuranceValue')
+            insuranceValue.appendChild(dom.createTextNode(str(0.0)))
+            root.appendChild(insuranceValue)
+
+            special = dom.createElement('special')
+            special.appendChild(dom.createTextNode(str(0.0)))
+            root.appendChild(special)
+
+            items = dom.createElement('items')
+            for detail in shipment_details:
+                item = dom.createElement('item')
+                item_name = dom.createElement('itemName')
+                item_name.appendChild(dom.createTextNode(detail.name))
+                item.appendChild(item_name)
+                item_num = dom.createElement('number')
+                item_num.appendChild(dom.createTextNode(str(detail.qty)))
+                item.appendChild(item_num)
+                items.appendChild(item)
+            root.appendChild(items)
+
+            req_dict = dict()
+
+            logistic_message = root.toxml()
+            req_dict['logistics_interface'] = logistic_message
+            LOG.info('The logistic message is %s' % logistic_message)
+
+            mac_source = '%s%s' % (logistic_message, PRIVATE_KEY)
+
+            mac_base64 = base64.b64encode(hashlib.md5(mac_source.encode('UTF-8')).digest())
+            req_dict['data_digest'] = mac_base64
+
+            request_body = urllib.urlencode(req_dict)
+
+            response = requests.post(SENDER_SERVICE_API,
+                                     headers=TO_SENDER_REQUEST_HEADERS, data=request_body, timeout=60)
+            if response.ok:
+                resp_body = response.content
+                resp_dom = xml.dom.minidom.parseString(resp_body)
+                root = resp_dom.documentElement
+                success_nodes = root.getElementsByTagName('success')
+                success_node = success_nodes[0]
+                if bool(success_node.nodeValue):
+                    LOG.debug(root.getElementsByTagName('noticeMessage')[0].nodeValue)
+                    provider_nodes = root.getElementsByTagName('logisticProviderID')
+                    LOG.info('The logisticProviderID of response message is %s' % provider_nodes[0].nodeValue)
+                    shipment.express_code = provider_nodes[0].nodeValue
+                    mailno_nodes = root.getElementsByTagName('mailNo')
+                    LOG.info('The mailNo of response message is %s' % mailno_nodes[0].nodeValue)
+                    shipment.express_orders_no = mailno_nodes[0].nodeValue
+                    mail_no = mailno_nodes[0].nodeValue
+                    shipment.express_name = DEFAULT_SENDER_NAME
+                    big_pen_nodes = root.getElementsByTagName('bigPen')
+                    shipment.big_pen = big_pen_nodes[0].nodeValue
+                else:
+                    reason_nodes = root.getElementsByTagName('reason')
+                    raise Exception(reason_nodes[0].nodeValue)
+            else:
+                raise Exception('Communication Error.')
+    except Exception as e:
+        raise e
+    return shipment
 
 
 @api_view(['POST'])
