@@ -1107,6 +1107,9 @@ def request_express(shipment, shipment_details):
             mac_base64 = base64.b64encode(hashlib.md5(mac_source.encode('UTF-8')).digest())
             req_dict['data_digest'] = mac_base64
 
+            req_dict['type'] = 'offline'
+            req_dict['clientId'] = CLIENT_ID
+
             request_body = urllib.urlencode(req_dict)
 
             LOG.info('Current request message is %s' % request_body)
