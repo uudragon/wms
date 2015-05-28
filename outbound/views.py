@@ -1066,7 +1066,7 @@ def request_express(shipment, shipment_details):
                 root.appendChild(agencyFund)
 
             totalServiceFee = dom.createElement('totalServiceFee')
-            totalServiceFee.appendChild(dom.createTextNode(shipment.amount))
+            totalServiceFee.appendChild(dom.createTextNode(str(shipment.amount)))
             root.appendChild(totalServiceFee)
 
             insuranceValue = dom.createElement('insuranceValue')
