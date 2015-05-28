@@ -15,6 +15,7 @@ import requests
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+import sys
 from big_house.models import ProductDetails, ShipmentDetails, Shipment, ProductPackageDetails, Product, Goods, \
     WarehouseGoodsDetails, WarehouseProductDetails, StorageRecords, PickingOrdersDetails, PickingOrders, Warehouse, \
     Contact
@@ -22,6 +23,9 @@ from big_house.serializers import ShipmentDetailsSerializer, ShipmentSerializer,
     PickingOrdersDetailsSerializer
 from uudragon_wms.local.settings import DEFAULT_PAGE_SIZE, STORAGE_RECORD_TYPE_OUTPUT, CLIENT_ID, LOGISTIC_PROVIDER_ID, \
     PRIVATE_KEY, TO_SENDER_REQUEST_HEADERS, SENDER_SERVICE_API, DEFAULT_SENDER_NAME
+
+reload(sys)
+sys.setdefaultencoding('utf8')
 
 
 LOG = logging.getLogger(__name__)
