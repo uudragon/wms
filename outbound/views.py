@@ -1016,6 +1016,7 @@ def request_express(shipment, shipment_details):
             sender.appendChild(sender_postCode)
             sender_phone = dom.createElement('phone')
             sender_phone.appendChild(dom.createTextNode(contact.tel))
+            sender.appendChild(sender_phone)
             sender_prov = dom.createElement('prov')
             sender_prov.appendChild(dom.createTextNode(contact.prov))
             sender.appendChild(sender_prov)
