@@ -1078,9 +1078,9 @@ def request_express(shipment, shipment_details):
             insuranceValue.appendChild(dom.createTextNode(str(0.0)))
             root.appendChild(insuranceValue)
 
-            special = dom.createElement('special')
-            special.appendChild(dom.createTextNode(str(0.0)))
-            root.appendChild(special)
+            # special = dom.createElement('special')
+            # special.appendChild(dom.createTextNode(str(0.0)))
+            # root.appendChild(special)
 
             LOG.debug('----------->3')
 
