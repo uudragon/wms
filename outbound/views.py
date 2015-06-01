@@ -1130,7 +1130,7 @@ def request_express(shipment, shipment_details):
                 success_nodes = root.getElementsByTagName('success')
                 LOG.debug('---------> %s ' % len(success_nodes))
                 success_node = success_nodes[0]
-                LOG.debug(success_node.nodeValue)
+                LOG.debug(dir(success_node))
                 if bool(success_node.nodeValue):
                     LOG.debug('------->success')
                     if len(root.getElementsByTagName('noticeMessage')) != 0:
