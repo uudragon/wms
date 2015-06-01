@@ -1027,6 +1027,8 @@ def request_express(shipment, shipment_details):
             sender_address.appendChild(dom.createTextNode(contact.address))
             sender.appendChild(sender_address)
 
+            LOG.debug('-----------1.5')
+
             root.appendChild(sender)
 
             receiver = dom.createElement('receiver')
