@@ -1131,16 +1131,18 @@ def request_express(shipment, shipment_details):
                 LOG.debug('---------> %s ' % len(success_nodes))
                 success_node = success_nodes[0]
                 if bool(success_node.nodeValue):
-                    LOG.debug(root.getElementsByTagName('noticeMessage')[0].nodeValue)
+                    if len(root.getElementsByTagName('noticeMessage')) > 0:
+                        LOG.debug(root.getElementsByTagName('noticeMessage')[0].nodeValue)
                     provider_nodes = root.getElementsByTagName('logisticProviderID')
                     LOG.info('The logisticProviderID of response message is %s' % provider_nodes[0].nodeValue)
                     shipment.express_code = provider_nodes[0].nodeValue
-                    mailno_nodes = root.getElementsByTagName('mailNo')
+                    order_node = root.getElementsByTagName('orderMessage')[0]
+                    mailno_nodes = order_node.getElementsByTagName('mailNo')
                     LOG.info('The mailNo of response message is %s' % mailno_nodes[0].nodeValue)
                     shipment.express_orders_no = mailno_nodes[0].nodeValue
                     mail_no = mailno_nodes[0].nodeValue
                     shipment.express_name = DEFAULT_SENDER_NAME
-                    big_pen_nodes = root.getElementsByTagName('bigPen')
+                    big_pen_nodes = order_node.getElementsByTagName('bigPen')
                     shipment.big_pen = big_pen_nodes[0].nodeValue
                 else:
                     reason_nodes = root.getElementsByTagName('reason')
