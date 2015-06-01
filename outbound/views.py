@@ -1123,6 +1123,7 @@ def request_express(shipment, shipment_details):
                 resp_dom = xml.dom.minidom.parseString(resp_body)
                 root = resp_dom.documentElement
                 success_nodes = root.getElementsByTagName('success')
+                LOG.debug('---------> %s ' % len(success_nodes))
                 success_node = success_nodes[0]
                 if bool(success_node.nodeValue):
                     LOG.debug(root.getElementsByTagName('noticeMessage')[0].nodeValue)
