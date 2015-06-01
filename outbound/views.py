@@ -1142,8 +1142,8 @@ def request_express(shipment, shipment_details):
                     order_node = root.getElementsByTagName('orderMessage')[0]
                     mailno_nodes = order_node.getElementsByTagName('mailNo')
                     LOG.info('The mailNo of response message is %s' % mailno_nodes[0].childNodes[0].nodeValue)
-                    shipment.express_orders_no = mailno_nodes[0].childNodes[0].nodeValue
                     mail_no = mailno_nodes[0].childNodes[0].nodeValue
+                    shipment.express_orders_no = mail_no
                     shipment.express_name = DEFAULT_SENDER_NAME
                     big_pen_nodes = order_node.getElementsByTagName('bigPen')
                     shipment.big_pen = big_pen_nodes[0].childNodes[0].nodeValue
