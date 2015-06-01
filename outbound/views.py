@@ -1130,9 +1130,9 @@ def request_express(shipment, shipment_details):
                 success_nodes = root.getElementsByTagName('success')
                 LOG.debug('---------> %s ' % len(success_nodes))
                 success_node = success_nodes[0]
-                LOG.debug('------->success')
                 if bool(success_node.nodeValue):
-                    if len(root.getElementsByTagName('noticeMessage')) > 0:
+                    LOG.debug('------->success')
+                    if len(root.getElementsByTagName('noticeMessage')) != 0:
                         LOG.debug(root.getElementsByTagName('noticeMessage')[0].nodeValue)
                     provider_nodes = root.getElementsByTagName('logisticProviderID')
                     LOG.debug('-----------11 %s' % len(provider_nodes))
@@ -1147,6 +1147,7 @@ def request_express(shipment, shipment_details):
                     big_pen_nodes = order_node.getElementsByTagName('bigPen')
                     shipment.big_pen = big_pen_nodes[0].nodeValue
                 else:
+                    LOG.debug('--------->failure')
                     reason_nodes = root.getElementsByTagName('reason')
                     raise Exception(reason_nodes[0].nodeValue)
             else:
