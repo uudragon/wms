@@ -1147,6 +1147,7 @@ def request_express(shipment, shipment_details):
                     shipment.express_name = DEFAULT_SENDER_NAME
                     big_pen_nodes = order_node.getElementsByTagName('bigPen')
                     shipment.big_pen = big_pen_nodes[0].childNodes[0].nodeValue
+                    LOG.info('The bigpen of response message is %s' % big_pen_nodes[0].childNodes[0].nodeValue)
                 else:
                     LOG.debug('--------->failure')
                     reason_nodes = root.getElementsByTagName('reason')
