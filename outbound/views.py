@@ -1035,9 +1035,10 @@ def request_express(shipment, shipment_details):
             receiver_name = dom.createElement('name')
             receiver_name.appendChild(dom.createTextNode(shipment.customer_name))
             receiver.appendChild(receiver_name)
-            receiver_postCode = dom.createElement('postCode')
-            receiver_postCode.appendChild(dom.createTextNode(shipment.post))
-            receiver.appendChild(receiver_postCode)
+            if shipment.post is not None:
+                receiver_postCode = dom.createElement('postCode')
+                receiver_postCode.appendChild(dom.createTextNode(shipment.post))
+                receiver.appendChild(receiver_postCode)
             if shipment.customer_phone is not None:
                 receiver_phone = dom.createElement('phone')
                 receiver_phone.appendChild(dom.createTextNode(shipment.customer_phone))
