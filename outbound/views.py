@@ -1125,32 +1125,34 @@ def request_express(shipment, shipment_details):
             if response.ok:
                 resp_body = response.content
                 LOG.info('Current response message is %s' % resp_body)
+                import xml.etree.ElementTree as ET
+                ET.parse(resp_body)
                 resp_dom = xml.dom.minidom.parseString(resp_body)
                 root = resp_dom.documentElement
                 success_nodes = root.getElementsByTagName('success')
                 LOG.debug('---------> %s ' % len(success_nodes))
                 success_node = success_nodes[0]
-                LOG.debug('%s--%s' % (success_node.nodeName, success_node.nodeValue))
-                if bool(success_node.nodeValue):
+                LOG.debug('%s--%s' % (success_node.nodeName, success_node.childNodes[0].nodeValue))
+                if bool(success_node.childNodes[0].nodeValue):
                     LOG.debug('------->success')
                     if len(root.getElementsByTagName('noticeMessage')) != 0:
-                        LOG.debug(root.getElementsByTagName('noticeMessage')[0].nodeValue)
+                        LOG.debug(root.getElementsByTagName('noticeMessage')[0].childNodes[0].nodeValue)
                     provider_nodes = root.getElementsByTagName('logisticProviderID')
                     LOG.debug('-----------11 %s' % len(provider_nodes))
-                    LOG.info('The logisticProviderID of response message is %s' % provider_nodes[0].nodeValue)
-                    shipment.express_code = provider_nodes[0].nodeValue
+                    LOG.info('The logisticProviderID of response message is %s' % provider_nodes[0].childNodes[0].nodeValue)
+                    shipment.express_code = provider_nodes[0].childNodes[0].nodeValue
                     order_node = root.getElementsByTagName('orderMessage')[0]
                     mailno_nodes = order_node.getElementsByTagName('mailNo')
-                    LOG.info('The mailNo of response message is %s' % mailno_nodes[0].nodeValue)
-                    shipment.express_orders_no = mailno_nodes[0].nodeValue
-                    mail_no = mailno_nodes[0].nodeValue
+                    LOG.info('The mailNo of response message is %s' % mailno_nodes[0].childNodes[0].nodeValue)
+                    shipment.express_orders_no = mailno_nodes[0].childNodes[0].nodeValue
+                    mail_no = mailno_nodes[0].childNodes[0].nodeValue
                     shipment.express_name = DEFAULT_SENDER_NAME
                     big_pen_nodes = order_node.getElementsByTagName('bigPen')
-                    shipment.big_pen = big_pen_nodes[0].nodeValue
+                    shipment.big_pen = big_pen_nodes[0].childNodes[0].nodeValue
                 else:
                     LOG.debug('--------->failure')
                     reason_nodes = root.getElementsByTagName('reason')
-                    raise Exception(reason_nodes[0].nodeValue)
+                    raise Exception(reason_nodes[0].childNodes[0].nodeValue)
             else:
                 raise Exception('Communication Error.')
     except Exception as e:
