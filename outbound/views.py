@@ -1134,6 +1134,7 @@ def request_express(shipment, shipment_details):
                     if len(root.getElementsByTagName('noticeMessage')) > 0:
                         LOG.debug(root.getElementsByTagName('noticeMessage')[0].nodeValue)
                     provider_nodes = root.getElementsByTagName('logisticProviderID')
+                    LOG.debug('-----------11 %s' % len(provider_nodes))
                     LOG.info('The logisticProviderID of response message is %s' % provider_nodes[0].nodeValue)
                     shipment.express_code = provider_nodes[0].nodeValue
                     order_node = root.getElementsByTagName('orderMessage')[0]
