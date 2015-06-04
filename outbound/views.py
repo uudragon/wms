@@ -1498,3 +1498,43 @@ def query_print_shipments(request):
                         content_type='application/json;charset=utf-8',
                         date={'error': 'Query shipments error.'})
     return Response(status=status.HTTP_200_OK, data=shipment_serias, content_type='application/json;charset=utf-8')
+
+
+@api_view(['GET'])
+def sync_shipments(request):
+    params = request.GET
+
+    LOG.info('Current method is [sync_shipments], received params are %s' % params)
+
+    conditions = dict()
+    if params.get('agent_code') is None:
+        LOG.error('Attribute[\'agent_code\'] can not be empty.')
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'Attribute[\'agent_code\'] can not be empty.'})
+    conditions['agent_code__exact'] = params.get('agent_code')
+    if params.get('begin_date') is None:
+        LOG.error('Attribute[\'begin_date\'] can not be empty.')
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'Attribute[\'begin_date\'] can not be empty.'})
+    conditions['sent_date__gte'] = datetime.strftime(params.get('begin_date'), '%Y-%m-%d')
+    if params.get('end_date') is None:
+        LOG.error('Attribute[\'end_date\'] can not be empty.')
+        return Response(status=status.HTTP_400_BAD_REQUEST,
+                        content_type='application/json;charset=utf-8',
+                        data={'error': 'Attribute[\'end_date\'] can not be empty.'})
+    conditions['sent_date__lte'] = datetime.strftime(params.get('end_date'), '%Y-%m-%d')
+
+    response_body = []
+    try:
+        shipments = Shipment.objects.filter(**conditions).filter(source=1).filter(status=4)
+        for shipment in shipments:
+            shipment_seria = ShipmentSerializer(shipment).data
+            response_body.append(shipment_seria)
+    except Exception as e:
+        LOG.error('Query shipments error. [ERROR] is %s' % str(e))
+        return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                        content_type='application/json;charset=utf-8',
+                        date={'error': 'Query shipments error.'})
+    return Response(status=status.HTTP_200_OK, data=response_body, content_type='application/json;charset=utf-8')
