@@ -1523,10 +1523,28 @@ def sync_shipments(request):
                         data={'error': 'Attribute[\'end_date\'] can not be empty.'})
     conditions['sent_date__lte'] = datetime.strptime(params.get('end_date')[0], '%Y-%m-%d')
 
+    if params.get('pageSize') is not None:
+        pageSize = params.get('pageSize')[0]
+    else:
+        pageSize = DEFAULT_PAGE_SIZE
+
+    if params.get('pageNo') is not None:
+        pageNo = params.get('pageNo')[0]
+    else:
+        pageNo = 1
+
     response_body = []
     try:
-        shipments = Shipment.objects.filter(**conditions).filter(source=1).filter(status=4)
-        for shipment in shipments:
+        query_list = Shipment.objects.filter(**conditions).filter(source=1).filter(status=4)
+        paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
+        total_page_count = paginator.num_pages
+        if pageNo > total_page_count:
+            pageNo = total_page_count
+        elif pageNo < 1:
+            pageNo = 1
+        cur_page = paginator.page(pageNo)
+        page_records = cur_page.object_list
+        for shipment in page_records:
             shipment_seria = ShipmentSerializer(shipment).data
             response_body.append(shipment_seria)
     except Exception as e:
