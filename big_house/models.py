@@ -227,6 +227,7 @@ class Shipment(models.Model):
     customer_name = models.CharField(db_column='CUSTOMER_NAME', null=False, max_length=100)
     prov = models.CharField(db_column='PROVINCE', null=True, max_length=255)
     city = models.CharField(db_column='CITY', null=True, max_length=255)
+    district = models.CharField(db_column='DISTRICT', null=True, max_length=50)
     customer_phone = models.CharField(db_column='CUSTOMER_PHONE', null=True, max_length=20)
     post = models.CharField(db_column='POST', null=True, max_length=20)
     address = models.CharField(db_column='ADDRESS', null=False, max_length=255)
