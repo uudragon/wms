@@ -1507,12 +1507,9 @@ def sync_shipments(request):
     LOG.info('Current method is [sync_shipments], received params are %s' % params)
 
     conditions = dict()
-    if params.get('agent_code') is None:
-        LOG.error('Attribute[\'agent_code\'] can not be empty.')
-        return Response(status=status.HTTP_400_BAD_REQUEST,
-                        content_type='application/json;charset=utf-8',
-                        data={'error': 'Attribute[\'agent_code\'] can not be empty.'})
-    conditions['agent_code__exact'] = params.get('agent_code')
+    if params.get('agent_code') is not None:
+        conditions['agent_code__exact'] = params.get('agent_code')
+
     if params.get('begin_date') is None:
         LOG.error('Attribute[\'begin_date\'] can not be empty.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
