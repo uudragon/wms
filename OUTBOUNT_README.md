@@ -1387,6 +1387,8 @@ orders_no|String|Y|订单号
 shipment_no|String|Y|发货单号
 customer_code|String|Y|客户编号
 customer_name|String|Y|客户姓名
+source|int|Y|订单来源。
+agent_code|String|Y|代理商编号
 address|String|Y|客户地址
 customer_tel|String|Y|客户电话
 amount|decimal|Y|付款金额
