@@ -1409,29 +1409,27 @@ status|int|Y|发货单状态。-1：无效；0：待审核；1：待发货；2�
 
 样例报文：
 
-	[{
-	    'orders_no':'00010101',
-	    'shipment_no':'shipment0001',
-	    'customer_code':'user001',
-	    'customer_name':'user1',
-	    'address':'北京天安门',
-	    'customer_tel':'18600000000',
-	    'amount':110.11,
-	    'shipped_qty':10,
-	    'has_invoice':0,
-	    'express_code':'express0001',
-        'express_orders_no':'010101010',
-        'express_name':'顺丰',
-        'express_cost':22:00,
-        'courier':'aaaa',
-        'courier_tel':18700000000,
-        'sent_date':'2015-01-01',
-	    'create_time':'2015-01-01T00:00:00',
-	    'creator':'admin',
-	    'update_time':'2015-01-01T00:00:00',
-	    'updater':'admin',
-	    'status':0
-	},...]
+	{'pageSize':8,
+    	'pageNo':1,
+    	'recordsCount':15,
+    	'pageNumber':2,
+    	'records':[{
+    	    'orders_no':'00010101',
+    	    'shipment_no':'shipment0001',
+    	    'customer_code':'user001',
+    	    'customer_name':'user1',
+    	    'address':'北京天安门',
+    	    'customer_tel':'18600000000',
+    	    'amount':110.11,
+    	    'shipped_qty':10,
+    	    'has_invoice':0,
+    	    'create_time':'2015-01-01T00:00:00',
+    	    'creator':'admin',
+    	    'update_time':'2015-01-01T00:00:00',
+    	    'updater':'admin',
+    	    'status':0
+    		}......]
+    }
 异常响应：
 
 	a．	HTTP_STATUS_CODE:400 Bad request；
