@@ -1355,9 +1355,11 @@ error| String  | 错误信息
 
 名称|类型|是否必填|说明
 ---|---|---|---
-agent_code|string|Y|代理商编号
+agent_code|string|N|代理商编号
 begin_date|string|Y|发货开始日期，格式：YYYY-MM-DD
 end_date|string|Y|发货结束日期,格式：YYYY-MM-DD
+pageSize|Int|Y|每页显示记录数
+pageNo|Int|Y|当前页号
 
 样例：
 wms/outbound/shipments/sync/?agent_code=101010&begin_date=2015-01-01&end_date=2015-01-31
@@ -1369,7 +1371,15 @@ wms/outbound/shipments/sync/?agent_code=101010&begin_date=2015-01-01&end_date=20
 
 响应报文说明：
 
-响应报文为出库单列表数组，数组项如下：
+名称|类型|是否必填|说明
+---|---|---|---
+pageSize|Int|Y|每页显示记录数
+pageNo|Int|Y|当前页号
+recordsCount|Int|Y|总记录数
+pageNumber|Int|Y|总页数
+records|Array|N|当前页记录
+
+<records-object>
 
 名称|类型|是否必填|说明
 ---|---|---|---

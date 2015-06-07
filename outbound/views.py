@@ -1533,7 +1533,7 @@ def sync_shipments(request):
     else:
         pageNo = 1
 
-    response_body = []
+    resp_message = dict()
     try:
         query_list = Shipment.objects.filter(**conditions).filter(source=1).filter(status=4)
         paginator = Paginator(query_list, pageSize, orphans=0, allow_empty_first_page=True)
@@ -1544,12 +1544,18 @@ def sync_shipments(request):
             pageNo = 1
         cur_page = paginator.page(pageNo)
         page_records = cur_page.object_list
-        for shipment in page_records:
-            shipment_seria = ShipmentSerializer(shipment).data
-            response_body.append(shipment_seria)
+        resp_array = []
+        for item in page_records:
+            record_seria = ShipmentSerializer(item)
+            resp_array.append(record_seria.data)
+        resp_message['records'] = resp_array
+        resp_message['recordsCount'] = paginator.count
+        resp_message['pageSize'] = pageSize
+        resp_message['pageNumber'] = total_page_count
+        resp_message['pageNo'] = pageNo
     except Exception as e:
         LOG.error('Query shipments error. [ERROR] is %s' % str(e))
         return Response(status=status.HTTP_500_INTERNAL_SERVER_ERROR,
                         content_type='application/json;charset=utf-8',
                         date={'error': 'Query shipments error.'})
-    return Response(status=status.HTTP_200_OK, data=response_body, content_type='application/json;charset=utf-8')
+    return Response(status=status.HTTP_200_OK, data=resp_message, content_type='application/json;charset=utf-8')
