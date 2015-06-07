@@ -1515,13 +1515,13 @@ def sync_shipments(request):
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'begin_date\'] can not be empty.'})
-    conditions['sent_date__gte'] = datetime.strftime(params.get('begin_date')[0], '%Y-%m-%d')
+    conditions['sent_date__gte'] = datetime.strptime(params.get('begin_date')[0], '%Y-%m-%d')
     if params.get('end_date') is None:
         LOG.error('Attribute[\'end_date\'] can not be empty.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'end_date\'] can not be empty.'})
-    conditions['sent_date__lte'] = datetime.strftime(params.get('end_date')[0], '%Y-%m-%d')
+    conditions['sent_date__lte'] = datetime.strptime(params.get('end_date')[0], '%Y-%m-%d')
 
     response_body = []
     try:
