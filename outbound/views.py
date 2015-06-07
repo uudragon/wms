@@ -1508,30 +1508,30 @@ def sync_shipments(request):
 
     conditions = dict()
     if params.get('agent_code') is not None:
-        conditions['agent_code__exact'] = params.get('agent_code')[0]
+        conditions['agent_code__exact'] = params.get('agent_code')
 
     if params.get('begin_date') is None:
         LOG.error('Attribute[\'begin_date\'] can not be empty.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'begin_date\'] can not be empty.'})
-    LOG.debug('-----------begin_date %s' % params.get('begin_date')[0])
-    conditions['sent_date__gte'] = datetime.strptime(params.get('begin_date')[0], '%Y-%m-%d')
+    LOG.debug('-----------begin_date %s' % params.get('begin_date'))
+    conditions['sent_date__gte'] = datetime.strptime(params.get('begin_date'), '%Y-%m-%d')
     if params.get('end_date') is None:
         LOG.error('Attribute[\'end_date\'] can not be empty.')
         return Response(status=status.HTTP_400_BAD_REQUEST,
                         content_type='application/json;charset=utf-8',
                         data={'error': 'Attribute[\'end_date\'] can not be empty.'})
     LOG.debug('-----------end_date')
-    conditions['sent_date__lte'] = datetime.strptime(params.get('end_date')[0], '%Y-%m-%d')
+    conditions['sent_date__lte'] = datetime.strptime(params.get('end_date'), '%Y-%m-%d')
 
     if params.get('pageSize') is not None:
-        pageSize = params.get('pageSize')[0]
+        pageSize = params.get('pageSize')
     else:
         pageSize = DEFAULT_PAGE_SIZE
 
     if params.get('pageNo') is not None:
-        pageNo = params.get('pageNo')[0]
+        pageNo = params.get('pageNo')
     else:
         pageNo = 1
 
